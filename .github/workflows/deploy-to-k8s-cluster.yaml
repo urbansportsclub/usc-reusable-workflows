@@ -1,0 +1,69 @@
+name: Deploy Helm Charts To Kubernetes Cluster
+
+on:
+  workflow_call:
+    inputs:
+      gke_zone:
+        required: false
+        type: string
+        default: "europe-west3"
+      gke_cluster:
+        required: true
+        type: string
+        description: "Kubernetes Cluster Name" 
+        default: "internal"
+      stage:
+        required: true
+        type: string
+        description: "dev, staging, prod, etc." 
+        default: "dev"
+      chart_name:
+        required: false
+        type: string
+        description: "Helm chart name." 
+        default: "usc-test-helm"
+      chart_version:
+        required: false
+        type: string
+        description: "Helm chart version to deploy. Defaults to latest." 
+        default: "latest"
+      image_version:
+        required: false
+        type: string
+        description: "The docker image you want to deploy. Defaults to latest." 
+        default: "latest"
+      namespace:
+        required: true
+        type: string
+        description: "Kubernetes namespace" 
+        default: "default"
+      sops:
+        required: false
+        type: bool
+        description: "Enable/Disable Helm Secrets(sops) Plugin" 
+        default: false
+        
+
+jobs:
+  deploy-to-k8s:
+    name: Deploy to Kubernetes Cluster
+    runs-on: [self-hosted,deploy]
+    steps:
+      - uses: actions/checkout@v3
+
+      # Set up k8s for dev cluster
+      - name: Set up K8s config
+        run: |-
+          gcloud container clusters get-credentials ${{ inputs.gke_cluster }} --region ${{ inputs.GKE_ZONE }}
+
+      # Deploy to the GKE cluster - with sops
+      - name: Deploy
+        if: inputs.sops == true
+        run: |-
+          helm secrets install ${{ inputs. }} . -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml -f secrets.${{ inputs.stage }}.yaml 
+
+      # Deploy to the GKE cluster - without sops
+      - name: Deploy
+        if: inputs.sops == false
+        run: |-
+          helm install ${{ inputs.chart_name }} . -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml

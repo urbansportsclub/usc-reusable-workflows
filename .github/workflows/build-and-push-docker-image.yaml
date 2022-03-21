@@ -1,0 +1,85 @@
+name: Build And Push Docker Images
+
+on:
+  workflow_call:
+    outputs:
+       image_version: ${{ jobs.buildandpushdocker.outputs.image_version }}
+    inputs:
+      dockerfile_path:
+        required: false
+        type: string
+        description: "Path of the dockerfile" 
+        default: "Dockerfile"
+      image_name:
+        required: true
+        type: string
+        description: "Name of the docker image" 
+        default: ""
+      registry:
+        required: false
+        type: string
+        description: "Registry Address, Most Likely You Do Not Need To Change It" 
+        default: "eu.gcr.io"
+      repository:
+        required: true
+        type: string
+        description: "Repository Name" 
+        default: "usc"
+      project_id:
+        required: false
+        type: string
+        description: "GCP Project ID" 
+        default: "urbansportsclub-dev"
+
+jobs:
+  buildandpushdocker:
+    id: buildandpushdocker
+    name: Build and Push
+    runs-on: [self-hosted, dind]
+
+    outputs:
+       image_version: ${{ steps.subscriber_meta.outputs.version }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Docker subscriber meta
+      id: subscriber_meta
+      uses: docker/metadata-action@v3
+      with:
+        images: ${{ inputs.registry }}/${{ inputs.project_id }}/${{ inputs.repository }}/${{ inputs.image_name }}
+        flavor: |
+          latest=auto
+          prefix=usc
+        tags: |
+          type=schedule
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha
+
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v1
+      with:
+          install: true
+          buildkitd-flags: --debug
+
+    - name: Configure Docker Auth
+      run: |-
+        gcloud auth configure-docker
+
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ${{ inputs.dockerfile_path }}
+        push: true
+        tags: ${{ steps.subscriber_meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new
+
