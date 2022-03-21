@@ -1,0 +1,57 @@
+name: Deploy Helm Charts To Kubernetes Cluster
+
+on:
+  workflow_call:
+    inputs:
+      GKE_ZONE:
+        required: false
+        type: string
+        default: "europe-west3"
+      GKE_CLUSTER:
+        required: true
+        type: string
+        description: "Kubernetes Cluster Name" 
+        default: "internal"
+      STAGE:
+        required: true
+        type: string
+        description: "dev, staging, prod, etc." 
+        default: "dev"
+      CHART_NAME:
+        required: false
+        type: string
+        description: "Helm chart name." 
+        default: "usc-test-helm"
+      NAMESPACE:
+        required: true
+        type: string
+        description: "Kubernetes namespace" 
+        default: "default"
+      SOPS:
+        required: false
+        type: bool
+        description: "Enable/Disable Helm Secrets(sops) Plugin" 
+        default: false
+        
+
+jobs:
+  deploy-to-k8s:
+    name: Deploy to Kubernetes Cluster
+    runs-on: [self-hosted,deploy]
+    steps:
+      - uses: actions/checkout@v3
+
+      # Set up k8s for dev cluster
+      - name: Set up K8s config
+        run: |-
+          gcloud container clusters get-credentials $GKE_CLUSTER --region $GKE_ZONE
+
+      # Deploy to the GKE cluster - with sops
+      - name: Deploy
+        run: |-
+          $SOPS && helm secrets install $CHART_NAME . -n $NAMESPACE -f values.yaml -f values.$STAGE.yaml -f secrets.$STAGE.yaml || echo "Helm sops disabled." 
+
+      # Deploy to the GKE cluster - without sops
+      - name: Deploy
+        run: |-
+          $SOPS | helm install $CHART_NAME . -n $NAMESPACE -f values.yaml -f values.$STAGE.yaml
