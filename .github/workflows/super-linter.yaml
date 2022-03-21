@@ -7,6 +7,12 @@ on:
         required: false
         type: string
         default: "main"
+      LANGUAGE:
+        required: true
+        type: string
+        default: ""
+        description: "Language to be linted"
+
 
 jobs:
   build:
@@ -26,3 +32,4 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: $BRANCH
+          VALIDATE_$LANGUAGE: true

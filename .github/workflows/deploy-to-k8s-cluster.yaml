@@ -48,10 +48,12 @@ jobs:
 
       # Deploy to the GKE cluster - with sops
       - name: Deploy
+        if: $SOPS == true
         run: |-
-          $SOPS && helm secrets install $CHART_NAME . -n $NAMESPACE -f values.yaml -f values.$STAGE.yaml -f secrets.$STAGE.yaml || echo "Helm sops disabled." 
+          helm secrets install $CHART_NAME . -n $NAMESPACE -f values.yaml -f values.$STAGE.yaml -f secrets.$STAGE.yaml 
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
+        if: $SOPS == false
         run: |-
-          $SOPS | helm install $CHART_NAME . -n $NAMESPACE -f values.yaml -f values.$STAGE.yaml
+          helm install $CHART_NAME . -n $NAMESPACE -f values.yaml -f values.$STAGE.yaml

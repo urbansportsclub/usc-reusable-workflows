@@ -12,7 +12,7 @@ on:
         required: true
         type: string
         description: "Name of the docker image" 
-        default: "usc-test-image"
+        default: ""
       REGISTRY:
         required: false
         type: string
@@ -54,12 +54,12 @@ jobs:
           install: true
           buildkitd-flags: --debug
 
-    - name: Build Docker Dind Image with Github Actions
-      run: |-
-        docker build \
-          --tag "$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG" \
-          -f $DOCKERFILE_PATH . 
-
-    - name: Publish Docker Dind Image
-      run: |-
-        docker push "$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG"
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: $DOCKERFILE_PATH
+        push: true
+        tags: $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new
