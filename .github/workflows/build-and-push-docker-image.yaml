@@ -3,45 +3,62 @@ name: Build And Push Docker Images
 on:
   workflow_call:
     inputs:
-      DOCKERFILE_PATH:
+      dockerfile_path:
         required: false
         type: string
         description: "Path of the dockerfile" 
         default: "Dockerfile"
-      IMAGE_NAME:
+      image_name:
         required: true
         type: string
         description: "Name of the docker image" 
         default: ""
-      REGISTRY:
+      registry:
         required: false
         type: string
         description: "Registry Address, Most Likely You Do Not Need To Change It" 
         default: "eu.gcr.io"
-      REPOSITORY:
+      repository:
         required: true
         type: string
         description: "Repository Name" 
         default: "usc"
-      PROJECT_ID:
+      project_id:
         required: false
         type: string
         description: "GCP Project ID" 
         default: "urbansportsclub-dev"
-      IMAGE_TAG:
-        required: true
+      image_tag:
+        required: false
         type: string
         description: "Image Tag, Please Dont Use Latest!" 
-        default: "latest"
+    outputs:
+      image_version: ${{ jobs.buildandpushdocker.outputs.image_version }}
 
 jobs:
   buildandpushdocker:
-    name: buildandpushdocker
+    name: Build and Push
     runs-on: [self-hosted, dind]
+
+    outputs:
+      image_version: ${{ steps.meta.outputs..version }}
 
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+
+    - name: Docker subscriber meta
+      id: subscriber_meta
+      uses: docker/metadata-action@v3
+      with:
+        images: ${{ inputs.registry }}/${{ inputs.project_id }}/${{ inputs.repository }}/${{ inputs.image_name}}
+        flavor: |
+          latest=auto
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+          type=sha,event=branch
 
     - name: Configure Docker Auth
       run: |-
@@ -55,11 +72,25 @@ jobs:
           buildkitd-flags: --debug
 
     - name: Build and push
+      if: inputs.image_tag == ""
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: $DOCKERFILE_PATH
+        file: ${{ inputs.dockerfile_path }}
         push: true
-        tags: $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new
+
+    - name: Build and push
+      if: inputs.image_tag != ""
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ${{ inputs.dockerfile_path }}
+        push: true
+        tags: ${{ inputs.registry }}/${{ inputs.project_id }}/${{ inputs.repository }}/${{ inputs.image_name}}:${{ inputs.image_tag }}
+        labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
