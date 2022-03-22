@@ -3,31 +3,41 @@ name: Deploy Helm Charts To Kubernetes Cluster
 on:
   workflow_call:
     inputs:
-      GKE_ZONE:
+      gke_zone:
         required: false
         type: string
         default: "europe-west3"
-      GKE_CLUSTER:
+      gke_cluster:
         required: true
         type: string
         description: "Kubernetes Cluster Name" 
         default: "internal"
-      STAGE:
+      stage:
         required: true
         type: string
         description: "dev, staging, prod, etc." 
         default: "dev"
-      CHART_NAME:
+      chart_name:
         required: false
         type: string
         description: "Helm chart name." 
         default: "usc-test-helm"
-      NAMESPACE:
+      chart_version:
+        required: false
+        type: string
+        description: "Helm chart version to deploy. Defaults to latest." 
+        default: "latest"
+      image_version:
+        required: false
+        type: string
+        description: "The docker image you want to deploy. Defaults to latest." 
+        default: "latest"
+      namespace:
         required: true
         type: string
         description: "Kubernetes namespace" 
         default: "default"
-      SOPS:
+      sops:
         required: false
         type: bool
         description: "Enable/Disable Helm Secrets(sops) Plugin" 
@@ -44,16 +54,16 @@ jobs:
       # Set up k8s for dev cluster
       - name: Set up K8s config
         run: |-
-          gcloud container clusters get-credentials $GKE_CLUSTER --region $GKE_ZONE
+          gcloud container clusters get-credentials ${{ inputs.gke_cluster }} --region ${{ inputs.GKE_ZONE }}
 
       # Deploy to the GKE cluster - with sops
       - name: Deploy
-        if: $SOPS == true
+        if: inputs.sops == true
         run: |-
-          helm secrets install $CHART_NAME . -n $NAMESPACE -f values.yaml -f values.$STAGE.yaml -f secrets.$STAGE.yaml 
+          helm secrets install ${{ inputs. }} . -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml -f secrets.${{ inputs.stage }}.yaml 
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
-        if: $SOPS == false
+        if: inputs.sops == false
         run: |-
-          helm install $CHART_NAME . -n $NAMESPACE -f values.yaml -f values.$STAGE.yaml
+          helm install ${{ inputs.chart_name }} . -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml
