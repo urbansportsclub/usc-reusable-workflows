@@ -3,7 +3,8 @@ name: Build And Push Docker Images
 on:
   workflow_call:
     outputs:
-       image_version: ${{ jobs.buildandpushdocker.outputs.image_version }}
+       image_version: 
+         value: ${{ jobs.buildandpushdocker.outputs.image_version }}
     inputs:
       dockerfile_path:
         required: false
