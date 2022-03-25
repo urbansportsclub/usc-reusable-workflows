@@ -34,7 +34,6 @@ on:
 
 jobs:
   buildandpushdocker:
-    id: buildandpushdocker
     name: Build and Push
     runs-on: [self-hosted, dind]
 
