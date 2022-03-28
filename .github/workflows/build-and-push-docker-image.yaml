@@ -57,7 +57,7 @@ jobs:
         flavor: |
           latest=auto
         tags: |
-          type=raw,priority=10,value=${{ inputs.image_tag }},enable={{ inputs.image_tag != "" }}
+          type=raw,priority=10,value=${{ inputs.image_tag }},enable={{ inputs.image_tag != '' }}
           type=semver,priority=20,pattern={{version}}
           type=schedule,priority=30
           type=sha,priority=40
