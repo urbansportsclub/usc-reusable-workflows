@@ -65,10 +65,10 @@ jobs:
       - name: Deploy
         if: inputs.sops == true
         run: |-
-          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml -f secrets.${{ inputs.stage }}.yaml 
+          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml -f secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }}
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
         if: inputs.sops == false
         run: |-
-          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml
+          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }}
