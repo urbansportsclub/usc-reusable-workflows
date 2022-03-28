@@ -39,9 +39,14 @@ on:
         default: "default"
       sops:
         required: false
-        type: bool
+        type: boolean
         description: "Enable/Disable Helm Secrets(sops) Plugin" 
         default: false
+      chart_path:
+        required: false
+        type: string
+        description: "Chart location defaults to ." 
+        default: "."
         
 
 jobs:
@@ -60,10 +65,10 @@ jobs:
       - name: Deploy
         if: inputs.sops == true
         run: |-
-          helm secrets install ${{ inputs. }} . -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml -f secrets.${{ inputs.stage }}.yaml 
+          helm secrets install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml -f secrets.${{ inputs.stage }}.yaml 
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
         if: inputs.sops == false
         run: |-
-          helm install ${{ inputs.chart_name }} . -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml
+          helm install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f values.yaml -f values.${{ inputs.stage }}.yaml
