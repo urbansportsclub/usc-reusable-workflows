@@ -19,7 +19,7 @@ jobs:
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/build-and-push-docker-image.yaml@main
     with:
       repository: usc-your-repo
-      image: your-awesome-app
+      image_name: your-awesome-app
       project_id: urbansportsclub-dev
       dockerfile_path: "Dockerfile"
 ```
