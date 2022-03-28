@@ -40,7 +40,7 @@ on:
 
 jobs:
 
-  call-docker-build-push-workflow:
+  call-docker-build-push-workflow:  # ID of the build job
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/build-and-push-docker-image.yaml@main
     with:
       repository: usc-your-repo
@@ -52,8 +52,9 @@ jobs:
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/deploy-to-k8s-cluster.yaml@main
     needs: call-docker-build-push-workflow
     with:
+      chart_path: "charts/your-chart-directory"  # No trailing slash at the end of the chart path.
       chart_name: "your-chart-name"
-      image_version: ${{ needs.call-docker-build-push-workflow.outputs.version }}
+      image_version: ${{ needs.call-docker-build-push-workflow.outputs.version }}  # Same as the ID of the build job 
       namespace: "test"
       stage: "dev"
       gke_cluster: "internal"
