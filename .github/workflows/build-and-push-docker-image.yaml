@@ -31,6 +31,11 @@ on:
         type: string
         description: "GCP Project ID" 
         default: "urbansportsclub-dev"
+      image_tag:
+        required: false
+        type: string
+        description: "Tag for Docker image"
+        default: ""
 
 jobs:
   buildandpushdocker:
@@ -51,15 +56,13 @@ jobs:
         images: ${{ inputs.registry }}/${{ inputs.project_id }}/${{ inputs.repository }}/${{ inputs.image_name }}
         flavor: |
           latest=auto
-          prefix=usc
         tags: |
+          type=raw,value=${{ inputs.image_tag }}
           type=schedule
           type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}
+          type=sha
           type=ref,event=branch
           type=ref,event=pr
-          type=sha
 
     - name: Set up Docker Buildx
       id: buildx
