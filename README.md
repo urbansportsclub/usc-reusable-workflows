@@ -54,7 +54,7 @@ jobs:
     with:
       chart_path: "charts/your-chart-directory"  # No trailing slash at the end of the chart path.
       chart_name: "your-chart-name"
-      image_version: ${{ needs.call-docker-build-push-workflow.outputs.version }}  # Same as the ID of the build job 
+      image_version: ${{ needs.call-docker-build-push-workflow.outputs.image_version }}  # Same as the ID of the build job 
       namespace: "test"
       stage: "dev"
       gke_cluster: "internal"
