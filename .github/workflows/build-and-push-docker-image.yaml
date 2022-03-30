@@ -80,7 +80,7 @@ jobs:
         file: ${{ inputs.dockerfile_path }}
         push: true
         tags: ${{ steps.subscriber_meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        labels: ${{ steps.subscriber_meta.outputs.labels }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
 
