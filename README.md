@@ -47,6 +47,7 @@ jobs:
       image: your-awesome-app
       project_id: urbansportsclub-dev
       dockerfile_path: "Dockerfile"
+      # image_tag: "v1.14.14"  # Add this line if you need to specify docker image tag
 
   deploy-to-k8s-workflow:
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/deploy-to-k8s-cluster.yaml@main
