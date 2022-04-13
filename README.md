@@ -61,3 +61,25 @@ jobs:
       gke_cluster: "internal"
       sops: true
 ```
+
+## Rollback Workflow
+
+```
+name: Rollback Helm Deployment 
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  helm-rollback-workflow:
+    uses: urbansportsclub/usc-reusable-workflows/.github/workflows/helm-rollback.yaml@main
+    needs: call-docker-build-push-workflow
+    with:
+      chart_name: "your-chart-name"
+      version: 0 # Optional, Revision (version) number. If this argument is omitted, it will rollback to the previous release.
+      namespace: "test"
+      gke_cluster: "internal"
+```
