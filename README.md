@@ -68,6 +68,12 @@ jobs:
 name: Rollback Helm Deployment 
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Revision ( version ) number. Enter 0 to rollback previous release.'     
+        required: true
+        default: '0'
   pull_request:
     branches:
       - main
