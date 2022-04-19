@@ -31,7 +31,7 @@ on:
 
 jobs:
   rollback-helm-deployment:
-    name: Deploy to Kubernetes Cluster
+    name: Helm rollback kubernetes deployment
     runs-on: [self-hosted,deploy]
     steps:
       - uses: actions/checkout@v3
