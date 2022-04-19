@@ -43,5 +43,5 @@ jobs:
 
       - name: Helm Rollback
         run: |-
-          helm rollback ${{ inputs.chart_name }} --namespace {{ inputs.namespace }} ${{ inputs.version }}  
+          helm rollback ${{ inputs.chart_name }} --namespace ${{ inputs.namespace }} ${{ inputs.version }}  
 
