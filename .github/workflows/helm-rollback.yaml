@@ -1,0 +1,47 @@
+name: Rollback Helm Deployment
+
+on:
+  workflow_call:
+    inputs:
+      gke_zone:
+        required: false
+        type: string
+        default: "europe-west3"
+      gke_cluster:
+        required: true
+        type: string
+        description: "Kubernetes Cluster Name" 
+        default: "internal"
+      chart_name:
+        required: true
+        type: string
+        description: "Helm chart name." 
+        default: "usc-test-helm"
+      version:
+        required: false
+        type: string
+        description: "Revision (version) number. If this argument is omitted, it will rollback to the previous release." 
+        default: 0
+      namespace:
+        required: true
+        type: string
+        description: "Kubernetes namespace" 
+        default: "default"
+        
+
+jobs:
+  rollback-helm-deployment:
+    name: Helm rollback kubernetes deployment
+    runs-on: [self-hosted,deploy]
+    steps:
+      - uses: actions/checkout@v3
+
+      # Set up k8s for dev cluster
+      - name: Set up K8s config
+        run: |-
+          gcloud container clusters get-credentials ${{ inputs.gke_cluster }} --region ${{ inputs.GKE_ZONE }}
+
+      - name: Helm Rollback
+        run: |-
+          helm rollback ${{ inputs.chart_name }} --namespace {{ inputs.namespace }} ${{ inputs.version }}  
+
