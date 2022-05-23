@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: "weekly"
     assignees:
-      - "urbansportsclub/production-engineering"
+      - "urbansportsclub/sre"
     reviewers:
-      - "urbansportsclub/production-engineering"
+      - "urbansportsclub/sre"
     open-pull-requests-limit: 10
