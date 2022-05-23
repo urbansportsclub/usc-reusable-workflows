@@ -10,49 +10,53 @@ on:
       gke_cluster:
         required: true
         type: string
-        description: "Kubernetes Cluster Name" 
+        description: "Kubernetes Cluster Name"
         default: "internal"
       stage:
         required: true
         type: string
-        description: "dev, staging, prod, etc." 
+        description: "dev, staging, prod, etc."
         default: "dev"
+      override_values_stage:
+        required: false
+        type: string
+        description: "Override stage value for passing values file. e.g values.<override_values_stage>.yaml"
+        default: ""
       chart_name:
         required: false
         type: string
-        description: "Helm chart name." 
+        description: "Helm chart name."
         default: "usc-test-helm"
       chart_version:
         required: false
         type: string
-        description: "Helm chart version to deploy. Defaults to latest." 
+        description: "Helm chart version to deploy. Defaults to latest."
         default: "latest"
       image_version:
         required: false
         type: string
-        description: "The docker image you want to deploy. Defaults to latest." 
+        description: "The docker image you want to deploy. Defaults to latest."
         default: "latest"
       namespace:
         required: true
         type: string
-        description: "Kubernetes namespace" 
+        description: "Kubernetes namespace"
         default: "default"
       sops:
         required: false
         type: boolean
-        description: "Enable/Disable Helm Secrets(sops) Plugin" 
+        description: "Enable/Disable Helm Secrets(sops) Plugin"
         default: false
       chart_path:
         required: false
         type: string
-        description: "Chart location defaults to ." 
+        description: "Chart location defaults to ."
         default: "."
-        
 
 jobs:
   deploy-to-k8s:
     name: Deploy to Kubernetes Cluster
-    runs-on: [self-hosted,deploy]
+    runs-on: [self-hosted, deploy]
     steps:
       - uses: actions/checkout@v3
 
@@ -61,14 +65,24 @@ jobs:
         run: |-
           gcloud container clusters get-credentials ${{ inputs.gke_cluster }} --region ${{ inputs.GKE_ZONE }}
 
+      # Get stage value from override_values_stage
+      # GITHUB_ENV is environment file and variables from GITHUB_ENV can be accessed by `env`.
+      - name: Get stage value
+        run: |-
+          if [ "${{ inputs.override_values_stage }}" == "" ]; then
+            echo "VALUES_STAGE=${{ inputs.stage }}" >> $GITHUB_ENV
+          else
+            echo "VALUES_STAGE=${{ inputs.override_values_stage }}" >> $GITHUB_ENV
+          fi
+
       # Deploy to the GKE cluster - with sops
       - name: Deploy
         if: inputs.sops == true
         run: |-
-          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ inputs.stage }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }}
+          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }}
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
         if: inputs.sops == false
         run: |-
-          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }}
+          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }}

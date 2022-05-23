@@ -28,7 +28,7 @@ We use docker/metadata to guess your image tag based on your branch, or tag. Thi
 
 ## Call Deploy to Kubernetes Workflow ( Helm ) 
 
-Putting all together, we have the follwoing.
+Putting all together, we have the following.
 
 ```
 name: Deploy to Kubernetes Cluster 
