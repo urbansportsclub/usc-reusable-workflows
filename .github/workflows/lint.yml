@@ -7,7 +7,7 @@ on:
 jobs:
   lint:
     name: ESLint and StyleLint
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, deploy]
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
