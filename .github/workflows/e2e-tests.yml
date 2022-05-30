@@ -25,6 +25,8 @@ jobs:
         with:
           node-version-file: ".nvmrc"
           registry-url: "https://npm.pkg.github.com"
+      - name: Setup Yarn
+        run: npm install -g yarn
       - name: Install NPM dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: yarn
