@@ -1,8 +1,14 @@
 name: Unit Tests
 on:
   workflow_call:
+    inputs:
+      REPO_NAME:
+        required: true
+        type: string
     secrets:
       GH_PACKAGES_TOKEN:
+        required: true
+      CODECOV_TOKEN:
         required: true
 jobs:
   unit_tests:
@@ -20,15 +26,6 @@ jobs:
             ./node_modules
             /home/runner/.cache/Cypress
           key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
-      # Restore Next.js cache
-      - name: Restore .next
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.next/cache
-          key: next-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          restore-keys: |
-            next-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}-
       - name: Set Node version
         uses: actions/setup-node@v3
         with:
@@ -44,3 +41,13 @@ jobs:
       # Unit Tests
       - name: Jest
         run: yarn jest:run
+      # Upload test coverage report to CodeCov
+      - name: Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./coverage
+          flags: Jest
+          name: ${{ inputs.REPO_NAME }}
+          fail_ci_if_error: true
+          verbose: true
