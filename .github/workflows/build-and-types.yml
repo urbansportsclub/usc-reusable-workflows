@@ -38,7 +38,7 @@ jobs:
         run: npm install -g yarn
       - name: Install NPM dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
-        run: yarn
+        run: yarn --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
       # Build

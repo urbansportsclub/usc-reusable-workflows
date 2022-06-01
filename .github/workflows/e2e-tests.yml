@@ -43,4 +43,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
       # E2E Tests
       - name: Cypress
-        run: yarn cy:run
+        uses: cypress-io/github-action@v2
+        with:
+          build: yarn build
+          start: yarn start
