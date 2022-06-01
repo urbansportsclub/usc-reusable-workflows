@@ -20,15 +20,6 @@ jobs:
             ./node_modules
             /home/runner/.cache/Cypress
           key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
-      # Restore Next.js cache
-      - name: Restore .next
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.next/cache
-          key: next-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          restore-keys: |
-            next-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}-
       - name: Set Node version
         uses: actions/setup-node@v3
         with:
