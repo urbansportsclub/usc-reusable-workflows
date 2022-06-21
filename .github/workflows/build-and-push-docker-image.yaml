@@ -36,11 +36,19 @@ on:
         type: string
         description: "Tag for Docker image"
         default: ""
+      working_directory:
+        required: false
+        type: string
+        description: "Working directory for github runner"
+        default: "/"
 
 jobs:
   buildandpushdocker:
     name: Build and Push
     runs-on: [self-hosted, dind]
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
 
     outputs:
        image_version: ${{ steps.subscriber_meta.outputs.version }}
