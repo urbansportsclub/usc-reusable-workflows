@@ -1,10 +1,10 @@
 # Reusable Workflows
 
-This is our set of reusable workflows that you can use to make your life simplert when dealing with a few standard actions in our CI.
+This is our set of reusable workflows that you can use to make your life simpler when dealing with a few standard actions in our CI.
 
 ## Call Build & Push Docker Workflow
 
-If you wan to build and push images you can simply add this to your workflow
+If you want to build and push images you can simply add this to your workflow
 
 ```
 name: Build and push docker
