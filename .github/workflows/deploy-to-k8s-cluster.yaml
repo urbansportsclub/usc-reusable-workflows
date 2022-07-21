@@ -32,6 +32,16 @@ on:
         type: string
         description: "Helm chart version to deploy. Defaults to latest."
         default: "latest"
+      chart_repo_name:
+        required: false
+        type: string
+        description: "Helm repo name where the chart will be coming from. If not defined will be the same as chart path."
+        default: ""
+      chart_repo_url:
+        required: false
+        type: string
+        description: "Helm repo url where the chart will be coming from."
+        default: ""
       image_version:
         required: false
         type: string
@@ -75,14 +85,25 @@ jobs:
             echo "VALUES_STAGE=${{ inputs.override_values_stage }}" >> $GITHUB_ENV
           fi
 
+      # Install external helm repository if needed
+      - name: Install external helm repository
+        run: |-
+          if [ "${{ inputs.chart_repo_name }}" == "" ]; then
+            echo "CHART_REPO_NAME=${{ inputs.chart_path }}" >> $GITHUB_ENV
+          else
+            helm repo add ${{ inputs.chart_repo_name }} ${{ inputs.chart_repo_url }}
+            echo "CHART_REPO_NAME=${{ inputs.chart_repo_name }}" >> $GITHUB_ENV
+          fi
+
+
       # Deploy to the GKE cluster - with sops
       - name: Deploy
         if: inputs.sops == true
         run: |-
-          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }}
+          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ env.CHART_REPO_NAME }} -n ${{ inputs.namespace }} -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }}
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
         if: inputs.sops == false
         run: |-
-          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }}
+          helm upgrade --install ${{ inputs.chart_name }} ${{ env.CHART_REPO_NAME }} -n ${{ inputs.namespace }} -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }}
