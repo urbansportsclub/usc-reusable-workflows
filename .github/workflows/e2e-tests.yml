@@ -7,7 +7,7 @@ on:
 jobs:
   e2e_tests:
     name: Cypress
-    runs-on: [self-hosted, vm]
+    runs-on: [self-hosted, dind]
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
