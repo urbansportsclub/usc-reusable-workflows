@@ -16,7 +16,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted,nonroot]
+    runs-on: [self-hosted,vm]
     name: Lint Code Base
 
     steps:
