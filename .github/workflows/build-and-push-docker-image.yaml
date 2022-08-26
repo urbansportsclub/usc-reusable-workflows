@@ -16,6 +16,11 @@ on:
         type: string
         description: "Name of the docker image" 
         default: ""
+      platforms:
+        required: false
+        type: string
+        description: "List of image platforms"
+        default: "linux/amd64"
       registry:
         required: false
         type: string
@@ -70,6 +75,10 @@ jobs:
           type=schedule,priority=30
           type=sha,priority=40
 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+      if: inputs.platforms != 'linux/amd64'
+
     - name: Set up Docker Buildx
       id: buildx
       uses: docker/setup-buildx-action@v2
@@ -86,6 +95,7 @@ jobs:
       with:
         context: .
         file: ${{ inputs.dockerfile_path }}
+        platforms: ${{ inputs.platforms }}
         push: true
         tags: ${{ steps.subscriber_meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
