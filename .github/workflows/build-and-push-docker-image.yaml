@@ -46,6 +46,11 @@ on:
         type: string
         description: "Working directory for github runner"
         default: "/"
+      build_args:
+        required: false
+        type: string
+        description: "List of build-time variables"
+        default: ""
 
 jobs:
   buildandpushdocker:
@@ -98,6 +103,7 @@ jobs:
         platforms: ${{ inputs.platforms }}
         push: true
         tags: ${{ steps.subscriber_meta.outputs.tags }}
+        build-args: ${{ steps.subscriber_meta.outputs.build_args }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
