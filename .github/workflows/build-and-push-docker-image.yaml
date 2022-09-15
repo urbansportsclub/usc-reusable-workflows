@@ -46,6 +46,11 @@ on:
         type: string
         description: "Working directory for github runner"
         default: "/"
+      build_args:
+        required: false
+        type: string
+        description: "Build args"
+        default: ""
 
 jobs:
   buildandpushdocker:
@@ -96,6 +101,7 @@ jobs:
         context: .
         file: ${{ inputs.dockerfile_path }}
         platforms: ${{ inputs.platforms }}
+        build-args: ${{ inputs.build_args }}
         push: true
         tags: ${{ steps.subscriber_meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
