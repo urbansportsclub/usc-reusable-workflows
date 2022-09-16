@@ -46,6 +46,10 @@ on:
         type: string
         description: "Working directory for github runner"
         default: "/"
+    secrets:
+      build_args:
+        required: false
+        description: "Build args"
 
 jobs:
   buildandpushdocker:
@@ -96,9 +100,10 @@ jobs:
         context: .
         file: ${{ inputs.dockerfile_path }}
         platforms: ${{ inputs.platforms }}
+        build-args: |
+          ${{ secrets.build_args }}
         push: true
         tags: ${{ steps.subscriber_meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
-

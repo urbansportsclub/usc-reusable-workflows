@@ -75,6 +75,18 @@ jobs:
             echo "VALUES_STAGE=${{ inputs.override_values_stage }}" >> $GITHUB_ENV
           fi
 
+      # Configure gcloud Auth
+      - name: Configure gcloud Auth
+        run: |-
+          gcloud auth print-access-token | helm registry login -u oauth2accesstoken --password-stdin https://europe-west3-docker.pkg.dev
+
+      # Build dependency for helm-library
+      - name: Helm dependency build
+        run: |-
+          for i in `ls -1 charts/`; do
+            helm dependency build charts/$i/
+          done
+
       # Deploy to the GKE cluster - with sops
       - name: Deploy
         if: inputs.sops == true
