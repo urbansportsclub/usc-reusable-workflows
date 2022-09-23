@@ -52,6 +52,16 @@ on:
         type: string
         description: "Chart location defaults to ."
         default: "."
+      project_id:
+        required: false
+        type: string
+        description: "Project id for gcloud (whenever you deploy to)."
+        default: "urbansportsclub-dev"
+      registry_project_id:
+        required: false
+        type: string
+        description: "Project id for gcloud registry (currently always dev)."
+        default: "urbansportsclub-dev"        
 
 jobs:
   deploy-to-k8s:
@@ -63,7 +73,7 @@ jobs:
       # Set up k8s for dev cluster
       - name: Set up K8s config
         run: |-
-          gcloud container clusters get-credentials ${{ inputs.gke_cluster }} --region ${{ inputs.GKE_ZONE }}
+          gcloud container clusters get-credentials ${{ inputs.gke_cluster }} --region ${{ inputs.GKE_ZONE }} --project ${{ inputs.project_id }}
 
       # Get stage value from override_values_stage
       # GITHUB_ENV is environment file and variables from GITHUB_ENV can be accessed by `env`.
@@ -78,7 +88,7 @@ jobs:
       # Configure gcloud Auth
       - name: Configure gcloud Auth
         run: |-
-          gcloud auth print-access-token | helm registry login -u oauth2accesstoken --password-stdin https://europe-west3-docker.pkg.dev
+          gcloud auth print-access-token --project ${{ inputs.registry_project_id }} | helm registry login -u oauth2accesstoken --password-stdin https://europe-west3-docker.pkg.dev
 
       # Build dependency for helm-library
       - name: Helm dependency build
