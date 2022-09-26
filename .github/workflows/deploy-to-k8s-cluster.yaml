@@ -62,11 +62,17 @@ on:
         type: string
         description: "Project id for gcloud registry (currently always dev)."
         default: "urbansportsclub-dev"        
+      runner:
+        required: false
+        type: string
+        description: "Runner type [ deploy, deploylive ] (Default deploy)."
+        default: "deploy"
+
 
 jobs:
   deploy-to-k8s:
     name: Deploy to Kubernetes Cluster
-    runs-on: [self-hosted, deploylive]
+    runs-on: [self-hosted, "${{ inputs.runner }}"]
     steps:
       - uses: actions/checkout@v3
 
