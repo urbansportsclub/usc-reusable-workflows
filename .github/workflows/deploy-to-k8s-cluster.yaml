@@ -72,7 +72,7 @@ on:
 jobs:
   deploy-to-k8s:
     name: Deploy to Kubernetes Cluster
-    runs-on: [self-hosted, ${{ inputs.runner }}]
+    runs-on: [self-hosted, "${{ inputs.runner }}"]
     steps:
       - uses: actions/checkout@v3
 
