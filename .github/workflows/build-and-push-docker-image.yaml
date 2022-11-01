@@ -46,6 +46,10 @@ on:
         type: string
         description: "Working directory for github runner"
         default: "/"
+      target:
+        required: false
+        type: string
+        description: "Sets the target stage to build"
     secrets:
       build_args:
         required: false
@@ -100,6 +104,7 @@ jobs:
         context: .
         file: ${{ inputs.dockerfile_path }}
         platforms: ${{ inputs.platforms }}
+        target: ${{ inputs.target }}
         build-args: |
           ${{ secrets.build_args }}
         push: true
