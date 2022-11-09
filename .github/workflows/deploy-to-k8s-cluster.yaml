@@ -62,6 +62,10 @@ on:
         type: string
         description: "Project id for gcloud registry (currently always dev)."
         default: "urbansportsclub-dev"        
+      helm_args:
+        required: false
+        type: string
+        description: "Additional Helm arguments"
       runner:
         required: false
         type: string
@@ -107,10 +111,10 @@ jobs:
       - name: Deploy
         if: inputs.sops == true
         run: |-
-          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }}
+          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }} ${{ inputs.helm_args }}
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
         if: inputs.sops == false
         run: |-
-          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }} 
+          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }} ${{ inputs.helm_args }}
