@@ -66,6 +66,10 @@ on:
         required: false
         type: string
         description: "Additional Helm arguments"
+      helm_repositories:
+        required: false
+        type: string
+        description: "JSON object of Helm repositories, keys as repo name and value as repo URL"
       runner:
         required: false
         type: string
@@ -99,6 +103,21 @@ jobs:
       - name: Configure gcloud Auth
         run: |-
           gcloud auth print-access-token --project ${{ inputs.registry_project_id }} | helm registry login -u oauth2accesstoken --password-stdin https://europe-west3-docker.pkg.dev
+
+      # Define additional Helm repositories
+      - name: Define Helm repositories
+        if: inputs.helm_repositories != ''
+        run: |-
+          set -x
+          HELM_REPOS=$(echo '${{ inputs.helm_repositories }}' | jq -r 'to_entries[] | "\(.key) \(.value)"')
+          ORIG_IFS=$IFS
+          IFS=$'\n'
+          read -d '' -r -a HELM_REPO_ARGS < <(echo $HELM_REPOS && printf '\0')
+          for args in ${HELM_REPO_ARGS[@]}; do
+            IFS=$ORIG_IFS
+            read -d '' -r -a ARGS < <(echo $args && printf '\0')
+            helm repo add ${ARGS[@]}
+          done
 
       # Build dependency for helm-library
       - name: Helm dependency build
