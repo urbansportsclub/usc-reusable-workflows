@@ -81,6 +81,7 @@ jobs:
   deploy-to-k8s:
     name: Deploy to Kubernetes Cluster
     runs-on: [self-hosted, "${{ inputs.runner }}"]
+    environment: ${{ inputs.stage }}
     steps:
       - uses: actions/checkout@v3
 
