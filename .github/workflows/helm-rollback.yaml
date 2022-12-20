@@ -27,19 +27,26 @@ on:
         type: string
         description: "Kubernetes namespace" 
         default: "default"
+      project_id:
+        required: false
+        type: string
+        description: "Project id for gcloud (whenever you deploy to)."
+        default: "urbansportsclub-dev"
+      runner:
+        required: false
+        type: string
+        description: "Runner type [ deploy, deploylive ] (Default deploy)."
+        default: "deploy"
         
 
 jobs:
   rollback-helm-deployment:
     name: Helm rollback kubernetes deployment
-    runs-on: [self-hosted,deploy]
+    runs-on: [self-hosted, "${{ inputs.runner }}"]
     steps:
-      - uses: actions/checkout@v3
-
-      # Set up k8s for dev cluster
       - name: Set up K8s config
         run: |-
-          gcloud container clusters get-credentials ${{ inputs.gke_cluster }} --region ${{ inputs.GKE_ZONE }}
+          gcloud container clusters get-credentials ${{ inputs.gke_cluster }} --region ${{ inputs.gke_zone }} --project ${{ inputs.project_id }}
 
       - name: Helm Rollback
         run: |-
