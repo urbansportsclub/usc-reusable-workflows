@@ -87,4 +87,6 @@ jobs:
       version: 0 # Optional, Revision (version) number. If this argument is omitted, it will rollback to the previous release.
       namespace: "test"
       gke_cluster: "internal"
+      project_id: "urbansportsclub-dev" # GCP Project ID
+      runner: "deploy" # Which Action Runner to use, change to "deploylive" for staging/live deployments.
 ```
