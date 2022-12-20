@@ -5,6 +5,9 @@ on:
       github-token:
         required: true
 
+env:
+  GOPRIVATE: "github.com/urbansportsclub/*"
+
 jobs:
   test:
     name: Test
@@ -26,6 +29,9 @@ jobs:
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
+
+    - name: Configure private repo
+      run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
 
     - name: Test
       run: go test -race -covermode=atomic -coverprofile=coverage.out ./...
