@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: [self-hosted, nonroot]
+    runs-on: [self-hosted, dind]
     timeout-minutes: 15
 
     steps:
@@ -26,6 +26,9 @@ jobs:
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
+
+    - name: Configure private repo
+      run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
 
     - name: Test
       run: go test -race -covermode=atomic -coverprofile=coverage.out ./...
