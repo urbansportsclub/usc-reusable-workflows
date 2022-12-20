@@ -1,17 +1,20 @@
 ---
 on:
   workflow_call:
+    inputs:
+      runner:
+        required: false
+        type: string
+        description: "Runner type [default 'dind']."
+        default: "dind"
     secrets:
       github-token:
         required: true
 
-env:
-  GOPRIVATE: "github.com/urbansportsclub/*"
-
 jobs:
   test:
     name: Test
-    runs-on: [self-hosted, nonroot]
+    runs-on: [self-hosted, "${{ inputs.runner }}"]
     timeout-minutes: 15
 
     steps:
@@ -23,12 +26,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - uses: actions/cache@v3
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
+    # - uses: actions/cache@v3
+    #   with:
+    #     path: ~/go/pkg/mod
+    #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-go-
 
     - name: Configure private repo
       run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
