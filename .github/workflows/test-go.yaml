@@ -1,12 +1,6 @@
 ---
 on:
   workflow_call:
-    inputs:
-      runner:
-        required: false
-        type: string
-        description: "Runner type [default 'dind']."
-        default: "dind"
     secrets:
       github-token:
         required: true
@@ -14,7 +8,7 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: [self-hosted, "${{ inputs.runner }}"]
+    runs-on: [self-hosted, dind]
     timeout-minutes: 15
 
     steps:
