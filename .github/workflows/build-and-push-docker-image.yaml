@@ -96,7 +96,7 @@ jobs:
 
     - name: Configure Docker Auth
       run: |-
-        gcloud auth configure-docker
+        gcloud auth configure-docker ${{ inputs.registry }}
 
     - name: Build and push
       uses: docker/build-push-action@v3
