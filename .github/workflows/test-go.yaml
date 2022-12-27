@@ -31,6 +31,6 @@ jobs:
       run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
 
     - name: Test
-      run: go test -race -covermode=atomic -coverprofile=coverage.out ./...
+      run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
       env:
         GITHUB_TOKEN: ${{ secrets.github-token }}
