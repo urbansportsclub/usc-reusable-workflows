@@ -32,3 +32,4 @@ jobs:
           DEFAULT_BRANCH: ${{ inputs.branch }}
           VALIDATE_ALL_CODEBASE: false
           KUBERNETES_KUBECONFORM_OPTIONS: "-ignore-missing-schemas"
+          KUBERNETES_KUBEVAL_OPTIONS: "--ignore-missing-schemas"
