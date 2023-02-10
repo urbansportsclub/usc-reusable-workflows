@@ -11,6 +11,11 @@ on:
         required: false
         type: string
         default: "main"
+      enable_jscpd:
+        required: false
+        type: boolean
+        default: true
+    
 
 jobs:
   build:
@@ -33,4 +38,4 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           KUBERNETES_KUBECONFORM_OPTIONS: "-ignore-missing-schemas"
           KUBERNETES_KUBEVAL_OPTIONS: "--ignore-missing-schemas"
-          VALIDATE_JSCPD: false
+          VALIDATE_JSCPD: ${{ inputs.enable_jscpd }}
