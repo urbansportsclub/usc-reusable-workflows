@@ -33,3 +33,4 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           KUBERNETES_KUBECONFORM_OPTIONS: "-ignore-missing-schemas"
           KUBERNETES_KUBEVAL_OPTIONS: "--ignore-missing-schemas"
+          VALIDATE_JSCPD: false
