@@ -15,7 +15,6 @@ on:
         required: false
         type: boolean
         default: true
-    
 
 jobs:
   build:
