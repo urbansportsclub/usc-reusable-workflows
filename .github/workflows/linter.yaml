@@ -23,7 +23,7 @@ on:
 jobs:
   build:
     runs-on: [self-hosted, nonroot]
-    name: Code Base
+    name: Lint Code Base
 
     steps:
       - name: Checkout Code
