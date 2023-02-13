@@ -15,6 +15,10 @@ on:
         required: false
         type: boolean
         default: true
+      enable_go:
+        require: false
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -41,7 +45,8 @@ jobs:
           VALIDATE_JSCPD: ${{ inputs.enable_jscpd }}
 
   golang:
-    name: Golang files
+    if: inputs.enable_go == true
+    name: Lint Golang Files
     runs-on: [self-hosted, nonroot]
     timeout-minutes: 15
 
@@ -59,7 +64,7 @@ jobs:
       - name: Configure private repo
         run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
 
-      - name: Golangci Lint
+      - name: Lint Code Base
         uses: golangci/golangci-lint-action@v3
         with:
           version: latest
