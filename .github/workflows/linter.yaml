@@ -16,7 +16,11 @@ on:
         type: boolean
         default: true
       enable_go:
-        require: false
+        required: false
+        type: boolean
+        default: false
+      validate_all_codebase:
+        required: false
         type: boolean
         default: false
 
