@@ -42,7 +42,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github-token }}
           DEFAULT_BRANCH: ${{ inputs.branch }}
-          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_ALL_CODEBASE: ${{ inputs.validate_all_codebase }}
           VALIDATE_GO: false
           KUBERNETES_KUBECONFORM_OPTIONS: "-ignore-missing-schemas"
           KUBERNETES_KUBEVAL_OPTIONS: "--ignore-missing-schemas"
