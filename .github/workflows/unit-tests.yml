@@ -9,7 +9,7 @@ on:
       GH_PACKAGES_TOKEN:
         required: true
       CODECOV_TOKEN:
-        required: true
+        required: false
 jobs:
   unit_tests:
     name: Jest
@@ -43,6 +43,7 @@ jobs:
         run: yarn jest:run
       # Upload test coverage report to CodeCov
       - name: Codecov
+        if: secrets.CODECOV_TOKEN != ""
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
