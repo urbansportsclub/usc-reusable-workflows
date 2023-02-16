@@ -23,6 +23,10 @@ on:
         required: false
         type: boolean
         default: false
+      enable_kubeform:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -47,6 +51,7 @@ jobs:
           KUBERNETES_KUBECONFORM_OPTIONS: "-ignore-missing-schemas"
           KUBERNETES_KUBEVAL_OPTIONS: "--ignore-missing-schemas"
           VALIDATE_JSCPD: ${{ inputs.enable_jscpd }}
+          VALIDATE_KUBERNETES_KUBECONFORM: ${{ inputs.enable_kubeform }}
 
   golang:
     if: inputs.enable_go == true
