@@ -10,6 +10,8 @@ on:
         required: true
       CODECOV_TOKEN:
         required: false
+env:
+  IS_CODECOV_SET:  secrets.CODECOV_TOKEN != null
 jobs:
   unit_tests:
     name: Jest
@@ -43,7 +45,7 @@ jobs:
         run: yarn jest:run
       # Upload test coverage report to CodeCov
       - name: Codecov
-        if: ${{ secrets.CODECOV_TOKEN != "" }}
+        if: env.IS_CODECOV_SET
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
