@@ -5,13 +5,17 @@ on:
       REPO_NAME:
         required: true
         type: string
+      USE_CODECOV:
+        required: false
+        type: boolean
+        # this should be FALSE by default but as of now onefit B2B has a dependency and we would
+        # need to make a change in there
+        default: true
     secrets:
       GH_PACKAGES_TOKEN:
         required: true
       CODECOV_TOKEN:
         required: false
-env:
-  IS_CODECOV_SET:  secrets.CODECOV_TOKEN != null
 jobs:
   unit_tests:
     name: Jest
@@ -45,7 +49,7 @@ jobs:
         run: yarn jest:run
       # Upload test coverage report to CodeCov
       - name: Codecov
-        if: env.IS_CODECOV_SET
+        if: ${{ inputs.USE_CODECOV }}
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
