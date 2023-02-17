@@ -43,7 +43,7 @@ jobs:
         run: yarn jest:run
       # Upload test coverage report to CodeCov
       - name: Codecov
-        if: secrets.CODECOV_TOKEN != ""
+        if: ${{ secrets.CODECOV_TOKEN != "" }}
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
