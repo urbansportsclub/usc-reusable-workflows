@@ -1,16 +1,20 @@
+---
 Name: Auto-merge dependabot PR's
 
-on: pull_request_target
+on: 
+  workflow_call:
+    secrets:
+      github-token:
+        required: true
 
 permissions:
   pull-requests: write
   contents: write
 
-
 jobs:
   dependabot:
     name: Dependabot auto-merge
-    runs-on: [self-hosted, dind]
+    runs-on: [self-hosted]
     timeout-minutes: 15
     if: ${{ github.actor == 'dependabot[bot]' }}
 
