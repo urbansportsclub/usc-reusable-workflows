@@ -52,6 +52,7 @@ jobs:
           KUBERNETES_KUBEVAL_OPTIONS: "--ignore-missing-schemas"
           VALIDATE_JSCPD: ${{ inputs.enable_jscpd }}
           VALIDATE_KUBERNETES_KUBECONFORM: ${{ inputs.enable_kubeform }}
+          VALIDATE_KUBERNETES_KUBEVAL: ${{ inputs.enable_kubeform }}
 
   golang:
     if: inputs.enable_go == true
