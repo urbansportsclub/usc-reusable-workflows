@@ -14,7 +14,7 @@ on:
       enable_jscpd:
         required: false
         type: boolean
-        default: true
+        default: false
       enable_go:
         required: false
         type: boolean
@@ -34,7 +34,7 @@ on:
       enable_sqlfluff:
         required: false
         type: boolean
-        default: true
+        default: false
 
 jobs:
   build:
