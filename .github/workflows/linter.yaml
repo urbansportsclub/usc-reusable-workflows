@@ -27,6 +27,14 @@ on:
         required: false
         type: boolean
         default: false
+      regexp_exclude:
+        required: false
+        type: string
+        default: ""
+      enable_sqlfluff:
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -53,6 +61,8 @@ jobs:
           VALIDATE_JSCPD: ${{ inputs.enable_jscpd }}
           VALIDATE_KUBERNETES_KUBECONFORM: ${{ inputs.enable_kubeconform }}
           VALIDATE_KUBERNETES_KUBEVAL: ${{ inputs.enable_kubeconform }}
+          FILTER_REGEX_EXCLUDE: ${{ inputs.regexp_exclude }}
+          VALIDATE_SQLFLUFF: ${{ inputs.enable_sqlfluff }}
 
   golang:
     if: inputs.enable_go == true
