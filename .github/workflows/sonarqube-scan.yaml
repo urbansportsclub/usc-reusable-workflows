@@ -35,7 +35,7 @@ jobs:
       # If you wish to fail your job when the Quality Gate is red, uncomment the
       # following lines. This would typically be used to fail a deployment.
       - uses: sonarsource/sonarqube-quality-gate-action@master
-        if: ${{ inputs.enable_quality_gate }}
+        if: inputs.enable_quality_gate == true
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.token }}
