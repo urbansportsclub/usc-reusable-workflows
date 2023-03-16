@@ -32,6 +32,9 @@ jobs:
           name: coverage
           path: coverage.out
 
+      - name: LS
+        run: ls -la
+
       - uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.token }}
