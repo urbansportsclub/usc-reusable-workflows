@@ -8,7 +8,7 @@ on:
         required: true
     inputs:
       url:
-        required: true
+        required: false
         type: string
         default: https://sonarqube.svc.urbansportsclub.tech
       enable_quality_gate:
