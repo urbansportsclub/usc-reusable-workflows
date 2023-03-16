@@ -35,7 +35,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: coverage-artifact
-          path: coverage
 
       - uses: sonarsource/sonarqube-scan-action@master
         env:
