@@ -29,8 +29,8 @@ jobs:
       - name: Download code coverage results
         uses: actions/download-artifact@v3
         with:
-          name: coverage.out
-          path: .
+          name: coverage
+          path: ./coverage.out
 
       - uses: sonarsource/sonarqube-scan-action@master
         env:
