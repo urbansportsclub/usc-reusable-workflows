@@ -38,5 +38,7 @@ jobs:
     - name: Archive code coverage results
       uses: actions/upload-artifact@v3
       with:
-        name: coverage
-        path: coverage.out
+        name: coverage-artifact
+        path: coverage
+        retentation-days: 5
+        if-no-files-found: error

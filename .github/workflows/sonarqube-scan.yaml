@@ -15,6 +15,10 @@ on:
         required: false
         type: boolean
         default: true
+      with_code_coverage:
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -27,13 +31,11 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Download code coverage results
+        if: inputs.with_code_coverage == true
         uses: actions/download-artifact@v3
         with:
-          name: coverage
-          path: coverage.out
-
-      - name: LS
-        run: ls -la coverage.out
+          name: coverage-artifact
+          path: coverage
 
       - uses: sonarsource/sonarqube-scan-action@master
         env:
