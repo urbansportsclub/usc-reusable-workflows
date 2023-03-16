@@ -39,6 +39,6 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: coverage-artifact
-        path: coverage
+        path: coverage.out
         retentation-days: 5
         if-no-files-found: error
