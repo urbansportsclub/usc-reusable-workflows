@@ -1,0 +1,41 @@
+---
+name: Sonarqube
+on:
+  push:
+    branches:
+      - main
+  workflow_call:
+    secrets:
+      token:
+        required: true
+    inputs:
+      url:
+        required: true
+        type: string
+      enable_quality_gate:
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.token }}
+          SONAR_HOST_URL: ${{ secrets.url }}
+
+      # If you wish to fail your job when the Quality Gate is red, uncomment the
+      # following lines. This would typically be used to fail a deployment.
+      - uses: sonarsource/sonarqube-quality-gate-action@master
+        if: ${{ inputs.enable_quality_gate }}
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.token }}
