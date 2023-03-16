@@ -33,7 +33,7 @@ jobs:
           path: coverage.out
 
       - name: LS
-        run: ls -la
+        run: ls -la coverage.out
 
       - uses: sonarsource/sonarqube-scan-action@master
         env:
