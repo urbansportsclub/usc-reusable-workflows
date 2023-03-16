@@ -4,6 +4,15 @@ on:
     secrets:
       github-token:
         required: true
+    inputs:
+      upload_coverage_artifact:
+        required: false
+        type: boolean
+        default: true
+      coverage_artifact_name:
+        required: false
+        type: string
+        default: coverage-artifact
 
 jobs:
   test:
@@ -34,3 +43,12 @@ jobs:
       run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
       env:
         GITHUB_TOKEN: ${{ secrets.github-token }}
+    
+    - name: Archive code coverage results
+      if: inputs.upload_coverage_artifact == true
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.coverage_artifact_name }}
+        path: coverage.out
+        retention-days: 5
+        if-no-files-found: error
