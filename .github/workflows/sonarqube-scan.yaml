@@ -15,10 +15,14 @@ on:
         required: false
         type: boolean
         default: true
-      with_code_coverage:
+      download_coverage_artifact:
         required: false
         type: boolean
         default: false
+      coverage_artifact_name:
+        required: false
+        type: string
+        default: coverage-artifact
 
 jobs:
   build:
@@ -31,10 +35,10 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Download code coverage results
-        if: inputs.with_code_coverage == true
+        if: inputs.download_coverage_artifact == true
         uses: actions/download-artifact@v3
         with:
-          name: coverage-artifact
+          name: ${{ inputs.coverage_artifact_name }}
 
       - uses: sonarsource/sonarqube-scan-action@master
         env:
