@@ -118,6 +118,25 @@ jobs:
 
 ![project information](resources/readme/project-information.png)
 
+### Properties file
+
+You need to include a file called `sonar-project.properties` in the root of your project in order for SonarScan to work properly. This file holds certain properties that SonarQube needs to function. For more information, please refer to the full documentation [here](https://docs.sonarqube.org/latest/analyzing-source-code/scanners/sonarscanner/).
+
+Here is an example for Golang projects:
+
+```toml
+sonar.projectKey=[STEP 7]
+
+sonar.tests=.
+sonar.test.inclusions=**/*_test.go
+sonar.test.exclusions=**/vendor/**
+
+sonar.sources=.
+sonar.exclusions=**/*_test.go,**/vendor/**,**/testdata/*
+
+sonar.go.coverage.reportPaths=coverage.out
+```
+
 ### Using the Workflow
 
 Here is an example on how to use SonarQube in your pull requests:
