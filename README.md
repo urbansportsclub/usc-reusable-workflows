@@ -94,29 +94,27 @@ jobs:
 ## SonarQube
 ### Setting Up
 
-1. To start a new project on SonarQube, you need to access [sonarqube.svc.urbansportsclub.tech](https://sonarqube.svc.urbansportsclub.tech/). Once logged in, you can click on the button on the top right corner called `Create Project` and select `Github`.
-
+1. Sign in to [sonarqube.svc.urbansportsclub.tech](https://sonarqube.svc.urbansportsclub.tech/).
+2. Click on the `Create Project` button in the top right corner and select `Github`.
 ![create project](resources/readme/new-project-github.png)
 
-2. Now, you have to select the organization and which repository do you want to create the project for. After you have selected, you can click in `Set up selected repository`.
+3. Select the organization and repository you want to create the project for, then click `Set up selected repository`.
 
 ![selecting the project](resources/readme/selecting-project.png)
 
-3. To setup the repository, you need to select `GitHub Actions`.
+4. Select `GitHub Actions` to set up the repository and generate a `SONAR_TOKEN` to send data from your repository.
 
 ![github actions](resources/readme/github-actions.png)
 
-4. The `GitHub Actions` secrets will show up. In this section, is where you will generate the `SONAR_TOKEN` necessary to send the data from your repository to SonarQube. After clicking on `Generate Token`, a pop-up will show, you can select an expiration time, you can select `No expiration` and then, finally click in `Generate`.
+5. Copy the token and go to your repository in GitHub, then set a new secret with the name `SONAR_TOKEN` and paste the token.
 
 ![secrets](resources/readme/project-secrets.png)
 
-5. Copy the token and go to your repository. There, you will need to set a new secret. For that, go to `Settings > Secrets and variables > New repository secret`. Give the name of `SONAR_TOKEN` and paste the token from SonarQube.
-
 ![github secrets](resources/readme/github-secrets.png)
 
-6. Back to SonarQube page, you can click on `Continue` and finish the tutorial.
+6. Return to the SonarQube page and click `Continue` to finish the tutorial.
 
-7. You will also need to retrieve the `Project key`, which can be found inside the project that you just created, clicking in the top right corner link, called `Project information` and copy the value.
+7. Retrieve the `Project key` by clicking the `Project information` link in the top right corner of the project page and copying the value.
 
 ![project information](resources/readme/project-information.png)
 
@@ -182,7 +180,7 @@ jobs:
 
 ### Code coverage for other languages
 
-To use code coverage for other languages, your test step should output a coverage file. This file then, should be uploaded to GitHub artifacts. Since the upload step and download happen in different moments, you have to specify the name of the artifact to be downloaded.
+Your test step should output a coverage file for use with other languages, which should then be uploaded to GitHub artifacts. Since the upload and download of the file occur at different times, you need to specify the name of the artifact to be downloaded.
 
 ```yaml
 test:
