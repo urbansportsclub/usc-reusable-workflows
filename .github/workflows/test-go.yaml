@@ -28,13 +28,6 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v3
-
-    - name: Install GO dependencies
-      run: |
-        sudo apt update
-        sudo apt-get -y install poppler-utils wv unrtf tidy
-        go get github.com/JalfResi/justext
-        go install code.sajari.com/docconv/docd@latest
     
     - uses: actions/cache@v3
       with:
@@ -45,6 +38,13 @@ jobs:
 
     - name: Configure private repo
       run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
+
+    - name: Install GO dependencies
+      run: |
+        sudo apt update
+        sudo apt-get -y install poppler-utils wv unrtf tidy
+        go get github.com/JalfResi/justext
+        go install code.sajari.com/docconv/docd@latest
 
     - name: Test
       run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
