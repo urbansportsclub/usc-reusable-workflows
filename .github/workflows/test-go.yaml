@@ -31,7 +31,8 @@ jobs:
 
     - name: Install GO dependencies
       run: |
-        sudo apt-get install poppler-utils wv unrtf tidy
+        sudo apt update
+        sudo apt-get -y install poppler-utils wv unrtf tidy
         go get github.com/JalfResi/justext
         go install code.sajari.com/docconv/docd@latest
     
