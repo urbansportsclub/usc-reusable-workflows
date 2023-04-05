@@ -29,6 +29,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Install GO dependencies
+      run: |
+      sudo apt-get install poppler-utils wv unrtf tidy
+      go get github.com/JalfResi/justext
+      go install code.sajari.com/docconv/docd@latest
+
     - uses: actions/cache@v3
       with:
         path: ~/go/pkg/mod
