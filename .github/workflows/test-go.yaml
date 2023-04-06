@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: coverage-artifact
+      external_container_dependencies:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   test:
@@ -28,7 +32,7 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v3
-
+    
     - uses: actions/cache@v3
       with:
         path: ~/go/pkg/mod
@@ -38,6 +42,10 @@ jobs:
 
     - name: Configure private repo
       run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
+
+    - name: Install external dependencies
+      if: inputs.external_container_dependencies != ''
+      run: ${{ inputs.external_container_dependencies }}
 
     - name: Test
       run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
