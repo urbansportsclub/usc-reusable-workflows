@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: coverage-artifact
+      external_container_dependencies:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   test:
@@ -39,12 +43,9 @@ jobs:
     - name: Configure private repo
       run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
 
-    - name: Install GO dependencies
-      run: |
-        sudo apt update
-        sudo apt-get -y install poppler-utils wv unrtf tidy
-        go get github.com/JalfResi/justext
-        go install code.sajari.com/docconv/docd@latest
+    - name: Install external dependencies
+      if: inputs.external_container_dependencies != ""
+      run: ${{ inputs.external_container_dependencies }}
 
     - name: Test
       run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
