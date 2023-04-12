@@ -225,3 +225,22 @@ scan:
   secrets:
     token: ${{ secrets.SONAR_TOKEN }}
 ```
+
+
+### Custom dependencies
+
+If you need to add more dependencies for a workflow there is already an implemented solution in test-go (.github/workflows/lint-and-test.yml) that allows to install custom dependencies on the current runner just before the main action of the reusable-workflow.
+
+You just need to add the input `external_container_dependencies` with your desired commands to run on the runner:
+
+```yaml
+  test:
+    name: Test
+    uses: urbansportsclub/usc-reusable-workflows/.github/workflows/test-go.yaml@install-dependencies-go-invoices
+    with:
+      external_container_dependencies: |
+        sudo apt update
+        sudo apt-get -y install poppler-utils wv unrtf tidy
+        go get github.com/JalfResi/justext
+        go install code.sajari.com/docconv/docd@latest
+```
