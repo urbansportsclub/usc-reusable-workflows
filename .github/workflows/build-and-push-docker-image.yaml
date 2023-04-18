@@ -41,11 +41,11 @@ on:
         type: string
         description: "Tag for Docker image"
         default: ""
-      working_directory:
+      context:
         required: false
         type: string
-        description: "Working directory for github runner"
-        default: "/"
+        description: "Docker build context" 
+        default: "."
       target:
         required: false
         type: string
@@ -59,9 +59,6 @@ jobs:
   buildandpushdocker:
     name: Build and Push
     runs-on: [self-hosted, dind]
-    defaults:
-      run:
-        working-directory: ${{ inputs.working_directory }}
 
     outputs:
        image_version: ${{ steps.subscriber_meta.outputs.version }}
@@ -101,7 +98,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
-        context: .
+        context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile_path }}
         platforms: ${{ inputs.platforms }}
         target: ${{ inputs.target }}
