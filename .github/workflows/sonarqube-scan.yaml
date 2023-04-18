@@ -23,6 +23,9 @@ on:
         required: false
         type: string
         default: coverage-artifact
+      branch_version: 
+        required: false
+        type: string
 
 jobs:
   build:
@@ -40,7 +43,18 @@ jobs:
         with:
           name: ${{ inputs.coverage_artifact_name }}
 
-      - uses: sonarsource/sonarqube-scan-action@master
+      - name: Scan
+        if: inputs.branch_version == ''
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.token }}
+          SONAR_HOST_URL: ${{ inputs.url }}
+
+      - name: Scan
+        if: inputs.branch_version != ''
+        uses: sonarsource/sonarqube-scan-action@master
+        with:
+          args: -Dsonar.projectVersion=${{inputs.branch_version}}
         env:
           SONAR_TOKEN: ${{ secrets.token }}
           SONAR_HOST_URL: ${{ inputs.url }}
