@@ -3,9 +3,6 @@ name: Sonarqube
 
 on:
   workflow_call:
-    secrets:
-      token:
-        required: true
     inputs:
       url:
         required: false
@@ -45,7 +42,7 @@ jobs:
         with:
           args: -Dsonar.projectVersion=${{ github.sha }}
         env:
-          SONAR_TOKEN: ${{ secrets.token }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ inputs.url }}
 
       # If you wish to fail your job when the Quality Gate is red, uncomment the
@@ -54,4 +51,4 @@ jobs:
         if: inputs.enable_quality_gate == true
         timeout-minutes: 5
         env:
-          SONAR_TOKEN: ${{ secrets.token }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
