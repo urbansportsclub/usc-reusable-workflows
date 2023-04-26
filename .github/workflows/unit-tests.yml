@@ -11,6 +11,10 @@ on:
         # this should be FALSE by default but as of now onefit B2B has a dependency and we would
         # need to make a change in there
         default: true
+      UPLOAD_ARTIFACTS:
+        required: false
+        type: boolean
+        default: false
     secrets:
       GH_PACKAGES_TOKEN:
         required: true
@@ -58,3 +62,9 @@ jobs:
           name: ${{ inputs.REPO_NAME }}
           fail_ci_if_error: true
           verbose: true
+      - name: Upload Code Coverage Artifacts to test-artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ inputs.UPLOAD_ARTIFACTS }}
+        with:
+          name: test-artifacts
+          path: ./coverage
