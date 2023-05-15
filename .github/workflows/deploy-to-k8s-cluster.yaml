@@ -61,7 +61,12 @@ on:
         required: false
         type: string
         description: "Project id for gcloud registry (currently always dev)."
-        default: "urbansportsclub-dev"        
+        default: "urbansportsclub-dev"  
+      helm_path:
+        required: false
+        type: string
+        description: "Path for your helm configuration"
+        default: "charts"
       helm_args:
         required: false
         type: string
@@ -123,18 +128,21 @@ jobs:
       # Build dependency for helm-library
       - name: Helm dependency build
         run: |-
-          for i in `ls -1 charts/`; do
-            helm dependency build charts/$i/
+          PATH=$(echo ${{ inputs.chart_path }} | cut -d '/' -f1)
+          for i in `ls -1 $PATH/`; do
+            helm dependency build $PATH/$i/
           done
 
       # Deploy to the GKE cluster - with sops
       - name: Deploy
         if: inputs.sops == true
         run: |-
-          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }} ${{ inputs.helm_args }}
+          PATH=$(echo ${{ inputs.chart_path }} | cut -d '/' -f1)
+          helm secrets upgrade --install ${{ inputs.chart_name }} $PATH/${{ inputs.chart_name }} -n ${{ inputs.namespace }} --create-namespace -f $PATH/${{ inputs.chart_name }}/values.yaml -f $PATH/${{ inputs.chart_name }}/values.${{ env.VALUES_STAGE }}.yaml -f $PATH/${{ inputs.chart_name }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }} ${{ inputs.helm_args }}
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
         if: inputs.sops == false
         run: |-
-          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }} ${{ inputs.helm_args }}
+          PATH=$(echo ${{ inputs.chart_path }} | cut -d '/' -f1)
+          helm upgrade --install ${{ inputs.chart_name }} $PATH/${{ inputs.chart_name }} -n ${{ inputs.namespace }} --create-namespace -f $PATH/${{ inputs.chart_name }}/values.yaml -f $PATH/${{ inputs.chart_name }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }} ${{ inputs.helm_args }}
