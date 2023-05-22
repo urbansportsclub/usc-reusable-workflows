@@ -144,7 +144,7 @@ jobs:
     name: Test
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/test-go.yaml@main
     secrets:
-      github-token: ${{ secrets.GB_TOKEN_PRIVATE }}
+      github-token: ${{ secrets.USG_GITHUB_TOKEN }}
 
   scan:
     name: Sonarqube Scan
@@ -173,7 +173,7 @@ jobs:
     name: Test
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/test-go.yaml@main
     secrets:
-      github-token: ${{ secrets.GB_TOKEN_PRIVATE }}
+      github-token: ${{ secrets.USG_GITHUB_TOKEN }}
   
   scan:
     name: Sonarqube Scan
