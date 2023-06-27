@@ -52,3 +52,5 @@ jobs:
       # Build
       - name: Build
         run: yarn build
+        env:
+          CI: false

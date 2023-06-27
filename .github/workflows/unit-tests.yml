@@ -72,9 +72,12 @@ jobs:
           name: ${{ inputs.REPO_NAME }}
           fail_ci_if_error: true
           verbose: true
+      - name: List coverage
+        run: ls -la
+
       - name: Upload Code Coverage Artifacts to test-artifacts
         uses: actions/upload-artifact@v3
         if: ${{ inputs.UPLOAD_ARTIFACTS }}
         with:
           name: test-artifacts
-          path: ./coverage
+          path: ${{ inputs.WORKING_DIRECTORY }}/coverage
