@@ -45,11 +45,11 @@ jobs:
           key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
       - name: List
         run: ls -la
-        
+
       - name: Set Node version
         uses: actions/setup-node@v3
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: '**/.nvmrc'
           registry-url: 'https://npm.pkg.github.com'
       - name: Setup Yarn
         run: npm install -g yarn
