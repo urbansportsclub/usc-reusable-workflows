@@ -15,6 +15,10 @@ on:
         required: false
         type: boolean
         default: false
+      WORKING_DIRECTORY:
+        type: string
+        default: "."
+        required: false
     secrets:
       GH_PACKAGES_TOKEN:
         required: true
@@ -24,6 +28,9 @@ jobs:
   unit_tests:
     name: Jest
     runs-on: [self-hosted, deploy]
+    defaults:
+      run:
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
@@ -39,8 +46,8 @@ jobs:
       - name: Set Node version
         uses: actions/setup-node@v3
         with:
-          node-version-file: ".nvmrc"
-          registry-url: "https://npm.pkg.github.com"
+          node-version-file: '.nvmrc'
+          registry-url: 'https://npm.pkg.github.com'
       - name: Setup Yarn
         run: npm install -g yarn
       - name: Install NPM dependencies
