@@ -43,6 +43,9 @@ jobs:
             ./node_modules
             /home/runner/.cache/Cypress
           key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
+      - name: List
+        run: ls -la
+        
       - name: Set Node version
         uses: actions/setup-node@v3
         with:
