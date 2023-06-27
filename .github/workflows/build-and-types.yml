@@ -40,7 +40,7 @@ jobs:
       - name: Set Node version
         uses: actions/setup-node@v3
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
           registry-url: 'https://npm.pkg.github.com'
       - name: Setup Yarn
         run: npm install -g yarn
