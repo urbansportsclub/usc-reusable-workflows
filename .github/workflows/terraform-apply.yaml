@@ -1,0 +1,25 @@
+name: Terraform Apply
+on:
+  push:
+    branches: [main]
+
+jobs:
+  terraform:
+    name: Apply
+    runs-on: [terraform]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve -input=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GB_MANAGEMENT_TOKEN }}
+          TF_VAR_DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          TF_VAR_DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
