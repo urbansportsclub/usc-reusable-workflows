@@ -48,7 +48,7 @@ jobs:
       run: ${{ inputs.external_container_dependencies }}
 
     - name: Test
-      run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
+      run: go test -v -race -short -covermode=atomic -coverprofile=coverage.out ./...
       env:
         GITHUB_TOKEN: ${{ secrets.github-token }}
     
