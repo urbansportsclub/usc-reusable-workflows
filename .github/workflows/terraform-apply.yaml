@@ -1,7 +1,17 @@
 name: Terraform Apply
 on:
-  push:
-    branches: [main]
+  workflow_call:
+    inputs:
+      terraform_path:
+        required: false
+        type: string
+        description: "Path for Terraform files"
+        default: "terraform/"
+      tf_args:
+        required: false
+        type: string
+        description: "Additional Terraform variables"
+        default: ""
 
 jobs:
   terraform:
@@ -12,14 +22,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Terraform Init
-        id: init
+      - name: Change directory to the Terraform path
+        run: cd ${{ inputs.terraform_path }}
+
+      - name: Init Terraform
         run: terraform init
 
-      - name: Terraform Apply
+      - name: Apply Terraform
         id: apply
+        if: inputs.tf_args != ""
+        run: terraform apply -auto-approve -input=false ${{ inputs.tf_args }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+
+      - name: Apply Terraform
+        id: apply
+        if: inputs.tf_args == ""
         run: terraform apply -auto-approve -input=false
         env:
-          GITHUB_TOKEN: ${{ secrets.GB_MANAGEMENT_TOKEN }}
-          TF_VAR_DD_API_KEY: ${{ secrets.DD_API_KEY }}
-          TF_VAR_DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+          GITHUB_TOKEN: ${{ secrets.github-token }}

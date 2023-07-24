@@ -1,7 +1,17 @@
 name: Terraform Plan
 on:
-  pull_request:
-    branches: [main]
+  workflow_call:
+    inputs:
+      terraform_path:
+        required: false
+        type: string
+        description: "Path for Terraform files"
+        default: "terraform/"
+      tf_args:
+        required: false
+        type: string
+        description: "Additional Terraform variables"
+        default: ""
 
 permissions:
   id-token: write
@@ -11,7 +21,6 @@ permissions:
 
 jobs:
   terraform:
-    needs: [lint]
     name: Terraform
     runs-on: [terraform]
     if: (github.actor != 'dependabot') || (github.actor == 'dependabot' && contains(github.event.pull_request.labels.*.name, 'safe-to-test'))
@@ -20,27 +29,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Terraform Format
-        id: fmt
+      - name: Change directory to the Terraform path
+        run: cd ${{ inputs.terraform_path }}
+
+      - name: Check Terraform format
         run: terraform fmt -check
         continue-on-error: true
 
-      - name: Terraform Init
-        id: init
+      - name: Init Terraform
         run: terraform init
 
-      - name: Terraform Validate
-        id: validate
+      - name: Validate Terraform
         run: terraform validate -no-color
 
-      - name: Terraform Plan
+      - name: Plan Terraform
         id: plan
+        if: inputs.tf_args != ""
+        run: terraform plan -no-color ${{ inputs.tf_args }} -out workspace.plan
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+
+      - name: Plan Terraform
+        id: plan
+        if: inputs.tf_args == ""
         run: terraform plan -no-color -out workspace.plan
         continue-on-error: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GB_MANAGEMENT_TOKEN }}
-          TF_VAR_DATADOG_API_KEY: ${{ secrets.DD_API_KEY }}
-          TF_VAR_DATADOG_APP_KEY: ${{ secrets.DD_APP_KEY }}
+          GITHUB_TOKEN: ${{ secrets.github-token }}
 
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
@@ -100,6 +116,6 @@ jobs:
               })
             }
 
-      - name: Terraform Plan Status
+      - name: Plan Terraform Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
