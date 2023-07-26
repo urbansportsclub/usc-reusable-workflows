@@ -44,16 +44,7 @@ jobs:
 
       - name: Plan Terraform
         id: plan
-        if: inputs.tf_args != ""
         run: terraform plan -no-color ${{ inputs.tf_args }} -out workspace.plan
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.github-token }}
-
-      - name: Plan Terraform
-        id: plan
-        if: inputs.tf_args == ""
-        run: terraform plan -no-color -out workspace.plan
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.github-token }}
