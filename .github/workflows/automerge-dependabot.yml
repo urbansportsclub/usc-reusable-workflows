@@ -1,5 +1,5 @@
 ---
-Name: Auto-merge dependabot PR's
+name: Auto-merge dependabot PR's
 
 on: 
   workflow_call:
@@ -14,7 +14,7 @@ permissions:
 jobs:
   dependabot:
     name: Dependabot auto-merge
-    runs-on: [self-hosted]
+    runs-on: [self-hosted, nonroot]
     timeout-minutes: 15
     if: ${{ github.actor == 'dependabot[bot]' }}
 
