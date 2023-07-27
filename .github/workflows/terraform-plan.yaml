@@ -46,8 +46,6 @@ jobs:
         id: plan
         run: terraform plan -no-color ${{ inputs.tf_args }} -out workspace.plan
         continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.github-token }}
 
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'

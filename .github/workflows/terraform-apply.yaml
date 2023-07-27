@@ -31,5 +31,3 @@ jobs:
       - name: Apply Terraform
         id: apply
         run: terraform apply -auto-approve -input=false ${{ inputs.tf_args }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.github-token }}
