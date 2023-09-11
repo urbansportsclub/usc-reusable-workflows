@@ -10,7 +10,7 @@ jobs:
     runs-on: [self-hosted, deploy]
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Restore NPM cache
       - name: Restore node_modules
         uses: actions/cache@v3
