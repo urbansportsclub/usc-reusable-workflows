@@ -96,7 +96,7 @@ jobs:
         gcloud auth configure-docker ${{ inputs.registry }}
 
     - name: Build and push
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile_path }}
