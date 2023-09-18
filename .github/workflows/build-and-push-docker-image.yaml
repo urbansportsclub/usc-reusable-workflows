@@ -81,7 +81,7 @@ jobs:
           type=sha,priority=40
 
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+      uses: docker/setup-qemu-action@v3
       if: inputs.platforms != 'linux/amd64'
 
     - name: Set up Docker Buildx
