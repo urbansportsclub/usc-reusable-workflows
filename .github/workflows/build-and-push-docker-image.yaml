@@ -69,7 +69,7 @@ jobs:
 
     - name: Docker subscriber meta
       id: subscriber_meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: ${{ inputs.registry }}/${{ inputs.project_id }}/${{ inputs.repository }}/${{ inputs.image_name }}
         flavor: |
