@@ -9,6 +9,10 @@ on:
         type: string
         default: '.'
         required: false
+      CI:
+        type: boolean
+        default: true
+        required: false
 jobs:
   build_and_types:
     name: Build and TSC
@@ -53,4 +57,4 @@ jobs:
       - name: Build
         run: yarn build
         env:
-          CI: false
+          CI: ${{ inputs.CI }}
