@@ -21,7 +21,7 @@ jobs:
             /home/runner/.cache/Cypress
           key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
       - name: Set Node version
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
           registry-url: "https://npm.pkg.github.com"
