@@ -20,11 +20,16 @@ on:
         required: false
         type: string
         default: coverage-artifact
+      reference_branch:
+        required: false
+        type: string
 
 jobs:
   build:
     name: Build
     runs-on: [self-hosted, nonroot]
+    env:
+      REFERENCE_BRANCH: ${{ inputs.reference_branch || github.event.repository.default_branch }}
 
     steps:
       - uses: actions/checkout@v4
@@ -39,8 +44,20 @@ jobs:
 
       - name: Scan
         uses: sonarsource/sonarqube-scan-action@master
+        if: ${{ always() && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
         with:
           args: -Dsonar.projectVersion=${{ github.sha }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ inputs.url }}
+    
+      - name: Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        if: ${{ always() && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
+        with:
+          args: >
+            -Dsonar.projectVersion=${{ github.sha }}
+            -Dsonar.newCode.referenceBranch=${{ env.REFERENCE_BRANCH }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ inputs.url }}
@@ -48,7 +65,7 @@ jobs:
       # If you wish to fail your job when the Quality Gate is red, uncomment the
       # following lines. This would typically be used to fail a deployment.
       - uses: sonarsource/sonarqube-quality-gate-action@master
-        if: inputs.enable_quality_gate == true
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.enable_quality_gate == true }}
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
