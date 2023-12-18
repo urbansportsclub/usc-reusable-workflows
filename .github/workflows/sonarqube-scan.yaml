@@ -38,7 +38,7 @@ jobs:
 
       - name: Download code coverage results
         if: inputs.download_coverage_artifact == true
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.coverage_artifact_name }}
 
