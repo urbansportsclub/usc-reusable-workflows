@@ -54,7 +54,7 @@ jobs:
     
     - name: Archive code coverage results
       if: inputs.upload_coverage_artifact == true
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.coverage_artifact_name }}
         path: coverage.out
