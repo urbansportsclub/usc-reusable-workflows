@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
       # Restore NPM cache
       - name: Restore node_modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: node-cache
         with:
           path: |
@@ -34,7 +34,7 @@ jobs:
           key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
       # Restore Next.js cache
       - name: Restore .next
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.next/cache
