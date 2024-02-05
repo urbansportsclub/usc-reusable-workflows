@@ -64,7 +64,7 @@ jobs:
       # Upload test coverage report to CodeCov
       - name: Codecov
         if: ${{ inputs.USE_CODECOV }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./coverage
