@@ -11,6 +11,14 @@ on:
         # this should be FALSE by default but as of now onefit B2B has a dependency and we would
         # need to make a change in there
         default: true
+      UPLOAD_ARTIFACTS:
+        required: false
+        type: boolean
+        default: false
+      WORKING_DIRECTORY:
+        type: string
+        default: "."
+        required: false
     secrets:
       GH_PACKAGES_TOKEN:
         required: true
@@ -20,23 +28,29 @@ jobs:
   unit_tests:
     name: Jest
     runs-on: [self-hosted, deploy]
+    defaults:
+      run:
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Restore NPM cache
       - name: Restore node_modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: node-cache
         with:
           path: |
             ./node_modules
             /home/runner/.cache/Cypress
           key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
+      - name: List
+        run: ls -la
+
       - name: Set Node version
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
-          registry-url: "https://npm.pkg.github.com"
+          node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
+          registry-url: 'https://npm.pkg.github.com'
       - name: Setup Yarn
         run: npm install -g yarn
       - name: Install NPM dependencies
@@ -50,7 +64,7 @@ jobs:
       # Upload test coverage report to CodeCov
       - name: Codecov
         if: ${{ inputs.USE_CODECOV }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./coverage
@@ -58,3 +72,10 @@ jobs:
           name: ${{ inputs.REPO_NAME }}
           fail_ci_if_error: true
           verbose: true
+
+      - name: Upload Code Coverage Artifacts to test-artifacts
+        uses: actions/upload-artifact@v4
+        if: ${{ inputs.UPLOAD_ARTIFACTS }}
+        with:
+          name: test-artifacts
+          path: ${{ inputs.WORKING_DIRECTORY }}/coverage

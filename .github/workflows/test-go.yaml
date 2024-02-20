@@ -25,15 +25,15 @@ jobs:
     timeout-minutes: 15
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Setup go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: "stable"
-
-    - name: Checkout code
-      uses: actions/checkout@v3
     
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
@@ -54,7 +54,7 @@ jobs:
     
     - name: Archive code coverage results
       if: inputs.upload_coverage_artifact == true
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.coverage_artifact_name }}
         path: coverage.out
