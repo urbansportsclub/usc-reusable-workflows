@@ -102,11 +102,21 @@ jobs:
 
 ![selecting the project](resources/readme/selecting-project.png)
 
-4. Retrieve the `Project key` by clicking the `Project information` link in the top right corner of the project page and copying the value.
+4. Select `GitHub Actions` to set up the repository and generate a `SONAR_TOKEN` to send data from your repository.
+
+![github actions](resources/readme/github-actions.png)
+
+5. Copy the token and go to your repository in GitHub, then set a new secret with the name `SONAR_TOKEN` and paste the token.
+
+![secrets](resources/readme/project-secrets.png)
+
+![github secrets](resources/readme/github-secrets.png)
+
+6. Return to the SonarQube page and click `Continue` to finish the tutorial.
+
+7. Retrieve the `Project key` by clicking the `Project information` link in the top right corner of the project page and copying the value.
 
 ![project information](resources/readme/project-information.png)
-
-> **_NOTE:_**  You don't need to generate a SONAR_TOKEN as we are using a global analysis token and it is added at the organization level.
 
 ### Properties file
 
@@ -144,7 +154,7 @@ jobs:
     name: Test
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/test-go.yaml@main
     secrets:
-      github-token: ${{ secrets.USG_GITHUB_TOKEN }}
+      github-token: ${{ secrets.GB_TOKEN_PRIVATE }}
 
   scan:
     name: Sonarqube Scan
@@ -152,7 +162,8 @@ jobs:
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/sonarqube-scan.yaml@main
     with:
       download_coverage_artifact: true
-    secrets: inherit
+    secrets:
+      token: ${{ secrets.SONAR_TOKEN }}
 ```
 
 Here is an example on how to use SonarQube for the `master|main` branch. You can notice that we are exposing two inputs for the `scan`:
@@ -173,7 +184,7 @@ jobs:
     name: Test
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/test-go.yaml@main
     secrets:
-      github-token: ${{ secrets.USG_GITHUB_TOKEN }}
+      github-token: ${{ secrets.GB_TOKEN_PRIVATE }}
   
   scan:
     name: Sonarqube Scan
@@ -182,7 +193,8 @@ jobs:
     with:
       enable_quality_gate: false
       download_coverage_artifact: true
-    secrets: inherit
+    secrets:
+      token: ${{ secrets.SONAR_TOKEN }}
 ```
 
 ### Code coverage for other languages
@@ -210,7 +222,8 @@ scan:
     enable_quality_gate: true
     download_coverage_artifact: true
     coverage_artifact_name: php-coverage-xml
-  secrets: inherit
+  secrets:
+    token: ${{ secrets.SONAR_TOKEN }}
 ```
 
 
