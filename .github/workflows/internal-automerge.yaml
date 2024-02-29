@@ -1,0 +1,14 @@
+---
+#This is NOT a reusable workflow
+name: Automerge Dependabot PRs
+on:
+  pull_request:
+    branches:
+      - "*"
+jobs:
+  # execute the automerge for dependabot PRs
+  automerge:
+    name: Automerge Dependabot
+    uses: urbansportsclub/usc-reusable-workflows/.github/workflows/automerge-dependabot.yml@main
+    secrets:
+      github-token: ${{ secrets.USG_GITHUB_TOKEN }}
