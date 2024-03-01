@@ -6,7 +6,7 @@ This is our set of reusable workflows that you can use to make your life simpler
 
 If you want to build and push images you can simply add this to your workflow
 
-```
+```yaml
 name: Build and push docker
 
 on:
@@ -30,7 +30,7 @@ We use docker/metadata to guess your image tag based on your branch, or tag. Thi
 
 Putting all together, we have the following.
 
-```
+```yaml
 name: Deploy to Kubernetes Cluster 
 
 on:
@@ -64,7 +64,7 @@ jobs:
 
 ## Rollback Workflow
 
-```
+```yaml
 name: Rollback Helm Deployment 
 
 on:
@@ -90,6 +90,35 @@ jobs:
       project_id: "urbansportsclub-dev" # GCP Project ID
       runner: "deploy" # Which Action Runner to use, change to "deploylive" for staging/live deployments.
 ```
+
+## Merge dependabot PRs automatically
+
+To auto-merge Dependabot PRs, add this workflow:
+
+```yaml
+name: Automerge Dependabot PRs
+on:
+  pull_request:
+    branches:
+      - "*"
+  workflow_run:
+    workflows: ["Lint and Test"]
+    types:
+      - completed
+
+jobs:
+  # execute the automerge for dependabot PRs
+  automerge:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: Automerge Dependabot
+    uses: urbansportsclub/usc-reusable-workflows/.github/workflows/automerge-dependabot.yml@main
+    secrets:
+      github-token: ${{ secrets.USG_GITHUB_TOKEN }}
+```
+
+The `workflow_run` event is optional. It triggers when a workflow run is requested or completed. Here, it's configured to trigger the `Automerge Dependabot` job only when the `Lint and Test` workflow completes.
+
+The `if` condition is also optional. It checks the conclusion of the `Lint and Test` workflow run. If the conclusion is `success`, the `Automerge Dependabot` job will be executed. This ensures that Dependabot PRs are only automatically merged if the `Lint and Test` workflow passes.
 
 ## SonarQube
 ### Setting Up
