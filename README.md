@@ -93,32 +93,16 @@ jobs:
 
 ## Merge dependabot PRs automatically
 
-To auto-merge Dependabot PRs, add this workflow:
+To auto-merge Dependabot PRs, add this to the end of your lint and test workflow so that the automerge only gets triggered after the tests are successful:
 
 ```yaml
-name: Automerge Dependabot PRs
-on:
-  pull_request:
-    branches:
-      - "*"
-  workflow_run:
-    workflows: ["Lint and Test"]
-    types:
-      - completed
-
-jobs:
-  # execute the automerge for dependabot PRs
   automerge:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Automerge Dependabot
+    needs: [lint, test, scan]
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/automerge-dependabot.yml@main
     secrets:
       github-token: ${{ secrets.USG_GITHUB_TOKEN }}
 ```
-
-The `workflow_run` event is optional. It triggers when a workflow run is requested or completed. Here, it's configured to trigger the `Automerge Dependabot` job only when the `Lint and Test` workflow completes.
-
-The `if` condition is also optional. It checks the conclusion of the `Lint and Test` workflow run. If the conclusion is `success`, the `Automerge Dependabot` job will be executed. This ensures that Dependabot PRs are only automatically merged if the `Lint and Test` workflow passes.
 
 ## SonarQube
 ### Setting Up
