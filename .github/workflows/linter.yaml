@@ -93,6 +93,6 @@ jobs:
         with:
           version: v1.55
           only-new-issues: true
-          args: -c ./.github/linters/.golangci.yaml ${{inputs.enable_whole_files && '--whole-files'}}
+          args: -c ./.github/linters/.golangci.yaml ${{inputs.enable_whole_files && '--whole-files' || ''}}
         env:
           GITHUB_TOKEN: ${{ secrets.github-token }}
