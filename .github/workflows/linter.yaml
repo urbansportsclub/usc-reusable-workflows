@@ -91,7 +91,7 @@ jobs:
       - name: Lint Code Base
         uses: golangci/golangci-lint-action@v4
         with:
-          version: v1.55
+          version: v1.56
           only-new-issues: true
           args: -c ./.github/linters/.golangci.yaml ${{inputs.enable_whole_files && '--whole-files' || ''}}
         env:
