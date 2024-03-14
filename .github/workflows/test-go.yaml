@@ -43,7 +43,7 @@ jobs:
     - name: Configure private repo
       run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
 
-    - run: gcloud auth configure-docker --quiet
+    - run: gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://eu.gcr.io
 
     - name: Install external dependencies
       if: inputs.external_container_dependencies != ''
