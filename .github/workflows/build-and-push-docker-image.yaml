@@ -54,6 +54,9 @@ on:
       build_args:
         required: false
         description: "Build args"
+      secret_args:
+        required: false
+        description: "Secret args to be passed to the docker build"
 
 jobs:
   buildandpushdocker:
@@ -109,3 +112,5 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
+        secrets: |
+          ${{ secrets.secret_args }}
