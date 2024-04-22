@@ -25,15 +25,19 @@ jobs:
       with:
         github-token: "${{ secrets.github-token }}"
 
-    - name: Approve a PR
-      run: gh pr review --approve "$PR_URL"
+    - name: Check PR checks
+      run: |
+        PR_URL="${{ github.event.pull_request.html_url }}"
+        if gh pr checks "$PR_URL" --json conclusion | grep -q '"conclusion": "FAILURE"'; then
+          echo "Failed checks detected, stopping automerge."
+          exit 1
+        fi
       env:
-        PR_URL: ${{ github.event.pull_request.html_url }}
         GITHUB_TOKEN: ${{ secrets.github-token }}
 
     - name: Enable auto-merge for Dependabot PRs
       if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' }}
-      run: gh pr merge --auto --squash "$PR_URL"
+      run: gh pr merge --auto --squash --admin "$PR_URL"
       env:
         PR_URL: ${{ github.event.pull_request.html_url }}
         GITHUB_TOKEN: ${{ secrets.github-token }}
