@@ -1,0 +1,40 @@
+---
+name: Auto-merge dependabot PR's
+
+on: 
+  workflow_call:
+    secrets:
+      github-token:
+        required: true
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  dependabot:
+    name: Dependabot auto-merge
+    runs-on: [self-hosted, nonroot]
+    timeout-minutes: 15
+    if: ${{ github.actor == 'dependabot[bot]' }}
+
+    steps:
+    - name: Dependabot metadata
+      id: dependabot-metadata
+      uses: dependabot/fetch-metadata@v2.0.0
+      with:
+        github-token: "${{ secrets.github-token }}"
+  
+    - name: Check PR checks
+      run: |
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          gh pr checks $PR_URL --required --watch --fail-fast > /dev/null
+      env:
+        GITHUB_TOKEN: ${{ secrets.github-token }}
+
+    - name: Enable auto-merge for Dependabot PRs
+      if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' }}
+      run: gh pr merge --auto --squash --admin "$PR_URL"
+      env:
+        PR_URL: ${{ github.event.pull_request.html_url }}
+        GITHUB_TOKEN: ${{ secrets.github-token }}

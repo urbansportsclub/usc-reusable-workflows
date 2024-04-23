@@ -94,6 +94,7 @@ jobs:
 ## Merge dependabot PRs automatically
 
 To auto-merge Dependabot PRs, add this to the end of your lint and test workflow so that the automerge only gets triggered after the tests are successful:
+If you have codeowners on your project change for automerge-dependabot-with-codeowners.yml@main
 
 ```yaml
   automerge:
