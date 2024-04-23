@@ -24,11 +24,11 @@ jobs:
       uses: dependabot/fetch-metadata@v2.0.0
       with:
         github-token: "${{ secrets.github-token }}"
-
+  
     - name: Check PR checks
       run: |
           PR_URL="${{ github.event.pull_request.html_url }}"
-          gh pr checks $PR_URL --required  --required --watch --fail-fast > /dev/null
+          gh pr checks $PR_URL --required --watch --fail-fast > /dev/null
       env:
         GITHUB_TOKEN: ${{ secrets.github-token }}
 
