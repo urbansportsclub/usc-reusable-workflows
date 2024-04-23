@@ -1,7 +1,7 @@
 ---
 name: Auto-merge dependabot PR's
 
-on: 
+on:
   workflow_call:
     secrets:
       github-token:
@@ -19,21 +19,21 @@ jobs:
     if: ${{ github.actor == 'dependabot[bot]' }}
 
     steps:
-    - name: Dependabot metadata
-      id: dependabot-metadata
-      uses: dependabot/fetch-metadata@v2.0.0
-      with:
-        github-token: "${{ secrets.github-token }}"
+      - name: Dependabot metadata
+        id: dependabot-metadata
+        uses: dependabot/fetch-metadata@v2.0.0
+        with:
+          github-token: "${{ secrets.github-token }}"
 
-    - name: Approve a PR
-      run: gh pr review --approve "$PR_URL"
-      env:
-        PR_URL: ${{ github.event.pull_request.html_url }}
-        GITHUB_TOKEN: ${{ secrets.github-token }}
+      - name: Approve a PR
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.github-token }}
 
-    - name: Enable auto-merge for Dependabot PRs
-      if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' }}
-      run: gh pr merge --auto --squash "$PR_URL"
-      env:
-        PR_URL: ${{ github.event.pull_request.html_url }}
-        GITHUB_TOKEN: ${{ secrets.github-token }}
+      - name: Enable auto-merge for Dependabot PRs
+        if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' && github.event.pull_request.check_suite.conclusion == 'success' }}
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.github-token }}
