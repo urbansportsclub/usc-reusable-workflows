@@ -28,7 +28,7 @@ jobs:
       - name: Check PR checks
         run: |
           PR_URL="${{ github.event.pull_request.html_url }}"
-          gh pr checks $PR_URL --watch --fail-fast
+          gh pr checks $PR_URL --required --watch --fail-fast
         env:
           GITHUB_TOKEN: ${{ secrets.github-token }}
 
