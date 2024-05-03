@@ -16,7 +16,6 @@ jobs:
     name: Dependabot auto-merge
     runs-on: [self-hosted, nonroot]
     timeout-minutes: 15
-    if: ${{ github.actor == 'dependabot[bot]' }}
 
     steps:
       - name: Dependabot metadata
@@ -33,6 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github-token }}
 
       - name: Enable auto-merge for Dependabot PRs
+        if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' && github.event.pull_request.check_suite.conclusion == 'success' }}
         run: gh pr merge --auto --squash --admin "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
