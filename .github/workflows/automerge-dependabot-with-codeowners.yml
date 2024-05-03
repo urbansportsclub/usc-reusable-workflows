@@ -16,11 +16,11 @@ jobs:
     name: Dependabot auto-merge
     runs-on: [self-hosted, nonroot]
     timeout-minutes: 15
+    if: ${{ github.actor == 'dependabot[bot]' }}
 
     steps:
       - name: Dependabot metadata
         id: dependabot-metadata
-        if: ${{ github.actor == 'dependabot[bot]' }}
         uses: dependabot/fetch-metadata@v2.0.0
         with:
           github-token: "${{ secrets.github-token }}"
