@@ -1,0 +1,61 @@
+name: Unit Testing - NPM
+on:
+  workflow_call:
+    inputs:
+      REPO_NAME:
+        required: true
+        type: string
+      USE_CODECOV:
+        required: false
+        type: boolean
+        default: false
+      UPLOAD_ARTIFACTS:
+        required: false
+        type: boolean
+        default: false
+      WORKING_DIRECTORY:
+        type: string
+        default: "."
+        required: false
+    secrets:
+      GH_PACKAGES_TOKEN:
+        required: true
+      CODECOV_TOKEN:
+        required: false
+
+jobs:
+  unit_test_rtl:
+    name: Unit Tests - NPM
+    runs-on: [self-hosted, deploy]
+    defaults:
+      run:
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
+    steps:
+      - name: Checkout Repo Code
+        uses: actions/checkout@v4
+
+      - name: Restore `node_modules`
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            ./node_modules
+            /home/runner/.cache/Cypress
+          key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
+
+      - name: List Files
+        run: ls -la
+
+      - name: Setup Node.js Version
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+
+      - name: Clean Install Dependencies
+        run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+
+      - name: Run Unit Test Script
+        run: npm run test
