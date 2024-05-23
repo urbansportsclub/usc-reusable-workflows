@@ -1,4 +1,4 @@
-name: Unit Testing - NPM
+name: Unit Testing
 on:
   workflow_call:
     inputs:
@@ -24,8 +24,8 @@ on:
         required: false
 
 jobs:
-  unit_test_rtl:
-    name: Unit Tests - NPM
+  unit_tests:
+    name: Unit Tests
     runs-on: [self-hosted, deploy]
     defaults:
       run:
@@ -38,10 +38,8 @@ jobs:
         uses: actions/cache@v4
         id: node-cache
         with:
-          path: |
-            ./node_modules
-            /home/runner/.cache/Cypress
-          key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
+          path: ./node_modules
+          key: node-cache-${{ runner.os }}-${{ hashFiles('./package-lock.json') }}
 
       - name: List Files
         run: ls -la
