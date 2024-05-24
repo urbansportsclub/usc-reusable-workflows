@@ -75,7 +75,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
-      - if: ${{ inputs.PACKAGE_MANAGER == 'npm' }}
+      - if: ${{ inputs.PACKAGE_MANAGER == 'npm' }} && steps.node-cache-npm.outputs.cache-hit != 'true'
         name: Clean Install Dependencies - NPM
         run: npm ci
         env:
