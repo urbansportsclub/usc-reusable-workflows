@@ -71,7 +71,9 @@ jobs:
 
       - if: ${{ inputs.PACKAGE_MANAGER == 'yarn' }} && steps.node-cache-yarn.outputs.cache-hit != 'true'
         name: Install NPM dependencies - Yarn
-        run: yarn --frozen-lockfile
+        run: |
+          npm install -g yarn
+          yarn --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
