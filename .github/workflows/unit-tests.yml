@@ -19,6 +19,10 @@ on:
         type: string
         default: "."
         required: false
+      PACKAGE_MANAGER:
+        type: string
+        default: "yarn"
+        required: false
     secrets:
       GH_PACKAGES_TOKEN:
         required: true
@@ -34,16 +38,29 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+      
       # Restore NPM cache
-      - name: Restore node_modules
+      - if: ${{ inputs.PACKAGE_MANAGER == 'yarn' }}
+        name: Restore `node_modules` - yarn
         uses: actions/cache@v4
-        id: node-cache
+        id: node-cache-yarn
         with:
           path: |
             ./node_modules
             /home/runner/.cache/Cypress
           key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
-      - name: List
+      
+      - if: ${{ inputs.PACKAGE_MANAGER == 'npm' }}
+        name: Restore `node_modules` - npm
+        uses: actions/cache@v4
+        id: node-cache-npm
+        with:
+          path: |
+            ./node_modules
+            /home/runner/.cache/Cypress
+          key: node-cache-${{ runner.os }}-${{ hashFiles('./package-lock.json') }}
+
+      - name: List Directory Files
         run: ls -la
 
       - name: Set Node version
@@ -51,16 +68,28 @@ jobs:
         with:
           node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
           registry-url: 'https://npm.pkg.github.com'
-      - name: Setup Yarn
-        run: npm install -g yarn
-      - name: Install NPM dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
+
+      - if: ${{ inputs.PACKAGE_MANAGER == 'yarn' }} && steps.node-cache-yarn.outputs.cache-hit != 'true'
+        name: Install NPM dependencies - Yarn
         run: yarn --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+
+      - if: ${{ inputs.PACKAGE_MANAGER == 'npm' }}
+        name: Clean Install Dependencies - NPM
+        run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+
       # Unit Tests
-      - name: Jest
+      - if: ${{ inputs.PACKAGE_MANAGER == 'yarn' }}
+        name: Jest - Yarn
         run: yarn jest:run
+
+      - if: ${{ inputs.PACKAGE_MANAGER == 'npm' }}
+        name: Jest - NPM
+        run: npm run test
+
       # Upload test coverage report to CodeCov
       - name: Codecov
         if: ${{ inputs.USE_CODECOV }}
