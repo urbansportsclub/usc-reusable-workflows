@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Unit Tests - NPM
 on:
   workflow_call:
     inputs:
@@ -8,8 +8,6 @@ on:
       USE_CODECOV:
         required: false
         type: boolean
-        # this should be FALSE by default but as of now onefit B2B has a dependency and we would
-        # need to make a change in there
         default: true
       UPLOAD_ARTIFACTS:
         required: false
@@ -24,44 +22,48 @@ on:
         required: true
       CODECOV_TOKEN:
         required: false
+
 jobs:
   unit_tests:
-    name: Jest
+    name: Unit Tests (RTL/Jest)
     runs-on: [self-hosted, deploy]
     defaults:
       run:
         working-directory: ${{ inputs.WORKING_DIRECTORY }}
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+
       # Restore NPM cache
-      - name: Restore node_modules
+      - name: Restore `node_modules` - npm
         uses: actions/cache@v4
-        id: node-cache
+        id: node-cache-npm
         with:
           path: |
             ./node_modules
-            /home/runner/.cache/Cypress
-          key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
-      - name: List
+          key: node-cache-${{ runner.os }}-${{ hashFiles('./package-lock.json') }}
+
+      - name: List Directory Files
         run: ls -la
 
+      # Set Node version (requires .nvmrc file in the root of repository)
       - name: Set Node version
         uses: actions/setup-node@v4
         with:
           node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
           registry-url: "https://npm.pkg.github.com"
-      - name: Setup Yarn
-        run: npm install -g yarn
-      - name: Install NPM dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
-        run: yarn --frozen-lockfile
+
+      - if: ${{ steps.node-cache-npm.outputs.cache-hit != 'true' }}
+        name: Clean Install Dependencies - NPM
+        run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-      # Unit Tests
-      - name: Jest
-        run: yarn jest:run
-      # Upload test coverage report to CodeCov
+
+      - name: Run Test command
+        run: npm run test
+
+      # CodeCov testing coverage uploads
       - name: Codecov
         if: ${{ inputs.USE_CODECOV }}
         uses: codecov/codecov-action@v4
@@ -73,7 +75,7 @@ jobs:
           fail_ci_if_error: true
           verbose: true
 
-      - name: Upload Code Coverage Artifacts to test-artifacts
+      - name: Upload coverage artifacts to `${{ inputs.WORKING_DIRECTORY }}/coverage/test-artifacts`
         uses: actions/upload-artifact@v4
         if: ${{ inputs.UPLOAD_ARTIFACTS }}
         with:
