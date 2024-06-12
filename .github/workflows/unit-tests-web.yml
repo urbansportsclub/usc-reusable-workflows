@@ -66,17 +66,16 @@ jobs:
       - name: List Directory Files
         run: ls -la
 
-      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
-        name: Conditional Yarn install for runner if used
-        run:  npm -g install yarn
-
       # Set Node version (requires .nvmrc file in the root of repository)
       - name: Set Node version
         uses: actions/setup-node@v4
         with:
           node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
           registry-url: "https://npm.pkg.github.com"
-          cache: ${{ env.NODE_CMD_MODE }}
+
+      # - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
+      #   name: Conditional Yarn install for runner if used
+      #   run:  npm -g install yarn
 
       # Installing dependencies
       - if: ${{ steps.node-cache.outputs.cache-hit != 'true' }}
