@@ -6,17 +6,23 @@ on:
         required: true
         type: string
       USE_CODECOV:
-        required: false
-        type: boolean
         default: true
-      UPLOAD_ARTIFACTS:
         required: false
         type: boolean
+      UPLOAD_ARTIFACTS:
         default: false
+        required: false
+        type: boolean
       WORKING_DIRECTORY:
-        type: string
+        description: Working directory path.
         default: "."
         required: false
+        type: string
+      PACKAGE_MANAGER:
+        description: Package manager to install dependencies with (`npm` or `yarn`).
+        default: "npm"
+        required: false
+        type: string
     secrets:
       GH_PACKAGES_TOKEN:
         required: true
@@ -26,23 +32,36 @@ on:
 jobs:
   unit_tests:
     name: Unit Tests (RTL/Jest)
-    runs-on: [self-hosted, deploy]
     defaults:
       run:
         working-directory: ${{ inputs.WORKING_DIRECTORY }}
+    runs-on: [self-hosted, deploy]
+    env:
+      NODE_CACHE_MODE: ""
 
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
 
+      - name: Setup node_cache_mode env var
+        run: |
+          if [ "${{ inputs.PACKAGE_MANAGER }}" == 'npm' ] && { [ -f "${{ inputs.WORKING_DIRECTORY }}/package-lock.json" ]; }; then
+            echo "NODE_CACHE_MODE=npm" >> $GITHUB_ENV
+          elif [ "${{ inputs.PACKAGE_MANAGER }}" == 'yarn' ] && [ -f "${{ inputs.WORKING_DIRECTORY }}/yarn.lock" ]; then
+            echo "NODE_CACHE_MODE=yarn" >> $GITHUB_ENV
+          else
+            echo "Unknown package manager usage OR no lock files found within working dir"
+          fi
+
       # Restore NPM cache
-      - name: Restore `node_modules` - npm
+      - name: Restore `node_modules` cache
+        env:
+          LOCK_FILE: ${{ env.NODE_CACHE_MODE == 'npm' && '${{ inputs.WORKING_DIRECTORY }}/package-lock.json' || '${{ inputs.WORKING_DIRECTORY }}/yarn.lock' }}
         uses: actions/cache@v4
-        id: node-cache-npm
+        id: node-cache
         with:
-          path: |
-            ./node_modules
-          key: node-cache-${{ runner.os }}-${{ hashFiles('./package-lock.json') }}
+          path: ${{ inputs.WORKING_DIRECTORY }}/node_modules
+          key: node-cache-${{ runner.os }}-${{ hashFiles(env.LOCK_FILE) }}
 
       - name: List Directory Files
         run: ls -la
@@ -53,15 +72,17 @@ jobs:
         with:
           node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
           registry-url: "https://npm.pkg.github.com"
+          cache: ${{ env.NODE_CACHE_MODE }}
 
-      - if: ${{ steps.node-cache-npm.outputs.cache-hit != 'true' }}
-        name: Clean Install Dependencies - NPM
-        run: npm ci
+      - if: ${{ steps.node-cache.outputs.cache-hit != 'true' }}
+        name: Install Dependencies
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          INSTALL_ARGS: ${{ env.NODE_CACHE_MODE == 'npm' && 'ci' || env.NODE_CACHE_MODE == 'yarn' && '--frozen-lockfile' || 'install' }}
+        run: ${{ format('{0} {1}', inputs.PACKAGE_MANAGER, env.INSTALL_ARGS) }}
 
-      - name: Run Test command
-        run: npm run test
+      - name: Run test script command
+        run: ${{ ((inputs.PACKAGE_MANAGER == 'npm') && 'npm run') || 'yarn' }} test
 
       # CodeCov testing coverage uploads
       - name: Codecov
