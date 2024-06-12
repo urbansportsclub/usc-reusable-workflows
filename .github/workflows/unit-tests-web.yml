@@ -73,13 +73,12 @@ jobs:
           node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
           registry-url: "https://npm.pkg.github.com"
 
-      # - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
-      #   name: Conditional Yarn install for runner if used
-      #   run:  npm -g install yarn
+      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
+        name: Conditional Yarn install for runner if used
+        run:  npm -g install yarn
 
       # Installing dependencies
-      - if: ${{ steps.node-cache.outputs.cache-hit != 'true' }}
-        name: Install Dependencies
+      - name: Install Dependencies
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'npm' && 'ci' || env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || 'install' }}
