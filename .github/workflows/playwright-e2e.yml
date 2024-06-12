@@ -38,6 +38,10 @@ jobs:
             echo "Unknown package manager usage OR no lock files found within working dir"
           fi
 
+      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
+        name: Conditional Yarn install for runner if used
+        run:  npm -g install yarn
+
       # Set Node version (requires .nvmrc file in the root of repository)
       - name: Setup Node Version
         uses: actions/setup-node@v4
@@ -50,7 +54,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'npm' && 'ci' || env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || 'install' }}
-        run: ${{ format('{0} {1}', inputs.PACKAGE_MANAGER, env.INSTALL_ARGS) }}
+        run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps

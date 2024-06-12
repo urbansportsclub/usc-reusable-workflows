@@ -53,6 +53,10 @@ jobs:
             echo "Unknown package manager usage OR no lock files found within working dir"
           fi
 
+      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
+        name: Conditional Yarn install for runner if used
+        run:  npm -g install yarn
+
       # Restore Node cache
       - name: Restore `node_modules` cache
         env:
@@ -80,7 +84,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'npm' && 'ci' || env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || 'install' }}
-        run: ${{ format('{0} {1}', inputs.PACKAGE_MANAGER, env.INSTALL_ARGS) }}
+        run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
 
       # Running test command
       - name: Run test script command
