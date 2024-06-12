@@ -1,0 +1,58 @@
+name: Linting and Formatting
+on:
+  workflow_call:
+    inputs:
+      WORKING_DIRECTORY:
+        description: Working directory path.
+        default: "."
+        required: false
+        type: string
+      PACKAGE_MANAGER:
+        description: Package manager to install dependencies with (`npm` or `yarn`).
+        default: "npm"
+        required: false
+        type: string
+    secrets:
+      GH_PACKAGES_TOKEN:
+        required: true
+jobs:
+  lint:
+    name: ESLint and Prettier formatting
+    runs-on: [self-hosted, deploy]
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      # Restore NPM cache
+      - name: Restore node_modules cache
+        env:
+          LOCK_FILE: ${{ inputs.PACKAGE_MANAGER == 'npm' && '${{ inputs.WORKING_DIRECTORY }}/package-lock.json' || '${{ inputs.WORKING_DIRECTORY }}/yarn.lock' }}
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: ${{ inputs.WORKING_DIRECTORY }}/node_modules
+          key: node-cache-${{ runner.os }}-${{ hashFiles(env.LOCK_FILE) }}
+
+      - name: Set Node version
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+
+      - if: ${{ inputs.PACKAGE_MANAGER == 'yarn' }}
+        name: Conditional Yarn install for runner if used
+        run:  npm -g install yarn
+
+      # Installing dependencies
+      - name: Install Dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          INSTALL_ARGS: ${{ inputs.PACKAGE_MANAGER == 'npm' && 'ci' || inputs.PACKAGE_MANAGER == 'yarn' && '--frozen-lockfile' || 'install' }}
+        run: ${{ format('{0} {1}', inputs.PACKAGE_MANAGER, env.INSTALL_ARGS) }}
+
+      # Run Linter
+      - name: ESLint
+        run: ${{ ((inputs.PACKAGE_MANAGER == 'npm') && 'npm run') || 'yarn' }} lint
+      
+      # Run Formatter
+      - name: Prettier
+        run: ${{ ((inputs.PACKAGE_MANAGER == 'npm') && 'npm run') || 'yarn' }} format 
