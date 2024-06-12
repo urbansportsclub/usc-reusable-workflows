@@ -106,8 +106,8 @@ jobs:
           verbose: true
 
       - name: Upload coverage artifacts to `${{ inputs.WORKING_DIRECTORY }}/coverage/test-artifacts`
+        if: ${{ inputs.USE_CODECOV && inputs.UPLOAD_ARTIFACTS }}
         uses: actions/upload-artifact@v4
-        if: ${{ inputs.UPLOAD_ARTIFACTS }}
         with:
           name: test-artifacts
           path: ${{ inputs.WORKING_DIRECTORY }}/coverage
