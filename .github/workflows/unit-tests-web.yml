@@ -53,7 +53,7 @@ jobs:
             echo "Unknown package manager usage OR no lock files found within working dir"
           fi
 
-      # Restore NPM cache
+      # Restore Node cache
       - name: Restore `node_modules` cache
         env:
           LOCK_FILE: ${{ env.NODE_CACHE_MODE == 'npm' && '${{ inputs.WORKING_DIRECTORY }}/package-lock.json' || '${{ inputs.WORKING_DIRECTORY }}/yarn.lock' }}
@@ -74,6 +74,7 @@ jobs:
           registry-url: "https://npm.pkg.github.com"
           cache: ${{ env.NODE_CACHE_MODE }}
 
+      # Installing dependencies
       - if: ${{ steps.node-cache.outputs.cache-hit != 'true' }}
         name: Install Dependencies
         env:
@@ -81,6 +82,7 @@ jobs:
           INSTALL_ARGS: ${{ env.NODE_CACHE_MODE == 'npm' && 'ci' || env.NODE_CACHE_MODE == 'yarn' && '--frozen-lockfile' || 'install' }}
         run: ${{ format('{0} {1}', inputs.PACKAGE_MANAGER, env.INSTALL_ARGS) }}
 
+      # Running test command
       - name: Run test script command
         run: ${{ ((inputs.PACKAGE_MANAGER == 'npm') && 'npm run') || 'yarn' }} test
 
