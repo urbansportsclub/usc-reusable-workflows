@@ -38,10 +38,6 @@ jobs:
             echo "Unknown package manager usage OR no lock files found within working dir"
           fi
 
-      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
-        name: Conditional Yarn install for runner if used
-        run:  npm -g install yarn
-
       # Set Node version (requires .nvmrc file in the root of repository)
       - name: Setup Node Version
         uses: actions/setup-node@v4
@@ -49,6 +45,10 @@ jobs:
           node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
           registry-url: "https://npm.pkg.github.com"
           cache: ${{ env.NODE_CMD_MODE }}
+
+      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
+        name: Conditional Yarn install for runner if used
+        run:  npm -g install yarn
 
       - name: Install dependencies
         env:

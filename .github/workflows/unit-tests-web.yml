@@ -53,10 +53,6 @@ jobs:
             echo "Unknown package manager usage OR no lock files found within working dir"
           fi
 
-      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
-        name: Conditional Yarn install for runner if used
-        run:  npm -g install yarn
-
       # Restore Node cache
       - name: Restore `node_modules` cache
         env:
@@ -69,6 +65,10 @@ jobs:
 
       - name: List Directory Files
         run: ls -la
+
+      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
+        name: Conditional Yarn install for runner if used
+        run:  npm -g install yarn
 
       # Set Node version (requires .nvmrc file in the root of repository)
       - name: Set Node version
