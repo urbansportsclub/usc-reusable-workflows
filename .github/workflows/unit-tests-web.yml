@@ -88,6 +88,11 @@ jobs:
       - name: Run test script command
         run: ${{ ((inputs.PACKAGE_MANAGER == 'npm') && 'npm run') || 'yarn' }} test
 
+      # Yarn cleanup when used
+      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
+        name: Clean up Yarn from runner
+        run: npm uninstall -g yarn
+
       # CodeCov testing coverage uploads
       - name: Codecov
         if: ${{ inputs.USE_CODECOV }}

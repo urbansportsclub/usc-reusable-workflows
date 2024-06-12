@@ -56,6 +56,11 @@ jobs:
           INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'npm' && 'ci' || env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || 'install' }}
         run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
 
+      # Yarn cleanup when used
+      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
+        name: Clean up Yarn from runner
+        run: npm uninstall -g yarn
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
