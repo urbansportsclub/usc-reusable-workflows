@@ -23,6 +23,10 @@ on:
         default: "npm"
         required: false
         type: string
+      TEST_CMD_FLAG:
+        description: Optional flag to pass to `test` command script (e.g. :ci / :watch / :all, etc.)
+        required: false
+        type: string
     secrets:
       GH_PACKAGES_TOKEN:
         required: true
@@ -63,9 +67,6 @@ jobs:
           path: ${{ inputs.WORKING_DIRECTORY }}/node_modules
           key: node-cache-${{ runner.os }}-${{ hashFiles(env.LOCK_FILE) }}
 
-      - name: List Directory Files
-        run: ls -la
-
       # Set Node version (requires .nvmrc file in the root of repository)
       - name: Set Node version
         uses: actions/setup-node@v4
@@ -75,7 +76,7 @@ jobs:
 
       - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
         name: Conditional Yarn install for runner if used
-        run:  npm -g install yarn
+        run: npm -g install yarn
 
       # Installing dependencies
       - name: Install Dependencies
@@ -86,7 +87,9 @@ jobs:
 
       # Running test command
       - name: Run test script command
-        run: ${{ ((inputs.PACKAGE_MANAGER == 'npm') && 'npm run') || 'yarn' }} test
+        env:
+          PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || 'yarn' }}
+        run: ${{ format('{0} {1} {2}', env.PKG_CMD, 'test', inputs.TEST_CMD_FLAG) }}
 
       # CodeCov testing coverage uploads
       - name: Codecov
