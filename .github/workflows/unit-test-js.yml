@@ -35,7 +35,7 @@ jobs:
     defaults:
       run:
         working-directory: ${{ inputs.WORKING_DIRECTORY }}
-    runs-on: [self-hosted, deploy]
+    runs-on: [self-hosted, nonroot]
     env:
       NODE_CMD_MODE: ""
 
@@ -87,11 +87,6 @@ jobs:
       # Running test command
       - name: Run test script command
         run: ${{ ((inputs.PACKAGE_MANAGER == 'npm') && 'npm run') || 'yarn' }} test
-
-      # Yarn cleanup when used
-      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
-        name: Clean up Yarn from runner
-        run: npm uninstall -g yarn
 
       # CodeCov testing coverage uploads
       - name: Codecov
