@@ -7,6 +7,14 @@ on:
         default: "."
         required: false
         type: string
+      LINT_CMD_FLAG:
+        description: Optional flag to pass to `lint` command script (e.g. :ci / :watch / :all, etc.)
+        required: false
+        type: string
+      FORMAT_CMD_FLAG:
+        description: Optional flag to pass to `formant` command script (e.g. :ci / :watch / :check, etc.)
+        required: false
+        type: string
     secrets:
       GH_PACKAGES_TOKEN:
         required: true
@@ -66,8 +74,12 @@ jobs:
 
       # Run Linter
       - name: ESLint
-        run: ${{ ((env.NODE_CMD_MODE == 'npm') && 'npm run') || env.NODE_CMD_MODE }} lint
+        env:
+          PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
+        run: ${{ format('{0} {1} {2}', env.PKG_CMD, 'lint', inputs.LINT_CMD_FLAG) }}
       
       # Run Formatter
       - name: Prettier
-        run: ${{ ((env.NODE_CMD_MODE == 'npm') && 'npm run') || env.NODE_CMD_MODE }} format 
+        env:
+          PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
+        run: ${{ format('{0} {1} {2}', env.PKG_CMD, 'format', inputs.LINT_CMD_FLAG) }}

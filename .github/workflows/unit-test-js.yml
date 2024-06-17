@@ -1,4 +1,4 @@
-name: Unit Tests - NPM
+name: Unit Tests - Javascript
 on:
   workflow_call:
     inputs:
