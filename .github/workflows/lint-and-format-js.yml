@@ -78,10 +78,10 @@ jobs:
       - name: ESLint
         env:
           PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
-        run: ${{ format('{0} {1} {2}', env.PKG_CMD, 'lint', inputs.LINT_CMD_FLAG) }}
+        run: ${{ format('{0} {1}{2}', env.PKG_CMD, 'lint', inputs.LINT_CMD_FLAG) }}
       
       # Run Formatter
       - name: Prettier
         env:
           PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
-        run: ${{ format('{0} {1} {2}', env.PKG_CMD, 'format', inputs.LINT_CMD_FLAG) }}
+        run: ${{ format('{0} {1}{2}', env.PKG_CMD, 'format', inputs.LINT_CMD_FLAG) }}
