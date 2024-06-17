@@ -8,11 +8,6 @@ on:
         type: string
         default: "."
         required: false
-      PACKAGE_MANAGER:
-        description: Package manager to install dependencies with (`npm` or `yarn`).
-        default: "npm"
-        required: false
-        type: string
     secrets:
       GH_PACKAGES_TOKEN:
         required: true
@@ -24,19 +19,21 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_CMD_MODE: ""
+
     steps:
       - name: Checkout Repository Code
         uses: actions/checkout@v4
 
-      - name: Setup NODE_CMD_MODE env var
+      - name: Setup NODE_CMD_MODE values
         run: |
-          if [ "${{ inputs.PACKAGE_MANAGER }}" == 'npm' ] && { [ -f "${{ inputs.WORKING_DIRECTORY }}/package-lock.json" ]; }; then
-            echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
-          elif [ "${{ inputs.PACKAGE_MANAGER }}" == 'yarn' ] && [ -f "${{ inputs.WORKING_DIRECTORY }}/yarn.lock" ]; then
+          if [ -f "${{ inputs.WORKING_DIRECTORY }}/yarn.lock" ]; then
             echo "NODE_CMD_MODE=yarn" >> $GITHUB_ENV
+          elif [ -f "${{ inputs.WORKING_DIRECTORY }}/pnpm-lock.yaml" ]; then
+            echo "NODE_CMD_MODE=pnpm" >> $GITHUB_ENV
           else
-            echo "Unknown package manager usage OR no lock files found within working dir"
+            echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
           fi
+
 
       # Set Node version (requires .nvmrc file in the root of repository)
       - name: Setup Node Version

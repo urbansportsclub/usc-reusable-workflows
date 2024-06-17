@@ -18,11 +18,6 @@ on:
         default: "."
         required: false
         type: string
-      PACKAGE_MANAGER:
-        description: Package manager to install dependencies with (`npm` or `yarn`).
-        default: "npm"
-        required: false
-        type: string
       TEST_CMD_FLAG:
         description: Optional flag to pass to `test` command script (e.g. :ci / :watch / :all, etc.)
         required: false
@@ -42,19 +37,23 @@ jobs:
     runs-on: [self-hosted, nonroot]
     env:
       NODE_CMD_MODE: ""
+      LOCK_FILE: ""
 
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - name: Setup NODE_CMD_MODE env var
+      - name: Setup NODE_CMD_MODE/LOCK_FILE values
         run: |
-          if [ "${{ inputs.PACKAGE_MANAGER }}" == 'npm' ] && { [ -f "${{ inputs.WORKING_DIRECTORY }}/package-lock.json" ]; }; then
-            echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
-          elif [ "${{ inputs.PACKAGE_MANAGER }}" == 'yarn' ] && [ -f "${{ inputs.WORKING_DIRECTORY }}/yarn.lock" ]; then
+          if [ -f "${{ inputs.WORKING_DIRECTORY }}/yarn.lock" ]; then
             echo "NODE_CMD_MODE=yarn" >> $GITHUB_ENV
+            echo "LOCK_FILE=${{ inputs.WORKING_DIRECTORY }}/yarn.lock" >> $GITHUB_ENV
+          elif [ -f "${{ inputs.WORKING_DIRECTORY }}/pnpm-lock.yaml" ]; then
+            echo "NODE_CMD_MODE=pnpm" >> $GITHUB_ENV
+            echo "LOCK_FILE=${{ inputs.WORKING_DIRECTORY }}/pnpm-lock.yaml" >> $GITHUB_ENV
           else
-            echo "Unknown package manager usage OR no lock files found within working dir"
+            echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
+            echo "LOCK_FILE=${{ inputs.WORKING_DIRECTORY }}/package-lock.json" >> $GITHUB_ENV
           fi
 
       # Restore Node cache
