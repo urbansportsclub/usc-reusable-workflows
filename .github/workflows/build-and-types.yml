@@ -22,7 +22,7 @@ on:
 jobs:
   build_and_types:
     name: Build and TSC
-    runs-on: [self-hosted, deploy]
+    runs-on: [self-hosted, nonroot]
     defaults:
       run:
         working-directory: ${{ inputs.WORKING_DIRECTORY }}
