@@ -58,8 +58,6 @@ jobs:
 
       # Restore Node cache
       - name: Restore `node_modules` cache
-        env:
-          LOCK_FILE: ${{ env.NODE_CMD_MODE == 'npm' && '${{ inputs.WORKING_DIRECTORY }}/package-lock.json' || '${{ inputs.WORKING_DIRECTORY }}/yarn.lock' }}
         uses: actions/cache@v4
         id: node-cache
         with:

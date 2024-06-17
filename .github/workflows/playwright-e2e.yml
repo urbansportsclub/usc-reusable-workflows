@@ -34,14 +34,12 @@ jobs:
             echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
           fi
 
-
       # Set Node version (requires .nvmrc file in the root of repository)
       - name: Setup Node Version
         uses: actions/setup-node@v4
         with:
           node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
           registry-url: "https://npm.pkg.github.com"
-          cache: ${{ env.NODE_CMD_MODE }}
 
       - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
         name: Conditional Yarn install for runner if used
@@ -58,7 +56,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'npm' && 'ci' || env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || 'install' }}
         run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
-
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
