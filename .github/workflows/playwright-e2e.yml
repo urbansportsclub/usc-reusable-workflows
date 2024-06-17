@@ -47,16 +47,16 @@ jobs:
         name: Conditional Yarn install for runner if used
         run:  npm -g install yarn
 
+      - if: ${{ env.NODE_CMD_MODE == 'pnpm' }}
+        name: Conditional setup PNPM for runner
+        uses: pnpm/action-setup@v4
+
       - name: Install dependencies
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'npm' && 'ci' || env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || 'install' }}
         run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
 
-      # Yarn cleanup when used
-      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
-        name: Clean up Yarn from runner
-        run: npm uninstall -g yarn
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps

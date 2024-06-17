@@ -53,6 +53,10 @@ jobs:
         name: Conditional Yarn install for runner if used
         run:  npm -g install yarn
 
+      - if: ${{ env.NODE_CMD_MODE == 'pnpm' }}
+        name: Conditional setup PNPM for runner
+        uses: pnpm/action-setup@v4
+
       - name: Install Dependencies
         env:
           INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || env.NODE_CMD_MODE == 'pnpm' && 'install' || 'ci' }}
