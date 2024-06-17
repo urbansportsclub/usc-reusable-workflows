@@ -23,8 +23,6 @@ on:
         required: false
         type: string
     secrets:
-      GH_PACKAGES_TOKEN:
-        required: true
       CODECOV_TOKEN:
         required: false
 

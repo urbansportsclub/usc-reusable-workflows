@@ -15,9 +15,7 @@ on:
         description: Optional flag to pass to `formant` command script (e.g. :ci / :watch / :check, etc.)
         required: false
         type: string
-    secrets:
-      GH_PACKAGES_TOKEN:
-        required: true
+
 jobs:
   lint-and-format:
     name: ESLint and Prettier formatting
