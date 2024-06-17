@@ -15,6 +15,9 @@ on:
         description: Optional flag to pass to `formant` command script (e.g. :ci / :watch / :check, etc.)
         required: false
         type: string
+    secrets:
+      GH_PACKAGES_TOKEN:
+        required: true
 
 jobs:
   lint-and-format:
@@ -67,6 +70,7 @@ jobs:
 
       - name: Install Dependencies
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || env.NODE_CMD_MODE == 'pnpm' && 'install' || 'ci' }}
         run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
 
