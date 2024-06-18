@@ -22,11 +22,11 @@ on:
         description: Optional flag to pass to `test` command script (e.g. :ci / :watch / :all, etc.)
         required: false
         type: string
-    # secrets:
-    #   GH_PACKAGES_TOKEN:
-    #     required: true
-    #   CODECOV_TOKEN:
-    #     required: false
+    secrets:
+      GH_PACKAGES_TOKEN:
+        required: true
+      CODECOV_TOKEN:
+        required: false
 
 jobs:
   unit_tests:
