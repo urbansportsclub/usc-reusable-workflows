@@ -50,7 +50,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: "https://npm.pkg.github.com"
       - name: Setup Yarn
         run: npm install -g yarn
       - name: Install NPM dependencies

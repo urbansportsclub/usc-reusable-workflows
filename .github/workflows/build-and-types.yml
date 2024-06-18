@@ -9,20 +9,28 @@ on:
         type: string
         default: '.'
         required: false
+      BUILD_CMD_FLAG:
+        description: Optional flag to pass to `build` command script (e.g. :backend / :frontend / :all, etc.)
+        type: string
+        default: ''
+        required: false
       CI:
         type: boolean
         default: true
         required: false
+
 jobs:
   build_and_types:
     name: Build and TSC
-    runs-on: [self-hosted, deploy]
+    runs-on: [self-hosted, nonroot]
     defaults:
       run:
         working-directory: ${{ inputs.WORKING_DIRECTORY }}
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+
       # Restore NPM cache
       - name: Restore node_modules
         uses: actions/cache@v4
@@ -32,6 +40,7 @@ jobs:
             ./node_modules
             /home/runner/.cache/Cypress
           key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
+ 
       # Restore Next.js cache
       - name: Restore .next
         uses: actions/cache@v4
@@ -41,20 +50,23 @@ jobs:
           key: next-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
           restore-keys: |
             next-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}-
+
       - name: Set Node version
         uses: actions/setup-node@v4
         with:
           node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
           registry-url: 'https://npm.pkg.github.com'
+
       - name: Setup Yarn
         run: npm install -g yarn
+
       - name: Install NPM dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: yarn --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-      # Build
-      - name: Build
-        run: yarn build
+
+      - name: Run build
+        run: ${{ format('{0} {1}{2}', 'yarn', 'build', inputs.BUILD_CMD_FLAG) }}
         env:
           CI: ${{ inputs.CI }}

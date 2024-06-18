@@ -1,0 +1,71 @@
+name: Playwright E2E Tests
+on:
+  push:
+    branches: [main, master]
+  workflow_call:
+    inputs:
+      WORKING_DIRECTORY:
+        type: string
+        default: "."
+        required: false
+    secrets:
+      GH_PACKAGES_TOKEN:
+        required: true
+
+jobs:
+  e2e_tests:
+    name: Playwright E2E Tests
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    env:
+      NODE_CMD_MODE: ""
+
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Setup NODE_CMD_MODE values
+        run: |
+          if [ -f "${{ inputs.WORKING_DIRECTORY }}/yarn.lock" ]; then
+            echo "NODE_CMD_MODE=yarn" >> $GITHUB_ENV
+          elif [ -f "${{ inputs.WORKING_DIRECTORY }}/pnpm-lock.yaml" ]; then
+            echo "NODE_CMD_MODE=pnpm" >> $GITHUB_ENV
+          else
+            echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
+          fi
+
+      # Set Node version (requires .nvmrc file in the root of repository)
+      - name: Setup Node Version
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+
+      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
+        name: Conditional Yarn install for runner if used
+        run:  npm -g install yarn
+
+      - if: ${{ env.NODE_CMD_MODE == 'pnpm' }}
+        name: Conditional setup PNPM for runner
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'npm' && 'ci' || env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || 'install' }}
+        run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright Tests
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
