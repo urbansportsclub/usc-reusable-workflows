@@ -10,7 +10,7 @@ on:
         type: boolean
         # this should be FALSE by default but as of now onefit B2B has a dependency and we would
         # need to make a change in there
-        default: true
+        default: false
       UPLOAD_ARTIFACTS:
         required: false
         type: boolean
