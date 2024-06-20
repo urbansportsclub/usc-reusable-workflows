@@ -1,7 +1,5 @@
 name: Playwright E2E Tests
 on:
-  push:
-    branches: [main, master]
   workflow_call:
     inputs:
       WORKING_DIRECTORY:
@@ -43,7 +41,7 @@ jobs:
 
       - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
         name: Conditional Yarn install for runner if used
-        run:  npm -g install yarn
+        run: npm -g install yarn
 
       - if: ${{ env.NODE_CMD_MODE == 'pnpm' }}
         name: Conditional setup PNPM for runner
