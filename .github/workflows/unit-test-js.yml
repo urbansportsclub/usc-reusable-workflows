@@ -90,7 +90,7 @@ jobs:
       - name: Run test script command
         env:
           PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
-        run: ${{ format('{0} {1} {2}', env.PKG_CMD, 'test', inputs.TEST_CMD_FLAG) }}
+        run: ${{ format('{0} {1}{2}', env.PKG_CMD, 'test', inputs.TEST_CMD_FLAG) }}
 
       - name: Upload coverage artifacts to `${{ inputs.WORKING_DIRECTORY }}/coverage/test-artifacts`
         if: ${{ inputs.UPLOAD_ARTIFACTS }}
