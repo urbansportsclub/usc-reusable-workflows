@@ -6,7 +6,7 @@ on:
         required: true
         type: string
       USE_CODECOV:
-        default: true
+        default: false
         required: false
         type: boolean
       UPLOAD_ARTIFACTS:
@@ -92,20 +92,8 @@ jobs:
           PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
         run: ${{ format('{0} {1}{2}', env.PKG_CMD, 'test', inputs.TEST_CMD_FLAG) }}
 
-      # CodeCov testing coverage uploads
-      - name: Codecov
-        if: ${{ inputs.USE_CODECOV }}
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./coverage
-          flags: Jest
-          name: ${{ inputs.REPO_NAME }}
-          fail_ci_if_error: true
-          verbose: true
-
       - name: Upload coverage artifacts to `${{ inputs.WORKING_DIRECTORY }}/coverage/test-artifacts`
-        if: ${{ inputs.USE_CODECOV && inputs.UPLOAD_ARTIFACTS }}
+        if: ${{ inputs.UPLOAD_ARTIFACTS }}
         uses: actions/upload-artifact@v4
         with:
           name: test-artifacts
