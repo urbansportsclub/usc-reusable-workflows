@@ -50,9 +50,9 @@ on:
         required: false
         type: string
         description: "Sets the target stage to build"
-      no_summary:
+      enable_summary:
         type: boolean
-        default: true
+        default: false
         required: false
     secrets:
       build_args:
@@ -105,7 +105,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v6
       env:
-        DOCKER_BUILD_NO_SUMMARY: ${{ inputs.no_summary }}
+        DOCKER_BUILD_NO_SUMMARY: ${{ !inputs.enable_summary }}
       with:
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile_path }}
