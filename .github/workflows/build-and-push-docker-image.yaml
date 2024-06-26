@@ -100,6 +100,8 @@ jobs:
 
     - name: Build and push
       uses: docker/build-push-action@v6
+      env:
+        DOCKER_BUILD_NO_SUMMARY: true 
       with:
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile_path }}
