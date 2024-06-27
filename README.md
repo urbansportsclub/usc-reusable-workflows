@@ -26,6 +26,14 @@ jobs:
 
 We use docker/metadata to guess your image tag based on your branch, or tag. This will then be pushed to GCR and you can use that when deploying.
 
+By default, we disable the docker [build summary](https://docs.docker.com/build/ci/github-actions/build-summary/) but you can enable it from your workflow setting the enable_summary variable to true (the default is false):
+
+```yaml
+    uses: urbansportsclub/usc-reusable-workflows/.github/workflows/build-and-push-docker-image.yaml@main
+    with:
+      enable_summary: true
+```
+
 ## Call Deploy to Kubernetes Workflow ( Helm ) 
 
 Putting all together, we have the following.
