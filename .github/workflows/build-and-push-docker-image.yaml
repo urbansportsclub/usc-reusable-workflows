@@ -54,6 +54,10 @@ on:
         type: boolean
         default: false
         required: false
+      push:
+        type: boolean
+        default: true
+        required: false        
     secrets:
       build_args:
         required: false
@@ -113,7 +117,7 @@ jobs:
         target: ${{ inputs.target }}
         build-args: |
           ${{ secrets.build_args }}
-        push: true
+        push: false
         tags: ${{ steps.subscriber_meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=local,src=/tmp/.buildx-cache
