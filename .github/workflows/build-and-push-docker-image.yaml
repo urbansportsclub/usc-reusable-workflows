@@ -117,7 +117,7 @@ jobs:
         target: ${{ inputs.target }}
         build-args: |
           ${{ secrets.build_args }}
-        push: false
+        push: ${{ inputs.push }}
         tags: ${{ steps.subscriber_meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=local,src=/tmp/.buildx-cache
