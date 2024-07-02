@@ -23,6 +23,7 @@ jobs:
       project_id: urbansportsclub-dev
       dockerfile_path: "Dockerfile"
 ```
+You can add an adittional property ``` push: false``` if you want the workflow to build your image without pushing to the registry. This could be useful if you want to check for build errors and the default value is true (it pushes to the registry by default).
 
 We use docker/metadata to guess your image tag based on your branch, or tag. This will then be pushed to GCR and you can use that when deploying.
 
