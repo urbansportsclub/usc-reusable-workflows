@@ -109,7 +109,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v6
       env:
-        DOCKER_BUILD_NO_SUMMARY: ${{ !inputs.enable_summary }}
+        DOCKER_BUILD_SUMMARY: ${{ inputs.enable_summary }}
       with:
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile_path }}
