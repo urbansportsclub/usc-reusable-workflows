@@ -20,6 +20,9 @@ on:
         required: false
         type: string
         default: coverage-artifact
+      artifact_download_path:
+        required: false
+        type: string
       reference_branch:
         required: false
         type: string
@@ -41,7 +44,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.coverage_artifact_name }}
-          path: ./coverage
+          path: ${{inputs.artifact_download_path}}
 
       # DEBUGGING
       - name: Echo directory contents
