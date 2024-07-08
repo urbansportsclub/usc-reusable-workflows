@@ -41,6 +41,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.coverage_artifact_name }}
+          path: ./coverage
 
       # DEBUGGING
       - name: Echo directory contents
