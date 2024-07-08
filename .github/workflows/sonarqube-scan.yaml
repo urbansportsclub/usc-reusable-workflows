@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Download code coverage results
         if: inputs.download_coverage_artifact == true
@@ -45,10 +45,6 @@ jobs:
         with:
           name: ${{ inputs.coverage_artifact_name }}
           path: ${{inputs.artifact_download_path}}
-
-      # DEBUGGING
-      - name: Echo directory contents
-        run: ls -alh
 
       - name: Scan
         uses: sonarsource/sonarqube-scan-action@master
@@ -58,7 +54,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ inputs.url }}
-    
+
       - name: Scan
         uses: sonarsource/sonarqube-scan-action@master
         if: ${{ always() && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
