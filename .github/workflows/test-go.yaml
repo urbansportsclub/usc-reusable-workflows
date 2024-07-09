@@ -43,6 +43,9 @@ jobs:
     - name: Configure private repo
       run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
 
+    - name: Configure gcloud Auth
+      run: gcloud auth configure-docker europe-west3-docker.pkg.dev
+
     - name: Install external dependencies
       if: inputs.external_container_dependencies != ''
       run: ${{ inputs.external_container_dependencies }}
