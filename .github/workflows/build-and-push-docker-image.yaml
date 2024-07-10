@@ -25,7 +25,7 @@ on:
         required: false
         type: string
         description: "Registry Address, Most Likely You Do Not Need To Change It" 
-        default: "eu.gcr.io"
+        default: "eu.gcr.io,europe-west3-docker.pkg.dev"
       repository:
         required: true
         type: string
