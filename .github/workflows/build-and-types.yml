@@ -70,3 +70,6 @@ jobs:
         run: ${{ format('{0} {1}{2}', 'yarn', 'build', inputs.BUILD_CMD_FLAG) }}
         env:
           CI: ${{ inputs.CI }}
+      
+      - name: Deprecation message
+        run: echo "This workflow will be removed soon. Please update to the new workflow." 
