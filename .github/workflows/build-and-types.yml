@@ -72,4 +72,4 @@ jobs:
           CI: ${{ inputs.CI }}
       
       - name: Deprecation message
-        run: echo "This workflow will be removed soon. Please update to the new workflow." 
+        run: echo "This workflow will be deprecated and removed soon." 
