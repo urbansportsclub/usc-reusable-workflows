@@ -1,3 +1,4 @@
+# this workflow is deprecated and will be removed soon.
 name: Build and Types
 on:
   workflow_call:
@@ -7,12 +8,12 @@ on:
     inputs:
       WORKING_DIRECTORY:
         type: string
-        default: '.'
+        default: "."
         required: false
       BUILD_CMD_FLAG:
         description: Optional flag to pass to `build` command script (e.g. :backend / :frontend / :all, etc.)
         type: string
-        default: ''
+        default: ""
         required: false
       CI:
         type: boolean
@@ -40,7 +41,7 @@ jobs:
             ./node_modules
             /home/runner/.cache/Cypress
           key: node-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
- 
+
       # Restore Next.js cache
       - name: Restore .next
         uses: actions/cache@v4
@@ -55,7 +56,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: "https://npm.pkg.github.com"
 
       - name: Setup Yarn
         run: npm install -g yarn
@@ -70,6 +71,6 @@ jobs:
         run: ${{ format('{0} {1}{2}', 'yarn', 'build', inputs.BUILD_CMD_FLAG) }}
         env:
           CI: ${{ inputs.CI }}
-      
+
       - name: Deprecation message
-        run: echo "This workflow will be removed soon. Please update to the new workflow." 
+        run: echo "This workflow will be removed soon. Please update to the new workflow."
