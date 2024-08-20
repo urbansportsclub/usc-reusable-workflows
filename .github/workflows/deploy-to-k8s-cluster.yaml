@@ -123,9 +123,7 @@ jobs:
       # Build dependency for helm-library
       - name: Helm dependency build
         run: |-
-          for i in `ls -1 charts/`; do
-            helm dependency build charts/$i/
-          done
+          helm dependency build ${{ inputs.chart_path }}/
 
       # Deploy to the GKE cluster - with sops
       - name: Deploy
