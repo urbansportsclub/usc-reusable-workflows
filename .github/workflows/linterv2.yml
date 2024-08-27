@@ -51,7 +51,7 @@ jobs:
           fetch-depth: 0
 
       - name: Lint Code Base
-        uses: docker://github/super-linter:slim-v7.0.0 # x-release-please-version
+        uses: docker://github/super-linter:slim-latest # x-release-please-version
         env:
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.github-token }}
