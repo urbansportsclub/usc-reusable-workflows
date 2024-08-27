@@ -1,0 +1,66 @@
+name: Lint
+
+on:
+    workflow_call:
+      secrets:
+        github-token:
+            required: true
+      inputs:
+        branch:
+            required: false
+            type: string
+            default: "main"
+        enable_jscpd:
+            required: false
+            type: boolean
+            default: false
+        validate_all_codebase:
+            required: false
+            type: boolean
+            default: false
+        enable_kubeconform:
+            required: false
+            type: boolean
+            default: false
+        regexp_exclude:
+            required: false
+            type: string
+            default: ""
+        enable_sqlfluff:
+            required: false
+            type: boolean
+            default: false
+        enable_whole_files:
+            required: false
+            type: boolean
+            default: true
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: [self-hosted, nonroot]
+    name: Lint Code Base
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # super-linter needs the full git history to get the
+          # list of files that changed across commits
+          fetch-depth: 0
+
+      - name: Lint Code Base
+        uses: super-linter/super-linter@v7.0.0 # x-release-please-version
+        env:
+          # To report GitHub Actions status checks
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+          DEFAULT_BRANCH: ${{ inputs.branch }}
+          VALIDATE_ALL_CODEBASE: ${{ inputs.validate_all_codebase }}
+          KUBERNETES_KUBECONFORM_OPTIONS: "-ignore-missing-schemas"
+          KUBERNETES_KUBEVAL_OPTIONS: "--ignore-missing-schemas"
+          VALIDATE_JSCPD: ${{ inputs.enable_jscpd }}
+          VALIDATE_KUBERNETES_KUBECONFORM: ${{ inputs.enable_kubeconform }}
+          VALIDATE_KUBERNETES_KUBEVAL: ${{ inputs.enable_kubeconform }}
+          FILTER_REGEX_EXCLUDE: ${{ inputs.regexp_exclude }}
+        
