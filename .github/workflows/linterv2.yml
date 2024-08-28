@@ -10,7 +10,7 @@ on:
       branch:
         required: false
         type: string
-        default: "main"
+        default: "master"
       enable_jscpd:
         required: false
         type: boolean
