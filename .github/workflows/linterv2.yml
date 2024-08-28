@@ -34,6 +34,10 @@ on:
             required: false
             type: boolean
             default: true
+        enable_go:
+            required: false
+            type: boolean
+            default: false
 
 permissions: {}
 
@@ -63,4 +67,33 @@ jobs:
           VALIDATE_KUBERNETES_KUBECONFORM: ${{ inputs.enable_kubeconform }}
           VALIDATE_KUBERNETES_KUBEVAL: ${{ inputs.enable_kubeconform }}
           FILTER_REGEX_EXCLUDE: ${{ inputs.regexp_exclude }}
+        
+  golang:
+    if: inputs.enable_go == true
+    name: Lint Golang Files
+    runs-on: [self-hosted, nonroot]
+    timeout-minutes: 15
+        
+    steps:
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+        
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
+      - name: Configure private repo
+        run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
+        
+      - name: Lint Code Base
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          only-new-issues: true
+          args: -c ./.github/linters/.golangci.yaml ${{inputs.enable_whole_files && '--whole-files' || ''}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
         
