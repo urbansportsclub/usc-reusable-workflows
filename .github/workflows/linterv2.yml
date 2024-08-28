@@ -38,8 +38,14 @@ on:
   
 jobs:
   build:
-    runs-on: [self-hosted, nonroot]
+    runs-on: ubuntu-latest
     name: Lint Code Base
+
+    permissions:
+      contents: read
+      packages: read
+      # To report GitHub Actions status checks
+      statuses: write
   
     steps:
       - name: Checkout Code
@@ -50,7 +56,7 @@ jobs:
   
       # Run Linter against code base
       - name: Lint Code Base
-        uses: docker://github/super-linter:slim-v4
+        uses: super-linter/super-linter@v7.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.github-token }}
           DEFAULT_BRANCH: ${{ inputs.branch }}
