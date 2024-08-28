@@ -35,6 +35,10 @@ on:
         required: false
         type: boolean
         default: true
+      enable_checkcov:
+        required: false
+        type: boolean
+        default: true
   
 jobs:
   build:
@@ -68,6 +72,7 @@ jobs:
           VALIDATE_KUBERNETES_KUBECONFORM: ${{ inputs.enable_kubeconform }}
           VALIDATE_KUBERNETES_KUBEVAL: ${{ inputs.enable_kubeconform }}
           FILTER_REGEX_EXCLUDE: ${{ inputs.regexp_exclude }}
+          VALIDATE_CHECKOV: ${{ inputs.enable_checkcov }}
   
   golang:
     if: inputs.enable_go == true
