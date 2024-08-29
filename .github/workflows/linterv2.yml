@@ -73,6 +73,9 @@ jobs:
           VALIDATE_KUBERNETES_KUBEVAL: ${{ inputs.enable_kubeconform }}
           FILTER_REGEX_EXCLUDE: ${{ inputs.regexp_exclude }}
           VALIDATE_CHECKOV: ${{ inputs.enable_checkcov }}
+          VALIDATE_GO_MODULES: false
+          VALIDATE_YAML_PRETTIER: false
+          VALIDATE_JSON_PRETTIER: false
   
   golang:
     if: inputs.enable_go == true
