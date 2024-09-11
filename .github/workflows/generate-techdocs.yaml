@@ -1,0 +1,73 @@
+name: Publish TechDocs Site
+
+on:
+  workflow_call:
+    inputs:
+      TECHDOCS_GCS_BUCKET_NAME:
+        required: true
+        type: string
+        description: "GCS Bucket Name for TechDocs" # should we make it configurable or generate docs to the same bucket always
+      GOOGLE_APPLICATION_CREDENTIALS:
+        required: true
+        type: string
+        description: "Google Application Credentials" # where to get this, is it in the runner already?
+      BACKSTAGE_ENTITY_NAMESPACE:
+        required: false
+        type: string
+        description: "Backstage Entity Namespace"
+        default: 'default'
+      BACKSTAGE_ENTITY_KIND:
+        required: true
+        type: string
+        description: "Backstage Entity Kind"
+        default: 'Component'
+      BACKSTAGE_ENTITY_NAME:
+        required: true
+        type: string
+        description: "Backstage Entity Name"
+
+jobs:
+  publish-techdocs-site:
+    runs-on: [self-hosted, dind]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' # todo should this be configurable? what python version is needed
+          cache: 'pip' # caching pip dependencies
+
+      #      # the 2 steps below can be removed if you aren't using plantuml in your documentation
+      #      - name: setup java
+      #        uses: actions/setup-java@v3
+      #        with:
+      #          distribution: 'zulu'
+      #          java-version: '11'
+      #      - name: download, validate, install plantuml and its dependencies
+      #        run: |
+      #          curl -o plantuml.jar -L http://sourceforge.net/projects/plantuml/files/plantuml.1.2021.4.jar/download
+      #          echo "be498123d20eaea95a94b174d770ef94adfdca18  plantuml.jar" | sha1sum -c -
+      #          mv plantuml.jar /opt/plantuml.jar
+      #          mkdir -p "$HOME/.local/bin"
+      #          echo $'#!/bin/sh\n\njava -jar '/opt/plantuml.jar' ${@}' >> "$HOME/.local/bin/plantuml"
+      #          chmod +x "$HOME/.local/bin/plantuml"
+      #          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      #          sudo apt-get install -y graphviz
+
+      - name: Install techdocs-cli
+        run: sudo npm install -g @techdocs/cli
+
+      - name: Install mkdocs and mkdocs plugins
+        run: python -m pip install mkdocs-techdocs-core==1.*
+
+      - name: Generate docs site
+        run: techdocs-cli generate --no-docker --verbose
+
+      - name: Publish docs site
+        run: |
+          techdocs-cli publish --publisher-type googleGcs \
+          --storage-name ${{ inputs.TECHDOCS_GCS_BUCKET_NAME }} \
+          --entity ${{ inputs.BACKSTAGE_ENTITY_NAMESPACE }}/${{ inputs.BACKSTAGE_ENTITY_KIND }}/${{ inputs.BACKSTAGE_ENTITY_NAME }}
