@@ -26,6 +26,9 @@ jobs:
     env:
       NODE_CMD_MODE: ""
       LOCK_FILE: ""
+    defaults:
+      run:
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
 
     steps:
       - name: Check out repository code
@@ -33,15 +36,15 @@ jobs:
 
       - name: Setup NODE_CMD_MODE/LOCK_FILE values
         run: |
-          if [ -f "${{ inputs.WORKING_DIRECTORY }}/yarn.lock" ]; then
+          if [ -f "yarn.lock" ]; then
             echo "NODE_CMD_MODE=yarn" >> $GITHUB_ENV
-            echo "LOCK_FILE=${{ inputs.WORKING_DIRECTORY }}/yarn.lock" >> $GITHUB_ENV
-          elif [ -f "${{ inputs.WORKING_DIRECTORY }}/pnpm-lock.yaml" ]; then
+            echo "LOCK_FILE=yarn.lock" >> $GITHUB_ENV
+          elif [ -f "pnpm-lock.yaml" ]; then
             echo "NODE_CMD_MODE=pnpm" >> $GITHUB_ENV
-            echo "LOCK_FILE=${{ inputs.WORKING_DIRECTORY }}/pnpm-lock.yaml" >> $GITHUB_ENV
+            echo "LOCK_FILE=pnpm-lock.yaml" >> $GITHUB_ENV
           else
             echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
-            echo "LOCK_FILE=${{ inputs.WORKING_DIRECTORY }}/package-lock.json" >> $GITHUB_ENV
+            echo "LOCK_FILE=package-lock.json" >> $GITHUB_ENV
           fi
 
       # Restore NPM cache
@@ -49,18 +52,18 @@ jobs:
         uses: actions/cache@v4
         id: node-cache
         with:
-          path: ${{ inputs.WORKING_DIRECTORY }}/node_modules
+          path: node_modules
           key: node-cache-${{ runner.os }}-${{ hashFiles(env.LOCK_FILE) }}
 
       - name: Set Node version
         uses: actions/setup-node@v4
         with:
-          node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
+          node-version-file: .nvmrc
           registry-url: "https://npm.pkg.github.com"
 
       - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
         name: Conditional Yarn install for runner if used
-        run:  npm -g install yarn
+        run: npm -g install yarn
 
       - if: ${{ env.NODE_CMD_MODE == 'pnpm' }}
         name: Conditional setup PNPM for runner
@@ -79,7 +82,7 @@ jobs:
         env:
           PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
         run: ${{ format('{0} {1}{2}', env.PKG_CMD, 'lint', inputs.LINT_CMD_FLAG) }}
-      
+
       # Run Formatter
       - name: Prettier
         env:
