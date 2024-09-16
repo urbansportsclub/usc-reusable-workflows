@@ -26,13 +26,14 @@ jobs:
     env:
       NODE_CMD_MODE: ""
       LOCK_FILE: ""
-    defaults:
-      run:
-        working-directory: ${{ inputs.WORKING_DIRECTORY }}
 
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+
+      - if: ${{ inputs.WORKING_DIRECTORY != '.' }}
+        name: Run `cd` into working directory if set
+        run: cd ${{ inputs.WORKING_DIRECTORY }}
 
       - name: Setup NODE_CMD_MODE/LOCK_FILE values
         run: |
