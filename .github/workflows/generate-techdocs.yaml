@@ -5,7 +5,7 @@ on:
     inputs:
       TECHDOCS_GCS_BUCKET_NAME:
         required: false
-        type: boolean
+        type: string
         description: "GCS Bucket Name for TechDocs" # should we make it configurable or generate docs to the same bucket always
         default: "urbansportsclub-dev-backstage-techdocs" # for test, I'll use dev
       BACKSTAGE_ENTITY_NAMESPACE:
