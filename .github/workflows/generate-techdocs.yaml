@@ -31,11 +31,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12' # Note: We recommend Python version 3.11 or higher.
-          cache: 'pip' # caching pip dependencies
+#          cache: 'pip' # caching pip dependencies
       - name: Install techdocs-cli
         run: sudo npm install -g @techdocs/cli
 
