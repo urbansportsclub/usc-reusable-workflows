@@ -32,12 +32,14 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12' # Note: We recommend Python version 3.11 or higher.
 #          cache: 'pip' # caching pip dependencies
       - name: Install techdocs-cli
-        run: sudo npm install -g @techdocs/cli
+        run: npm install -g @techdocs/cli
 
       - name: Install mkdocs and mkdocs plugins
         run: python -m pip install mkdocs-techdocs-core==1.*
