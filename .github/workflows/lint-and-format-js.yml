@@ -26,14 +26,11 @@ jobs:
     env:
       NODE_CMD_MODE: ""
       LOCK_FILE: ""
+      working-directory: ${{ inputs.WORKING_DIRECTORY}}
 
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-
-      - if: ${{ inputs.WORKING_DIRECTORY != '.' }}
-        name: Run `cd` into working directory if set
-        run: cd ${{ inputs.WORKING_DIRECTORY }}
 
       - name: Setup NODE_CMD_MODE/LOCK_FILE values
         run: |
@@ -47,6 +44,7 @@ jobs:
             echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
             echo "LOCK_FILE=package-lock.json" >> $GITHUB_ENV
           fi
+        working-directory: ${{ env.working-directory }}
 
       # Restore NPM cache
       - name: Restore node_modules cache
@@ -59,7 +57,7 @@ jobs:
       - name: Set Node version
         uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version-file: ${{ env.working-directory }}.nvmrc
           registry-url: "https://npm.pkg.github.com"
 
       - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
@@ -77,15 +75,18 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || env.NODE_CMD_MODE == 'pnpm' && 'install' || 'ci' }}
         run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
+        working-directory: ${{ env.working-directory }}
 
       # Run Linter
       - name: ESLint
         env:
           PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
         run: ${{ format('{0} {1}{2}', env.PKG_CMD, 'lint', inputs.LINT_CMD_FLAG) }}
+        working-directory: ${{ env.working-directory }}
 
       # Run Formatter
       - name: Prettier
         env:
           PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
         run: ${{ format('{0} {1}{2}', env.PKG_CMD, 'format', inputs.FORMAT_CMD_FLAG) }}
+        working-directory: ${{ env.working-directory }}
