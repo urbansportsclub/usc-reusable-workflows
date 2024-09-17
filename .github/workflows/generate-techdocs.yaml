@@ -20,7 +20,7 @@ on:
 
 jobs:
   publish-techdocs-site:
-    runs-on: [self-hosted, deployservices]
+    runs-on: [self-hosted, deployservices] # It needs to run on services to have access to the bucket
 
     env:
       GCS_BUCKET_NAME: usg-svc-backstage-techdocs
