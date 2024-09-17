@@ -3,11 +3,6 @@ name: Publish TechDocs Site
 on:
   workflow_call:
     inputs:
-      TECHDOCS_GCS_BUCKET_NAME:
-        required: false
-        type: string
-        description: "GCS Bucket Name for TechDocs" # should we make it configurable or generate docs to the same bucket always
-        default: "urbansportsclub-dev-backstage-techdocs" # for test, I'll use dev
       BACKSTAGE_ENTITY_NAMESPACE:
         required: false
         type: string
@@ -25,7 +20,10 @@ on:
 
 jobs:
   publish-techdocs-site:
-    runs-on: [self-hosted, deploydevelopment]
+    runs-on: [self-hosted, deployservices]
+
+    env:
+      GCS_BUCKET_NAME: usg-svc-backstage-techdocs
 
     steps:
       - name: Checkout code
@@ -34,10 +32,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12' # Note: We recommend Python version 3.11 or higher.
-#          cache: 'pip' # caching pip dependencies
+          python-version: '3.12'
+
       - name: Install techdocs-cli
         run: npm install -g @techdocs/cli
 
@@ -50,5 +49,5 @@ jobs:
       - name: Publish docs site
         run: |
           techdocs-cli publish --publisher-type googleGcs \
-          --storage-name ${{ inputs.TECHDOCS_GCS_BUCKET_NAME }} \
+          --storage-name ${{ env.GCS_BUCKET_NAME }} \
           --entity ${{ inputs.BACKSTAGE_ENTITY_NAMESPACE }}/${{ inputs.BACKSTAGE_ENTITY_KIND }}/${{ inputs.BACKSTAGE_ENTITY_NAME }}
