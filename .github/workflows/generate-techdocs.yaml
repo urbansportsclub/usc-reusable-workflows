@@ -9,7 +9,7 @@ on:
         description: "Backstage Entity Namespace"
         default: 'default'
       BACKSTAGE_ENTITY_KIND:
-        required: true
+        required: false
         type: string
         description: "Backstage Entity Kind"
         default: 'Component'
