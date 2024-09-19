@@ -36,4 +36,6 @@
           env:
             GITHUB_TOKEN: ${{ secrets.github-token }}
             DEFAULT_BRANCH: ${{ inputs.branch }}
+            VALIDATE_GO: true
+            VALIDATE_YAML: true
             
