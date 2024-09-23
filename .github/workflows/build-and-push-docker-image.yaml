@@ -85,7 +85,7 @@ jobs:
 
     - name: Production ready checklist
       id: prod_ready
-      run: sh ../../prodChecker.sh
+      run: sh ./scripts/prodChecker.sh
 
     - name: Docker subscriber meta
       id: subscriber_meta
