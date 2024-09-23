@@ -86,8 +86,13 @@ jobs:
     - name: Production ready checklist
       id: prod_ready
       run: |
-        chmod +x ./scripts/prodChecker.sh
-        sh ./scripts/prodChecker.sh
+        if [ -f "catalog-info.yaml" ]; then
+          echo "Catalog file found."
+          exit 0
+        else
+          echo "Catalog file missing, more information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground"
+          exit 1
+        fi
 
     - name: Docker subscriber meta
       id: subscriber_meta
