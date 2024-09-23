@@ -83,9 +83,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: run production checklist
-      uses: ./.github/actions/prod-checker
-
     - name: Production ready checklist
       uses: ./.github/actions/prod-checker
 
