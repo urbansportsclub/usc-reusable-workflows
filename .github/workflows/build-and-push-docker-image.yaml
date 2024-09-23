@@ -84,7 +84,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Production ready checklist
-      uses: ./.github/actions/prod-checker
+      uses: urbansportsclub/usc-reusable-workflows/.github/actions/prod-checker@gt_prodChecker
 
     - name: Docker subscriber meta
       id: subscriber_meta
