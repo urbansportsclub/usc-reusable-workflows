@@ -3,18 +3,18 @@ name: Build And Push Docker Images
 on:
   workflow_call:
     outputs:
-       image_version: 
+       image_version:
          value: ${{ jobs.buildandpushdocker.outputs.image_version }}
     inputs:
       dockerfile_path:
         required: false
         type: string
-        description: "Path of the dockerfile" 
+        description: "Path of the dockerfile"
         default: "Dockerfile"
       image_name:
         required: true
         type: string
-        description: "Name of the docker image" 
+        description: "Name of the docker image"
         default: ""
       platforms:
         required: false
@@ -24,22 +24,22 @@ on:
       auth_registry:
         required: false
         type: string
-        description: "Registry Address to pull images, used on gcloud auth configure-docker" 
+        description: "Registry Address to pull images, used on gcloud auth configure-docker"
         default: "eu.gcr.io,europe-west3-docker.pkg.dev"
       registry:
         required: false
         type: string
-        description: "Registry Address for push images" 
+        description: "Registry Address for push images"
         default: "eu.gcr.io"
       repository:
         required: true
         type: string
-        description: "Repository Name" 
+        description: "Repository Name"
         default: "usc"
       project_id:
         required: false
         type: string
-        description: "GCP Project ID" 
+        description: "GCP Project ID"
         default: "urbansportsclub-dev"
       image_tag:
         required: false
@@ -49,7 +49,7 @@ on:
       context:
         required: false
         type: string
-        description: "Docker build context" 
+        description: "Docker build context"
         default: "."
       target:
         required: false
@@ -62,7 +62,7 @@ on:
       push:
         type: boolean
         default: true
-        required: false        
+        required: false
     secrets:
       build_args:
         required: false
@@ -82,6 +82,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
+    - name: Production ready checklist
+      id: prod_ready
+      run: sh ./prodChecker.sh
 
     - name: Docker subscriber meta
       id: subscriber_meta
