@@ -1,0 +1,41 @@
+---
+  name: Lint Code Base
+    
+  on:
+    workflow_call:
+      secrets:
+        github-token:
+          required: true
+      inputs:
+        branch:
+          required: false
+          type: string
+          default: "main"
+
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      name: Lint Code Base
+  
+      permissions:
+        contents: read
+        packages: read
+        # To report GitHub Actions status checks
+        statuses: write
+    
+      steps:
+        - name: Checkout Code
+          uses: actions/checkout@v4
+          with:
+            # Full git history is needed to get a proper list of changed files within `super-linter`
+            fetch-depth: 0
+    
+        # Run Linter against code base
+        - name: Lint Code Base
+          uses: super-linter/super-linter/slim@v7.0.0
+          env:
+            GITHUB_TOKEN: ${{ secrets.github-token }}
+            DEFAULT_BRANCH: ${{ inputs.branch }}
+            VALIDATE_GO: true
+            VALIDATE_YAML: true
+            
