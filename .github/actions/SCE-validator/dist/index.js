@@ -31654,18 +31654,25 @@ const filePath = 'catalog-info.yaml';
 const allowedTags = ['go', 'javascript']; // this should not be hardcoded
 const allowedSystems = ['payments', 'internal-libraries']; // this should not be hardcoded
 
-// Utility function to load and parse the catalog file
-const loadCatalogFile = (path) => {
-    // Read the file contents
-    const fileContents = fs.readFileSync(path, 'utf8');
+const readCatalogFile = (filePath) => {
+    try {
+        return fs.readFileSync(filePath, 'utf8');
+    } catch (error) {
+        throw new Error(
+            `Error reading the catalog file. Ensure that the file exists and contains valid YAML content.
+            \nMore information here: https://backstage.dev/docs/features/software-catalog/descriptor-format`
+        );
+    }
+}
 
-    // Parse the YAML content
+// Utility function to load and parse the catalog yaml file
+const parseCatalogYaml = (fileContents) => {
     const catalogFiles = yaml.loadAll(fileContents);
 
     // Check if the catalog file is empty or invalid
     if (!catalogFiles || catalogFiles.length === 0) {
         throw new Error(
-            `No content found in the catalog file. Ensure that your catalog file contains valid YAML content.
+            `Error parsing the catalog content. Ensure that the file contains valid YAML content.
              \nMore information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/`
         );
     }
@@ -31729,9 +31736,12 @@ const validateCatalogFile = (catalogFiles) => {
 };
 
 try {
+    // We read the catalog file, validating that our services have a catalog file
+    const fileContents = readCatalogFile(filePath);
+
     // We load the catalog file and validate the content, getting the SCE required fields from categorized services
-    const catalogFile = loadCatalogFile(filePath);
-    const {system, tags} = validateCatalogFile(catalogFile);
+    const catalogs = parseCatalogYaml(fileContents);
+    const {system, tags} = validateCatalogFile(catalogs);
 
 
     // Based in the categorized information from the catalog file, we execute the corresponding validator scripts
