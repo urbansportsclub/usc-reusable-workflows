@@ -1,6 +1,0 @@
-name: "Production Checklist action"
-description: "Checklist for production readiness"
-
-runs:
-  using: "node20"
-  main: "index.js"
