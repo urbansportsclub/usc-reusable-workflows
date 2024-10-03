@@ -3,4 +3,4 @@ description: "It checks that our services our compliant with USC standards"
 
 runs:
   using: "node20"
-  main: "index.js"
+  main: 'dist/index.js'
