@@ -4,21 +4,26 @@ const fs   = require('fs');
 const filePath = 'catalog-info.yaml';
 const tagsList = ['go', 'javascript'];
 const systemsList = ['payments', 'internal-libraries', 'internal-services']; // The systems of USC services
-let doc;
+
+// Utility functions
+const loadCatalogFile = (filePath) => {
+  try {
+    const fileContents = fs.readFileSync(filePath, 'utf8');
+    return yaml.loadAll(fileContents);
+  } catch (error) {
+    console.log('Catalog file missing, more information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/');
+    process.exit(1);
+  }
+};
+
+console.log(loadCatalogFile);
+
 // if (!existsSync(filePath)) {
 //   console.log('Catalog file missing, more information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/');
 //   process.exit(1);
 // }
 
-// Get catalog file, or throw exception if not found
-try {
-  doc = yaml.load(fs.readFileSync(filePath, 'utf8')); // todo make it constant
-} catch (e) {
-  console.log('Catalog file missing, more information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/');
-  process.exit(1);
-}
 
-console.log(doc) ;
 
 //
 // const fileContent = readFileSync(filePath, 'utf8');
