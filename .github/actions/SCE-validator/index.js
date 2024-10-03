@@ -1,61 +1,75 @@
+const core = require('@actions/core');
 const yaml = require('js-yaml');
-const fs   = require('fs');
+const fs = require('fs');
 
 const filePath = 'catalog-info.yaml';
-const tagsList = ['go', 'javascript'];
-const systemsList = ['payments', 'internal-libraries', 'internal-services']; // The systems of USC services
+const allowedTags = ['go', 'javascript'];
+const allowedSystems = ['payments', 'internal-libraries', 'internal-services'];
 
-// Utility functions
-const loadCatalogFile = (filePath) => {
-  try {
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    return yaml.loadAll(fileContents);
-  } catch (error) {
-    console.log('Catalog file missing, more information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/');
-    process.exit(1);
-  }
+// Utility function to load and parse the catalog file
+const loadCatalogFile = (path) => {
+    // Read the file contents
+    const fileContents = fs.readFileSync(path, 'utf8');
+
+    // Parse the YAML content
+    const catalogFile = yaml.load(fileContents, {});
+
+    // Check if the catalog file is empty or invalid
+    if (!catalogFile) {
+        throw new Error(
+            `No content found in the catalog file. Ensure that your catalog file contains valid YAML content.
+             \nMore information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/`
+        );
+    }
+
+    return catalogFile; // Return the parsed YAML document as an object
 };
 
-console.log(loadCatalogFile);
+try {
+    // Load the catalog file
+    const catalogFile = loadCatalogFile(filePath);
 
-// if (!existsSync(filePath)) {
-//   console.log('Catalog file missing, more information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/');
-//   process.exit(1);
-// }
+    if (!catalogFile.spec) {
+        throw new Error(`Missing 'spec' field in the catalog file.`);
+    }
 
+    const {system, tags} = catalogFile.spec;
 
+    if (
+        !tags ||
+        !Array.isArray(tags) ||
+        !tags.every((tag) => allowedTags.includes(tag))
+    ) {
+        throw new Error(
+            `Invalid or missing tags. Allowed tags are: ${allowedTags.join(', ')}.`
+        );
+    }
 
-//
-// const fileContent = readFileSync(filePath, 'utf8');
-// const catalogFiles = yaml.loadAll(fileContent);
-//
-// const catalogFile = catalogFiles.find(doc => doc.spec && doc.spec.tags && doc.spec.system);
-//
-// if (!catalogFile) {
-//   console.log('No valid document found in catalog file.');
-//   process.exit(1);
-// }
-//
-// const { system, tags } = catalogFile.spec;
-//
-// if (!tags.every(tag => tagsList.includes(tag))) {
-//   console.log('Tag missing, more information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/tags');
-//   process.exit(1);
-// }
-//
-// if (!systemsList.includes(system)) {
-//   console.log('System missing, more information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/systems');
-//   process.exit(1);
-// }
-//
-// if (tags.includes('go')) {
-//   // Call go-validator.js
-// }
-//
-// if (tags.includes('javascript')) {
-//   // Call javascript-validator.js
-// }
-//
-// if (system === 'payments') {
-//   // Call payments-validator.js
-// }
+    if (!system || !allowedSystems.includes(system)) {
+        throw new Error(
+            `Invalid or missing system. Allowed systems are: ${allowedSystems.join(', ')}.`
+        );
+    }
+
+    if (tags.includes('go')) {
+        // Execute go-validator.js
+        console.log('Go validator script is not implemented yet.');
+        // require('./go-validator.js')();
+    }
+
+    if (tags.includes('javascript')) {
+        // Execute javascript-validator.js
+        console.log('Javascript validator script is not implemented yet.');
+        // require('./javascript-validator.js')();
+    }
+
+    if (system === 'payments') {
+        // Execute payments-validator.js
+        console.log('Payments validator script is not implemented yet.');
+        // require('./payments-validator.js')();
+    }
+} catch (error) {
+    // Unified error handler
+    core.setFailed(`Error: ${error.message}`);
+    process.exit(1);
+}
