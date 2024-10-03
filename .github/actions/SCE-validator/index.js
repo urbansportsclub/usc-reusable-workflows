@@ -1,36 +1,8 @@
 const core = require('@actions/core');
-const yaml = require('js-yaml');
-const fs = require('fs');
+const utils = require('./utils/utils');
 
-const filePath = 'catalog-info.yaml';
 const allowedTags = ['go', 'javascript']; // this should not be hardcoded
 const allowedSystems = ['payments', 'internal-libraries']; // this should not be hardcoded
-
-const readCatalogFile = (filePath) => {
-    try {
-        return fs.readFileSync(filePath, 'utf8');
-    } catch (error) {
-        throw new Error(
-            `Error reading the catalog file. Ensure that the file exists and contains valid YAML content.
-            \nMore information here: https://backstage.dev/docs/features/software-catalog/descriptor-format`
-        );
-    }
-}
-
-// Utility function to load and parse the catalog yaml file
-const parseCatalogYaml = (fileContents) => {
-    const catalogFiles = yaml.loadAll(fileContents);
-
-    // Check if the catalog file is empty or invalid
-    if (!catalogFiles || catalogFiles.length === 0) {
-        throw new Error(
-            `Error parsing the catalog content. Ensure that the file contains valid YAML content.
-             \nMore information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/`
-        );
-    }
-
-    return catalogFiles; // Return the parsed YAML document as an object
-};
 
 
 // Function to validate the required fields in the catalog file
@@ -89,10 +61,10 @@ const validateCatalogFile = (catalogFiles) => {
 
 try {
     // We read the catalog file, validating that our services have a catalog file
-    const fileContents = readCatalogFile(filePath);
+    const fileContents = utils.readCatalogFile();
 
     // We load the catalog file and validate the content, getting the SCE required fields from categorized services
-    const catalogs = parseCatalogYaml(fileContents);
+    const catalogs = utils.parseCatalogYaml(fileContents);
     const {system, tags} = validateCatalogFile(catalogs);
 
 

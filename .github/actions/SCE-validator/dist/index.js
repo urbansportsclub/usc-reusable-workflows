@@ -29742,6 +29742,51 @@ module.exports = {
 
 /***/ }),
 
+/***/ 7710:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   parseCatalogYaml: () => (/* binding */ parseCatalogYaml),
+/* harmony export */   readCatalogFile: () => (/* binding */ readCatalogFile)
+/* harmony export */ });
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(9896);
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(fs__WEBPACK_IMPORTED_MODULE_0__);
+
+const yaml = __nccwpck_require__(4622);
+
+
+function readCatalogFile() {
+    try {
+        return fs__WEBPACK_IMPORTED_MODULE_0___default().readFileSync('catalog-info.yaml', 'utf8');
+    } catch (error) {
+        throw new Error(
+            `Error reading the catalog file. Ensure that the file exists and contains valid YAML content.
+             More information here: https://backstage.dev/docs/features/software-catalog/descriptor-format`
+        );
+    }
+}
+
+// Utility function to load and parse the catalog yaml file
+const parseCatalogYaml = (fileContents) => {
+    const catalogFiles = yaml.loadAll(fileContents);
+
+    // Check if the catalog file is empty or invalid
+    if (!catalogFiles || catalogFiles.length === 0) {
+        throw new Error(
+            `Error parsing the catalog content. Ensure that the file contains valid YAML content.
+             \nMore information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/`
+        );
+    }
+
+    return catalogFiles; // Return the parsed YAML document as an object
+};
+
+
+
+/***/ }),
+
 /***/ 2613:
 /***/ ((module) => {
 
@@ -31640,6 +31685,46 @@ module.exports = parseParams
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__nccwpck_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__nccwpck_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
@@ -31647,38 +31732,10 @@ module.exports = parseParams
 /************************************************************************/
 var __webpack_exports__ = {};
 const core = __nccwpck_require__(3005);
-const yaml = __nccwpck_require__(4622);
-const fs = __nccwpck_require__(9896);
+const utils = __nccwpck_require__(7710);
 
-const filePath = 'catalog-info.yaml';
 const allowedTags = ['go', 'javascript']; // this should not be hardcoded
 const allowedSystems = ['payments', 'internal-libraries']; // this should not be hardcoded
-
-const readCatalogFile = (filePath) => {
-    try {
-        return fs.readFileSync(filePath, 'utf8');
-    } catch (error) {
-        throw new Error(
-            `Error reading the catalog file. Ensure that the file exists and contains valid YAML content.
-            \nMore information here: https://backstage.dev/docs/features/software-catalog/descriptor-format`
-        );
-    }
-}
-
-// Utility function to load and parse the catalog yaml file
-const parseCatalogYaml = (fileContents) => {
-    const catalogFiles = yaml.loadAll(fileContents);
-
-    // Check if the catalog file is empty or invalid
-    if (!catalogFiles || catalogFiles.length === 0) {
-        throw new Error(
-            `Error parsing the catalog content. Ensure that the file contains valid YAML content.
-             \nMore information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/`
-        );
-    }
-
-    return catalogFiles; // Return the parsed YAML document as an object
-};
 
 
 // Function to validate the required fields in the catalog file
@@ -31737,10 +31794,10 @@ const validateCatalogFile = (catalogFiles) => {
 
 try {
     // We read the catalog file, validating that our services have a catalog file
-    const fileContents = readCatalogFile(filePath);
+    const fileContents = utils.readCatalogFile();
 
     // We load the catalog file and validate the content, getting the SCE required fields from categorized services
-    const catalogs = parseCatalogYaml(fileContents);
+    const catalogs = utils.parseCatalogYaml(fileContents);
     const {system, tags} = validateCatalogFile(catalogs);
 
 
