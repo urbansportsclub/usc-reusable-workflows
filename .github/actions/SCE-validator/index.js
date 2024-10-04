@@ -3,6 +3,7 @@ import * as core from '@actions/core';
 import * as utils from './utils/utils';
 import {jsValidator} from "./javascript-validator";
 
+// todo check the spelling
 const allowedTags = ['go', 'javascript']; // this should not be hardcoded
 const allowedSystems = ['payments', 'internal-libraries']; // this should not be hardcoded
 
@@ -12,7 +13,7 @@ try {
     const fileContents = utils.readCatalogFile();
 
     // We load the catalog file and validate the content, getting the SCE required fields from categorized services
-    const catalogs = utils.parseCatalogYaml(fileContents);
+    const catalogs = utils.parseCatalogYaml(fileContents); // catalogs could contain several yaml documents
     const {system, tags} = utils.validateCatalogFile(catalogs, allowedSystems, allowedTags);
 
 

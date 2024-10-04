@@ -31450,7 +31450,7 @@ function readCatalogFile() {
 
 // Utility function to load and parse the catalog yaml file
 function parseCatalogYaml(fileContents) {
-    const catalogFiles = js_yaml.loadAll(fileContents);
+    const catalogFiles = js_yaml.loadAll(fileContents); // todo check this error
 
     // Check if the catalog file is empty or invalid
     if (!catalogFiles || catalogFiles.length === 0) {
@@ -31478,6 +31478,7 @@ function validateCatalogFile(catalogFiles, allowedSystems, allowedTags) {
 
     if (!component.metadata) {
         throw new Error(
+            // todo fix the url in the error message
             `Missing 'metadata' field in the 'Component'. Ensure that 'metadata' is defined in your catalog file.\nMore information here: https://backstage.dev/docs/features/software-catalog/descriptor-format#metadata`
         );
     }
@@ -31527,6 +31528,7 @@ function jsValidator() {
 
 
 
+// todo check the spelling
 const allowedTags = ['go', 'javascript']; // this should not be hardcoded
 const allowedSystems = ['payments', 'internal-libraries']; // this should not be hardcoded
 
@@ -31536,7 +31538,7 @@ try {
     const fileContents = readCatalogFile();
 
     // We load the catalog file and validate the content, getting the SCE required fields from categorized services
-    const catalogs = parseCatalogYaml(fileContents);
+    const catalogs = parseCatalogYaml(fileContents); // catalogs could contain several yaml documents
     const {system, tags} = validateCatalogFile(catalogs, allowedSystems, allowedTags);
 
 

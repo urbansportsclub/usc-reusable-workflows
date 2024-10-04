@@ -14,7 +14,7 @@ export function readCatalogFile() {
 
 // Utility function to load and parse the catalog yaml file
 export function parseCatalogYaml(fileContents) {
-    const catalogFiles = yaml.loadAll(fileContents);
+    const catalogFiles = yaml.loadAll(fileContents); // todo check this error
 
     // Check if the catalog file is empty or invalid
     if (!catalogFiles || catalogFiles.length === 0) {
@@ -42,6 +42,7 @@ export function validateCatalogFile(catalogFiles, allowedSystems, allowedTags) {
 
     if (!component.metadata) {
         throw new Error(
+            // todo fix the url in the error message
             `Missing 'metadata' field in the 'Component'. Ensure that 'metadata' is defined in your catalog file.\nMore information here: https://backstage.dev/docs/features/software-catalog/descriptor-format#metadata`
         );
     }
