@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
-import * as utils from './utils/utils';
-import {goValidator} from "./go-validator";
-import {jsValidator} from "./javascript-validator";
+import * as utils from './utils/utils.js';
+import {goValidator} from "./go-validator.js";
+import {jsValidator} from "./javascript-validator.js";
 
 const TAGS = {
     GOLANG: 'golang',

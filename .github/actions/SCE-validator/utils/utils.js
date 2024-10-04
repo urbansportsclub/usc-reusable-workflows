@@ -14,7 +14,7 @@ export function readCatalogFile() {
 
 // Utility function to load and parse the catalog yaml file
 export function parseCatalogYaml(fileContents) {
-    const catalogFiles = yaml.loadAll(fileContents);
+    const catalogFiles = yaml.loadAll(fileContents, null, {});
 
     // Check if the catalog file is empty or invalid
     if (!catalogFiles || catalogFiles.length === 0) {
