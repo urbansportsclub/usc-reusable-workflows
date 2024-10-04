@@ -1,10 +1,19 @@
-import {goValidator} from "./go-validator";
 import * as core from '@actions/core';
 import * as utils from './utils/utils';
+import {goValidator} from "./go-validator";
 import {jsValidator} from "./javascript-validator";
 
-// todo check the spelling
-const allowedTags = ['go', 'javascript']; // this should not be hardcoded
+const TAGS = {
+    GOLANG: 'golang',
+    JAVASCRIPT: 'javascript',
+}
+
+const SYSTEMS = {
+    PAYMENTS: 'payments',
+    INTERNAL_LIBRARIES: 'internal-libraries',
+}
+
+const allowedTags = ['golang', 'javascript']; // this should not be hardcoded
 const allowedSystems = ['payments', 'internal-libraries']; // this should not be hardcoded
 
 
@@ -18,16 +27,20 @@ try {
 
 
     // Based in the categorized information from the catalog file, we execute the corresponding validator scripts
-    if (tags.includes('go')) {
+    if (tags.includes(TAGS.GOLANG)) {
         goValidator();
     }
 
-    if (tags.includes('javascript')) {
+    if (tags.includes(TAGS.JAVASCRIPT)) {
         jsValidator();
     }
 
-    if (system === 'payments') {
+    if (system === SYSTEMS.PAYMENTS) {
         console.log('Payments validator script is not implemented yet.');
+    }
+
+    if (system === SYSTEMS.INTERNAL_LIBRARIES) {
+        console.log('Internal libraries validator script is not implemented yet.');
     }
 } catch (error) {
     // Unified error handler with gitHub action core

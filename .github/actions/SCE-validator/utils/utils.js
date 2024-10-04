@@ -7,14 +7,14 @@ export function readCatalogFile() {
     } catch (error) {
         throw new Error(
             `Error reading the catalog file. Ensure that the file exists and contains valid YAML content.
-             More information here: https://backstage.dev/docs/features/software-catalog/descriptor-format`
+             More information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/`
         );
     }
 }
 
 // Utility function to load and parse the catalog yaml file
 export function parseCatalogYaml(fileContents) {
-    const catalogFiles = yaml.loadAll(fileContents); // todo check this error
+    const catalogFiles = yaml.loadAll(fileContents);
 
     // Check if the catalog file is empty or invalid
     if (!catalogFiles || catalogFiles.length === 0) {
@@ -36,14 +36,13 @@ export function validateCatalogFile(catalogFiles, allowedSystems, allowedTags) {
 
     if (!component) {
         throw new Error(
-            `No 'Component' kind found in the catalog file. Ensure that your catalog file includes a 'Component' kind.\nMore information here: https://backstage.dev/docs/features/software-catalog/descriptor-format#kind-component`
+            `No 'Component' kind found in the catalog file. Ensure that your catalog file includes a 'Component' kind.\nMore information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/`
         );
     }
 
     if (!component.metadata) {
         throw new Error(
-            // todo fix the url in the error message
-            `Missing 'metadata' field in the 'Component'. Ensure that 'metadata' is defined in your catalog file.\nMore information here: https://backstage.dev/docs/features/software-catalog/descriptor-format#metadata`
+            `Missing 'metadata' field in the 'Component'. Ensure that 'metadata' is defined in your catalog file.\nMore information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/`
         );
     }
 
@@ -51,7 +50,7 @@ export function validateCatalogFile(catalogFiles, allowedSystems, allowedTags) {
 
     if (!component.spec) {
         throw new Error(
-            `Missing 'spec' field in the 'Component'. Ensure that 'spec' is defined in your catalog file.\nMore information here: https://backstage.dev/docs/features/software-catalog/descriptor-format#spec`
+            `Missing 'spec' field in the 'Component'. Ensure that 'spec' is defined in your catalog file.\nMore information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/`
         );
     }
 
@@ -66,7 +65,7 @@ export function validateCatalogFile(catalogFiles, allowedSystems, allowedTags) {
         throw new Error(
             `Invalid or missing tags in 'metadata'. Allowed tags are: ${allowedTags.join(
                 ', '
-            )}.\nMore information here: https://backstage.dev/docs/features/software-catalog/descriptor-format#metadata`
+            )}.\nMore information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/tags`
         );
     }
 
@@ -75,7 +74,7 @@ export function validateCatalogFile(catalogFiles, allowedSystems, allowedTags) {
         throw new Error(
             `Invalid or missing 'system' in 'spec'. Allowed systems are: ${allowedSystems.join(
                 ', '
-            )}.\nMore information here: https://backstage.dev/docs/features/software-catalog/descriptor-format#spec`
+            )}.\nMore information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/systems`
         );
     }
 
