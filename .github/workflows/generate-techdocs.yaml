@@ -20,10 +20,10 @@ on:
 
 jobs:
   publish-techdocs-site:
-    runs-on: [self-hosted, deployservices] # It needs to run on services to have access to the bucket
+    runs-on: [self-hosted, deploydevelopment] # It needs to run on services to have access to the bucket, changed to deploydevelopment instead of deployservices temporarily
 
     env:
-      GCS_BUCKET_NAME: usg-svc-backstage-techdocs # urbansportsclub-dev-backstage-techdocs
+      GCS_BUCKET_NAME: urbansportsclub-dev-backstage-techdocs # changed to urbansportsclub-dev-backstage-techdocs instead of usg-svc-backstage-techdocs temporarily
 
     steps:
       - name: Checkout code
