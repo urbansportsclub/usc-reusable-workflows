@@ -7,7 +7,7 @@ export function readCatalogFile() {
     } catch (error) {
         throw new Error(
             `Error reading the catalog file. Ensure that the file exists and contains valid YAML content.
-             More information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/`
+             \nMore information here: https://backstage.dev.urbansportsclub.tech/docs/default/component/devx-playground/catalog/`
         );
     }
 }

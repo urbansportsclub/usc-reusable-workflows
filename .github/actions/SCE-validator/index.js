@@ -13,8 +13,8 @@ const SYSTEMS = {
     INTERNAL_LIBRARIES: 'internal-libraries',
 }
 
-const allowedTags = ['golang', 'javascript']; // this should not be hardcoded
-const allowedSystems = ['payments', 'internal-libraries']; // this should not be hardcoded
+const allowedTags = [TAGS.GOLANG, TAGS.JAVASCRIPT]; // this should not be hardcoded
+const allowedSystems = [SYSTEMS.PAYMENTS, SYSTEMS.INTERNAL_LIBRARIES]; // this should not be hardcoded
 
 
 try {
