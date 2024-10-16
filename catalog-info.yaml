@@ -3,6 +3,17 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: usc-reusable-workflows
+  description: Reusable workflows for Urban Sports Club
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+    github.com/project-slug: usc-reusable-workflows
+  tags:
+    - github-actions
+  links:
+    - url: https://urbansportsclub.atlassian.net/wiki/spaces/DV/pages/2345041925/Reusable+workflows
+      title: Project documentation
+      icon: docs
+      type: documentation
 spec:
   type: service
   lifecycle: production
