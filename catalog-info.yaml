@@ -9,7 +9,7 @@ metadata:
     github.com/project-slug: usc-reusable-workflows
   tags:
     - github-actions
-    - CI/CD
+    - CI-CD
   links:
     - url: https://urbansportsclub.atlassian.net/wiki/spaces/DV/pages/2345041925/Reusable+workflows
       title: Project documentation
