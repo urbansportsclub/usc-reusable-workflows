@@ -4,7 +4,7 @@ COPY ./ ./
 
 RUN apk add --update --no-cache make
 
-ARG SCE_REPOSITORY
+ENV ENV SCE_REPOSITORY=$SCE_REPOSITORY
 
 RUN git clone https://github.com/${SCE_REPOSITORY} /sce
 

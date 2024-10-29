@@ -8,5 +8,5 @@ inputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  build-args:
+  env:
       SCE_REPOSITORY: ${{ inputs.sce_repository }}
