@@ -1,0 +1,10 @@
+# action.yml
+name: 'SCE validator action'
+description: 'SCE validator action'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+inputs:
+  sce_repository:
+    description: 'urbansportsclub/usc-reusable-workflows/.github/actions/SCE-validator@DX-409-CL'
+    required: true
