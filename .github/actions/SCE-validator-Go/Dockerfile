@@ -6,7 +6,7 @@ RUN apk add --update --no-cache make
 
 ARG SCE_REPOSITORY
 
-RUN git clone urbansportsclub/usc-reusable-workflows/.github/actions/SCE-validator@DX-409-CL /sce
+RUN git clone https://github.com/${SCE_REPOSITORY} /sce
 
 WORKDIR /sce
 
