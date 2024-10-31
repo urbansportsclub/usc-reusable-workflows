@@ -76,6 +76,7 @@ jobs:
           VALIDATE_GO_MODULES: false
           VALIDATE_YAML_PRETTIER: false
           VALIDATE_JSON_PRETTIER: false
+          LINTER_RULES_PATH: config/lint
   
   golang:
     if: inputs.enable_go == true
