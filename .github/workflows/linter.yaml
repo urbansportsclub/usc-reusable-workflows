@@ -67,6 +67,7 @@ jobs:
           VALIDATE_KUBERNETES_KUBEVAL: ${{ inputs.enable_kubeconform }}
           FILTER_REGEX_EXCLUDE: ${{ inputs.regexp_exclude }}
           VALIDATE_SQLFLUFF: ${{ inputs.enable_sqlfluff }}
+          LINTER_RULES_PATH: .github/linters
 
   golang:
     if: inputs.enable_go == true
