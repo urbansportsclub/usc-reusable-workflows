@@ -100,6 +100,10 @@ jobs:
       uses: docker/setup-qemu-action@v3
       if: inputs.platforms != 'linux/amd64'
 
+    - name: Configure Docker Auth
+      run: |-
+        gcloud auth configure-docker ${{ inputs.auth_registry }}
+
     - name: Set up Docker Buildx
       id: buildx
       uses: docker/setup-buildx-action@v3
@@ -108,10 +112,6 @@ jobs:
           buildkitd-flags: --debug
           driver-opts: |
             image=europe-west3-docker.pkg.dev/urbansportsclub-dev/docker-hub/moby/buildkit:master
-
-    - name: Configure Docker Auth
-      run: |-
-        gcloud auth configure-docker ${{ inputs.auth_registry }}
 
     - name: Build and push
       uses: docker/build-push-action@v6
