@@ -106,6 +106,8 @@ jobs:
       with:
           install: true
           buildkitd-flags: --debug
+          driver-opts: |
+            image=europe-west3-docker.pkg.dev/urbansportsclub-dev/docker-hub/moby/buildkit:master
 
     - name: Configure Docker Auth
       run: |-
