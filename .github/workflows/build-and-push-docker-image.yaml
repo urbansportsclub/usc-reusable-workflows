@@ -83,6 +83,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: SCE validator
+      uses: urbansportsclub/usc-github-actions/SCE-validator@dev/DX-420
+
     - name: Docker subscriber meta
       id: subscriber_meta
       uses: docker/metadata-action@v5
