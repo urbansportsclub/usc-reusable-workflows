@@ -1,0 +1,12 @@
+# action.yml
+name: 'SCE validator action'
+description: 'SCE validator action'
+inputs:
+  sce_repository:
+    description: 'urbansportsclub/sce-validator@dev/DX-409-CL'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  env:
+      SCE_REPOSITORY: ${{ inputs.sce_repository }}
