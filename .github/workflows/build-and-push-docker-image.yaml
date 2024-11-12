@@ -101,6 +101,8 @@ jobs:
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
+      with:
+        image: 'europe-west3-docker.pkg.dev/urbansportsclub-dev/docker-hub/tonistiigi/binfmt:latest'
       if: inputs.platforms != 'linux/amd64'
 
     - name: Configure Docker Auth
