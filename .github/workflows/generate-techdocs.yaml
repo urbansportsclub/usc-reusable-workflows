@@ -20,7 +20,7 @@ on:
 
 jobs:
   publish-techdocs-site:
-    runs-on: [self-hosted, deployservices] # or deploydevelopment for dev environment
+    runs-on: [self-hosted, nonroot] # or deploydevelopment for dev environment
 
     env:
       GCS_BUCKET_NAME: usg-svc-backstage-techdocs # or urbansportsclub-dev-backstage-techdocs for dev environment
