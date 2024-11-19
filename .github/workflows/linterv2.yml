@@ -1,0 +1,108 @@
+---
+name: Lint Code Base
+  
+on:
+  workflow_call:
+    secrets:
+      github-token:
+        required: true
+    inputs:
+      branch:
+        required: false
+        type: string
+        default: "main"
+      enable_jscpd:
+        required: false
+        type: boolean
+        default: false
+      enable_go:
+        required: false
+        type: boolean
+        default: false
+      validate_all_codebase:
+        required: false
+        type: boolean
+        default: false
+      enable_kubeconform:
+        required: false
+        type: boolean
+        default: false
+      regexp_exclude:
+        required: false
+        type: string
+        default: ""
+      enable_whole_files:
+        required: false
+        type: boolean
+        default: true
+      enable_checkcov:
+        required: false
+        type: boolean
+        default: false
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Lint Code Base
+
+    permissions:
+      contents: read
+      packages: read
+      # To report GitHub Actions status checks
+      statuses: write
+  
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # Full git history is needed to get a proper list of changed files within `super-linter`
+          fetch-depth: 0
+  
+      # Run Linter against code base
+      - name: Lint Code Base
+        uses: super-linter/super-linter/slim@v7.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+          DEFAULT_BRANCH: ${{ inputs.branch }}
+          VALIDATE_ALL_CODEBASE: ${{ inputs.validate_all_codebase }}
+          VALIDATE_GO: false
+          KUBERNETES_KUBECONFORM_OPTIONS: "-ignore-missing-schemas"
+          KUBERNETES_KUBEVAL_OPTIONS: "--ignore-missing-schemas"
+          VALIDATE_JSCPD: ${{ inputs.enable_jscpd }}
+          VALIDATE_KUBERNETES_KUBECONFORM: ${{ inputs.enable_kubeconform }}
+          VALIDATE_KUBERNETES_KUBEVAL: ${{ inputs.enable_kubeconform }}
+          FILTER_REGEX_EXCLUDE: ${{ inputs.regexp_exclude }}
+          VALIDATE_CHECKOV: ${{ inputs.enable_checkcov }}
+          VALIDATE_GO_MODULES: false
+          VALIDATE_YAML_PRETTIER: false
+          VALIDATE_JSON_PRETTIER: false
+  
+  golang:
+    if: inputs.enable_go == true
+    name: Lint Golang Files
+    runs-on: [self-hosted, nonroot]
+    timeout-minutes: 15
+  
+    steps:
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+  
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+  
+      - name: Configure private repo
+        run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
+  
+      - name: Lint Code Base
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          only-new-issues: true
+          args: -c ./.github/linters/.golangci.yaml ${{inputs.enable_whole_files && '--whole-files' || ''}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+          
