@@ -1,17 +1,17 @@
 ---
-    name: SCE validator
-    on:
-     pull_request:
-        branches:
-          - "*"
-    
-    jobs:
-      docker:
-        runs-on: [self-hosted, dind]
-        steps: 
-          - name: Checkout
-            uses: actions/checkout@v4
-    
-          - name: SCE validator
-            uses: urbansportsclub/usc-github-actions/SCE-validator@main
+name: SCE validator
+on:
+ pull_request:
+    branches:
+      - "*"
+
+jobs:
+  sce_validator:
+    runs-on: [self-hosted, dind]
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: SCE validator
+        uses: urbansportsclub/usc-github-actions/SCE-validator@main
             
