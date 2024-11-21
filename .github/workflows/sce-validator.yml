@@ -1,9 +1,7 @@
 ---
 name: SCE validator
 on:
- pull_request:
-    branches:
-      - "*"
+ workflow_call:
 
 jobs:
   sce_validator:
