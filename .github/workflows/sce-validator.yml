@@ -1,0 +1,18 @@
+---
+    name: SCE validator
+    on:
+     pull_request:
+        branches:
+          - "*"
+    
+    jobs:
+      sce:
+        name: SCE validator
+        runs-on: 
+          - self-hosted 
+          - nonroot
+    
+        steps:
+          - name: SCE validator
+            uses: urbansportsclub/usc-github-actions/SCE-validator@main
+            
