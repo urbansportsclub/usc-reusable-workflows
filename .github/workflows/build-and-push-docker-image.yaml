@@ -79,12 +79,20 @@ jobs:
     outputs:
        image_version: ${{ steps.subscriber_meta.outputs.version }}
 
+    env: 
+      SKIP_SCE_VALIDATION: contains(${{ github.event.head_commit.message }}, "[skip-sce-validation]")
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
     - name: SCE validator
+      if: !env.SKIP_SCE_VALIDATION
       uses: urbansportsclub/usc-github-actions/SCE-validator@main
+
+    - name: Log
+      if: env.SKIP_SCE_VALIDATION
+      run: echo "::warning::Skipping SCE validation"
 
     - name: Docker subscriber meta
       id: subscriber_meta
