@@ -87,7 +87,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: SCE validator
-      if: !env.SKIP_SCE_VALIDATION
+      if: env.SKIP_SCE_VALIDATION == false
       uses: urbansportsclub/usc-github-actions/SCE-validator@main
 
     - name: Log
