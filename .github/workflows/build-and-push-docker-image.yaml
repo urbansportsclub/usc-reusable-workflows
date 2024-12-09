@@ -86,6 +86,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: test
+      run: git log -1 --pretty=%B | grep -q '[skip-sce-validation]' && echo true || echo false
+
     - name: Check if SCE validator step should be skipped
       run: echo "SKIP_SCE_VALIDATION=$(git log -1 --pretty=%B | grep -q '[skip-sce-validation]' && echo true || echo false)" >> $GITHUB_ENV
 
@@ -95,7 +98,7 @@ jobs:
 
     - name: Log
       if: env.SKIP_SCE_VALIDATION
-      run: echo "::warning::Skipping SCE validation"
+      run: echo $SKIP_SCE_VALIDATION
 
     - name: Docker subscriber meta
       id: subscriber_meta
