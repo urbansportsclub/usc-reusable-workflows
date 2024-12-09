@@ -80,11 +80,14 @@ jobs:
        image_version: ${{ steps.subscriber_meta.outputs.version }}
 
     env: 
-      SKIP_SCE_VALIDATION: contains(${{ github.event.head_commit.message }}, "[skip-sce-validation]")
+      SKIP_SCE_VALIDATION: false
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
+    - name: Check if SCE validator step should be skipped
+      run: echo "SKIP_SCE_VALIDATION=$(git log -1 --pretty=%B | grep -q '[skip-sce-validation]' && echo true || echo false)" >> $GITHUB_ENV
 
     - name: SCE validator
       if: env.SKIP_SCE_VALIDATION == false
