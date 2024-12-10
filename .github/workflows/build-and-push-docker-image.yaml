@@ -89,11 +89,8 @@ jobs:
     - name: Check if SCE validator step should be skipped
       run: echo "SKIP_SCE_VALIDATION=$(git log -1 --pretty=%B | grep -q '\[skip-sce-validation\]' && echo true || echo false)" >> $GITHUB_ENV
 
-    - name: test
-      run: echo $SKIP_SCE_VALIDATION
-
     - name: SCE validator
-      if: env.SKIP_SCE_VALIDATION == false
+      if: !env.SKIP_SCE_VALIDATION
       uses: urbansportsclub/usc-github-actions/SCE-validator@main
 
     - name: Docker subscriber meta
