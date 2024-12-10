@@ -90,7 +90,7 @@ jobs:
       run: echo "SKIP_SCE_VALIDATION=$(git log -1 --pretty=%B | grep -q '\[skip-sce-validation\]' && echo true || echo false)" >> $GITHUB_ENV
 
     - name: SCE validator
-      if: !env.SKIP_SCE_VALIDATION
+      if: env.SKIP_SCE_VALIDATION == 'false'
       uses: urbansportsclub/usc-github-actions/SCE-validator@main
 
     - name: Docker subscriber meta
