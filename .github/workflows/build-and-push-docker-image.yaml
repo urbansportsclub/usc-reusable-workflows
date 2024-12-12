@@ -86,12 +86,27 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Check if SCE validator step should be skipped
-      run: echo "SKIP_SCE_VALIDATION=$(git log -1 --pretty=%B | grep -q '\[skip-sce-validation\]' && echo true || echo false)" >> $GITHUB_ENV
+    # - name: Check if SCE validator step should be skipped
+    #   run: echo "SKIP_SCE_VALIDATION=$(git log -1 --pretty=%B | grep -q '\[skip-sce-validation\]' && echo true || echo false)" >> $GITHUB_ENV
+
+    # - name: SCE validator
+    #   if: env.SKIP_SCE_VALIDATION == 'false'
+    #   uses: urbansportsclub/usc-github-actions/SCE-validator@main
 
     - name: SCE validator
-      if: env.SKIP_SCE_VALIDATION == 'false'
+      id: sce_validator
       uses: urbansportsclub/usc-github-actions/SCE-validator@main
+      continue-on-error: true
+
+    - name: Request manual approval for emergency deployment
+      if: steps.sce_validator.outcome == 'failure'
+      uses: trstringer/manual-approval@v1
+      with:
+        secret: ${{ secrets.GITHUB_TOKEN }}
+        approvers: devx
+        minimum-approvals: 1
+        issue-title: "Emergency Deployment Approval"
+        issue-body: "An emergency deployment has been requested. Please review and approve."
 
     - name: Docker subscriber meta
       id: subscriber_meta
