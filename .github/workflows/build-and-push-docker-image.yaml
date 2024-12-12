@@ -103,7 +103,7 @@ jobs:
       uses: trstringer/manual-approval@v1
       with:
         secret: ${{ secrets.GITHUB_TOKEN }}
-        approvers: DevX
+        approvers: jelenazivovic,GersonTrj
         minimum-approvals: 1
         issue-title: "Emergency Deployment Approval"
         issue-body: "An emergency deployment has been requested. Please review and approve."
