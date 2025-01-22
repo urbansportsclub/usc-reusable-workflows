@@ -40,7 +40,7 @@ on:
         required: false
         type: string
         description: "GCP Project ID" 
-        default: "usg-svc"
+        default: "onefit-test-218210"
       image_tag:
         required: false
         type: string
