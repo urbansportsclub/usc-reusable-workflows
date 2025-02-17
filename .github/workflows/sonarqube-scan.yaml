@@ -48,8 +48,9 @@ jobs:
 
       - name: Scan
         uses: sonarsource/sonarqube-scan-action@v4.2.1
-        
-
+        if: ${{ always() && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
+        with:
+          args: -Dsonar.projectVersion=${{ github.sha }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ inputs.url }}
@@ -62,7 +63,7 @@ jobs:
             -Dsonar.projectVersion=${{ github.sha }}
             -Dsonar.newCode.referenceBranch=${{ env.REFERENCE_BRANCH }}
             -Dsonar.ws.timeout=180
-            -X
+            -Dsonar.scanner.skipAnalysisCache=true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ inputs.url }}
