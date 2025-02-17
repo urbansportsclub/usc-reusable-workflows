@@ -62,6 +62,7 @@ jobs:
             -Dsonar.projectVersion=${{ github.sha }}
             -Dsonar.newCode.referenceBranch=${{ env.REFERENCE_BRANCH }}
             -Dsonar.ws.timeout=180
+            -X
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ inputs.url }}
