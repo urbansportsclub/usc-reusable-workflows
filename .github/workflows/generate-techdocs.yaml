@@ -45,7 +45,7 @@ jobs:
 
       - name: Install dependencies for mermaid support
         run: |
-          apt-get install -y chromium
+          sudo apt-get install -y chromium
           pip3 install markdown-inline-mermaid
           npm install -g @mermaid-js/mermaid-cli
 
