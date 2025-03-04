@@ -46,10 +46,11 @@ jobs:
       - name: Install mkdocs kroki
         run: pip install mkdocs-kroki-plugin
 
-      - name: Clean and move readme
-        run: |
-          sed -i 's|docs/assets|assets|g' README.md
-          mv README.md docs
+      - name: Clean readme
+        run: sed -i 's|docs/assets|assets|g' README.md
+
+      - name: Move and rename readme
+        run: mv README.md docs/index.md
 
       - name: Generate docs site
         run: techdocs-cli generate --no-docker --verbose
