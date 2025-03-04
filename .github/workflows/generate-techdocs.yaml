@@ -46,15 +46,10 @@ jobs:
       - name: Install mkdocs kroki
         run: pip install mkdocs-kroki-plugin
 
-      - name: Clean Up Readmes
+      - name: Clean and move readme
         run: |
-          for i in README*.md; do
-            sed -i 's|docs/assets|assets|g' $i
-          done
-
-      - name: Copy Translated Readmes
-        run: |
-          mv README-*.md docs
+          sed -i 's|docs/assets|assets|g' README.md
+          mv README.md docs
 
       - name: Generate docs site
         run: techdocs-cli generate --no-docker --verbose
