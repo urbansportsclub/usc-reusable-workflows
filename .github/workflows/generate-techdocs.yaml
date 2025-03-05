@@ -18,6 +18,9 @@ on:
         type: string
         description: "Backstage Entity Name"
 
+env:
+  KROKI_SERVER_URL: https://kroki.svc.urbansportsclub.tech
+
 jobs:
   publish-techdocs-site:
     runs-on: [self-hosted, nonroot]
