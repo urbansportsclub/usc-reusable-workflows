@@ -25,10 +25,8 @@
     
           - run: |
               yarn config set npmAlwaysAuth true
-              yarn config set npmAuthToken $NODE_AUTH_TOKEN
+              yarn config set npmAuthToken ${{ secrets.NODE_AUTH_TOKEN }}
               yarn config set npmPublishRegistry https://npm.pkg.github.com
-            env:
-              NODE_AUTH_TOKEN: ${{ secrets.USG_GITHUB_TOKEN }}
     
           - name: Publish to GitHub Packages
             run: yarn npm publish
