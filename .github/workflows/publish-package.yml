@@ -6,10 +6,6 @@
         secrets:
             NODE_AUTH_TOKEN:
               required: true
-
-    permissions:
-        contents: read
-        packages: write
     
     jobs:
       build:
