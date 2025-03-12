@@ -6,6 +6,11 @@
         secrets:
             NODE_AUTH_TOKEN:
               required: true
+        inputs:
+            workspace-name:
+              description: "Name of the workspace to publish"
+              required: true
+              type: string
     
     jobs:
       build:
@@ -29,5 +34,5 @@
               yarn config set npmPublishRegistry https://npm.pkg.github.com
     
           - name: Publish to GitHub Packages
-            run: yarn npm publish
+            run: yarn workspace ${{ inputs.workspace-name }} npm publish
               
