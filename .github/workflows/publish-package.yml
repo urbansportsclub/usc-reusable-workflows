@@ -28,11 +28,6 @@
               corepack enable
               corepack prepare yarn@4.7.0 --activate
     
-          # - name: Install yarn
-          #   run: |
-          #     npm install -g yarn
-          #     yarn set version 4.7.0
-    
           - run: |
               yarn config set npmAlwaysAuth true
               yarn config set npmAuthToken ${{ secrets.NODE_AUTH_TOKEN }}
