@@ -17,7 +17,7 @@ on:
         type: string
     secrets:
       GH_PACKAGES_TOKEN:
-        required: true
+        required: false
       NODE_AUTH_TOKEN:
           required: true
 
