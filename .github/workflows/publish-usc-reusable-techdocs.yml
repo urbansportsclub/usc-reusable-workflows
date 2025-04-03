@@ -1,4 +1,6 @@
 ---
+# This workflow is used to publish the TechDocs site for the USC reusable workflows repository.
+# This is not a reusable workflow.
 name: Publish TechDocs
 
 on:
@@ -12,3 +14,4 @@ jobs:
       BACKSTAGE_ENTITY_NAMESPACE: "default"
       BACKSTAGE_ENTITY_KIND: "Component"
       BACKSTAGE_ENTITY_NAME: "usc-reusable-workflows"
+      
