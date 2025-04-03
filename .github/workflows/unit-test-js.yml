@@ -24,6 +24,8 @@ on:
         type: string
     secrets:
       GH_PACKAGES_TOKEN:
+        required: false
+      NODE_AUTH_TOKEN:
         required: true
       CODECOV_TOKEN:
         required: false
@@ -83,7 +85,7 @@ jobs:
 
       - name: Install Dependencies
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN  }}
           INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || env.NODE_CMD_MODE == 'pnpm' && 'install' || 'ci' }}
         run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
 
