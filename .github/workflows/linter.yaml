@@ -39,6 +39,17 @@ on:
         required: false
         type: boolean
         default: true
+      golangci_lint_version:
+        required: false
+        type: string
+        default: 1
+
+# Permissions necessary for Golangci Lint https://github.com/golangci/golangci-lint-action?tab=readme-ov-file#annotations
+permissions:
+  # Required: allow read access to the content for analysis.
+  contents: read
+  # Optional: allow read access to pull request. Use with `only-new-issues` option.
+  pull-requests: read
 
 jobs:
   build:
@@ -68,8 +79,8 @@ jobs:
           FILTER_REGEX_EXCLUDE: ${{ inputs.regexp_exclude }}
           VALIDATE_SQLFLUFF: ${{ inputs.enable_sqlfluff }}
 
-  golang:
-    if: inputs.enable_go == true
+  golangci_lint:
+    if: inputs.enable_go == true && inputs.golangci_lint_version == 1
     name: Lint Golang Files
     runs-on: [self-hosted, nonroot]
     timeout-minutes: 15
@@ -96,3 +107,31 @@ jobs:
           args: -c ./.github/linters/.golangci.yaml ${{inputs.enable_whole_files && '--whole-files' || ''}}
         env:
           GITHUB_TOKEN: ${{ secrets.github-token }}
+  
+  golangci_lint_v2:
+    if: inputs.enable_go == true && inputs.golangci_lint_version == 2
+    name: Lint Golang Files
+    runs-on: [self-hosted, nonroot]
+    timeout-minutes: 15
+
+    steps:
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure private repo
+        run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
+
+      - name: Lint Code Base
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: latest
+          only-new-issues: true
+          github-token: ${{ secrets.github-token }}
+          args: -c ./.github/linters/.golangci.yaml ${{ inputs.enable_whole_files && '--whole-files' || '' }}
