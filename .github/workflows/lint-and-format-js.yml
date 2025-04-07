@@ -19,7 +19,7 @@ on:
       GH_PACKAGES_TOKEN:
         required: false
       NODE_AUTH_TOKEN:
-          required: true
+          required: false
 
 jobs:
   lint-and-format:
