@@ -41,7 +41,7 @@ on:
         default: true
       golangci_lint_version:
         required: false
-        type: string
+        type: number
         default: 1
 
 # Permissions necessary for Golangci Lint https://github.com/golangci/golangci-lint-action?tab=readme-ov-file#annotations
