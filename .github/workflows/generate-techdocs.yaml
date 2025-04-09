@@ -58,7 +58,7 @@ jobs:
           fi
 
       - name: Check for index.md conflict and copy README if needed
-        if: inputs.ADD_README == true
+        if: ${{ inputs.ADD_README }}
         run: |
           if [ -f "${{ inputs.TECHDOCS_DIR }}/index.md" ]; then
             echo "::error::Cannot add README.md as homepage because ${{ inputs.TECHDOCS_DIR }}/index.md already exists. Please either remove the existing index.md file or set ADD_README to false."
