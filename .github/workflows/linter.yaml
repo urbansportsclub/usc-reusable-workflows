@@ -63,6 +63,10 @@ jobs:
           # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
+      # test
+      - name: Configure private repo
+        run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
+
       # Run Linter against code base
       - name: Lint Code Base
         uses: docker://github/super-linter:slim-v4
