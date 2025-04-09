@@ -17,6 +17,16 @@ on:
         required: true
         type: string
         description: "Backstage Entity Name"
+      ADD_README:
+        required: false
+        type: boolean
+        default: false
+        description: "Extra file to be added to the docs site"
+      TECHDOCS_DIR:
+        required: false
+        type: string
+        default: 'docs'
+        description: "Directory containing documentation files"
 
 env:
   KROKI_SERVER_URL: https://kroki.svc.urbansportsclub.tech
@@ -39,6 +49,22 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Check if docs directory exists
+        run: |
+          if [ ! -d "${{ inputs.TECHDOCS_DIR }}" ]; then
+            echo "::error::The techdocs directory '${{ inputs.TECHDOCS_DIR }}' does not exist. Please create this directory or specify a different one using TECHDOCS_DIR parameter."
+            exit 1
+          fi
+
+      - name: Check for index.md conflict and copy README if needed
+        if: inputs.ADD_README == true
+        run: |
+          if [ -f "${{ inputs.TECHDOCS_DIR }}/index.md" ]; then
+            echo "::error::Cannot add README.md as homepage because ${{ inputs.TECHDOCS_DIR }}/index.md already exists. Please either remove the existing index.md file or set ADD_README to false."
+            exit 1
+          fi
+          cp README.md ${{ inputs.TECHDOCS_DIR }}/index.md
 
       - name: Install techdocs-cli
         run: npm install -g @techdocs/cli
