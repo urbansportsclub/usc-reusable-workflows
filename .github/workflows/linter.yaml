@@ -56,6 +56,9 @@ jobs:
     runs-on: [self-hosted, nonroot]
     name: Lint Code Base
 
+    env:
+      GIT_ASKPASS: "true"
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
