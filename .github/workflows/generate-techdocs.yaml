@@ -21,7 +21,7 @@ on:
         required: false
         type: boolean
         default: false
-        description: "Extra file to be added to the docs site"
+        description: "Extra file to be added to the docs site as index.md"
       TECHDOCS_DIR:
         required: false
         type: string
