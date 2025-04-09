@@ -65,7 +65,7 @@ jobs:
 
       # test
       - name: Configure private repo
-        run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/urbansportsclub".insteadOf "https://github.com/urbansportsclub"
+        run: git config --global url."https://${{ secrets.github-token }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
       # Run Linter against code base
       - name: Lint Code Base
