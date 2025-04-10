@@ -20,7 +20,7 @@
               node-version: '20.x'
               registry-url: 'https://npm.pkg.github.com'
               scope: '@urbansportsclub'
-              auth-token: ${{ secrets.USG_GITHUB_TOKEN }}
+              token: ${{ secrets.USG_GITHUB_TOKEN }}
             env: 
               NODE_AUTH_TOKEN: ${{ secrets.USG_GITHUB_TOKEN }}
     
