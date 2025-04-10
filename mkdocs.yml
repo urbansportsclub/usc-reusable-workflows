@@ -1,0 +1,13 @@
+---
+site_name: 'USC reusable workflows'
+site_description: 'USC reusable workflows'
+repo_url: https://github.com/urbansportsclub/usc-reusable-workflows
+edit_uri: edit/main/docs
+
+nav:
+  - Home: index.md
+  - Publish packages architecture: publish-packages-architecture.md
+
+plugins:
+  - techdocs-core
+  - kroki
