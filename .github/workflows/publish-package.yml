@@ -3,6 +3,9 @@
     
     on:
       workflow_call:
+        secrets:
+          NODE_AUTH_TOKEN:
+            required: true
         inputs:
             workspace-name:
               description: "Name of the workspace to publish"
@@ -21,9 +24,9 @@
               registry-url: 'https://npm.pkg.github.com'
               scope: '@urbansportsclub'
               always-auth: true 
-              token: ${{ secrets.USG_GITHUB_TOKEN }}
-            env: 
-              NODE_AUTH_TOKEN: ${{ secrets.USG_GITHUB_TOKEN }}
+              token: ${{ secrets.NODE_AUTH_TOKEN }}
+            env:
+              NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
     
           - name: Publish to GitHub Packages
             run: npm publish
