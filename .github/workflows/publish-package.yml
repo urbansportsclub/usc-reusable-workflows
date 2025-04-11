@@ -24,8 +24,10 @@
               registry-url: 'https://npm.pkg.github.com'
               scope: '@urbansportsclub'
               always-auth: true 
+              # Used to authenticate and publish private npm packages to our private registry in Github
               token: ${{ secrets.NODE_AUTH_TOKEN }}
             env:
+              # To ensure that the token is available for npm publish
               NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
     
           - name: Publish to GitHub Packages
