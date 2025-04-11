@@ -16,13 +16,27 @@
 	}}
 }%%
 flowchart TD
-    A[/USC Gym/] --> C
-    B[/Backstage Custom Actions/] --> C
-    C[Reusable workflow] --> |Push| D
+    B[/"Standard project"/] --> C["Reusable workflow : Publish Package"]
+    
+    subgraph Requirements for Publish
+      direction TB
+      S[Secrets: NODE_AUTH_TOKEN]
+      I[Input: workspace-name]
+    end
 
-    D[GitHub packages] --> |Pull| E
-    D --> |Pull| F
+    C --> S
+    C --> I
 
-    E[Project 1]
-    F[Project 2]
+    C -- "Push with npm publish" --> D["GitHub Packages"]
+
+    subgraph Usage Requirements
+      direction TB
+      P1[Add package to dependencies<br/>in package.json]
+    end
+
+    D -- Pull --> E["Project 1"]
+    D -- Pull --> F["Project 2"]
+
+    E --> P1
+    F --> P1
 ```
