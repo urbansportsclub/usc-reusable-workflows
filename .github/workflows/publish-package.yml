@@ -11,6 +11,11 @@
               description: "Name of the workspace to publish"
               required: true
               type: string
+            is-monorepo:
+              description: "The repo is a monorepo with workspaces"
+              required: false
+              default: false
+              type: boolean
     
     jobs:
       build:
@@ -29,7 +34,18 @@
             env:
               # To ensure that the token is available for npm publish
               NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+
+          - name: Enable Corepack (for yarn monorepos only)
+            if: ${{ inputs.is-monorepo }}
+            run: |
+              corepack enable
+              corepack prepare yarn@4.7.0 --activate
+
+          - name: Publish to GitHub Packages for monorepo
+            if: ${{ inputs.is-monorepo }}
+            run: yarn workspace ${{ inputs.workspace-name }} npm publish
     
           - name: Publish to GitHub Packages
+            if: ${{ !inputs.is-monorepo }}
             run: npm publish
               
