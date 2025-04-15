@@ -9,7 +9,7 @@
         inputs:
             workspace:
               description: "Name of the workspace to publish"
-              required: true
+              required: false
               type: string
             is-monorepo:
               description: "The repo is a monorepo with workspaces"
