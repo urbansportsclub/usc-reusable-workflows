@@ -7,7 +7,7 @@
           NODE_AUTH_TOKEN:
             required: true
         inputs:
-            workspace-name:
+            workspace:
               description: "Name of the workspace to publish"
               required: true
               type: string
@@ -39,11 +39,11 @@
             if: ${{ inputs.is-monorepo }}
             run: |
               corepack enable
-              corepack prepare yarn@4.7.0 --activate
+              corepack prepare yarn@4.2.2 --activate
 
           - name: Publish to GitHub Packages for monorepo
             if: ${{ inputs.is-monorepo }}
-            run: yarn workspace ${{ inputs.workspace-name }} npm publish
+            run: yarn workspace ${{ inputs.workspace }} npm publish
     
           - name: Publish to GitHub Packages
             if: ${{ !inputs.is-monorepo }}
