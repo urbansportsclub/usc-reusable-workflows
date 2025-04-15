@@ -88,7 +88,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN  }}
           INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || env.NODE_CMD_MODE == 'pnpm' && 'install' || 'ci' }}
         run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
-        working-directory: ${{ env.working-directory }}
 
       - name: Run test script command
         env:
