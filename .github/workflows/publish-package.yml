@@ -36,10 +36,12 @@
               NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
           - name: Enable Corepack (for yarn monorepos only)
-            if: ${{ inputs.is-monorepo }}
             run: |
               corepack enable
               corepack prepare yarn@4.2.2 --activate
+
+          - name: Build package
+            run: yarn build
 
           - name: Publish to GitHub Packages for monorepo
             if: ${{ inputs.is-monorepo }}
