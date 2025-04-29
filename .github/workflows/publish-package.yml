@@ -55,5 +55,5 @@
     
           - name: Publish to GitHub Packages
             if: ${{ !inputs.is-monorepo }}
-            run: npm publish
+            run: yarn publish
               
