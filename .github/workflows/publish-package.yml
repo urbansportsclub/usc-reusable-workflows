@@ -44,12 +44,14 @@
           - name: Publish to GitHub Packages for monorepo
             if: ${{ inputs.is-monorepo }}
             run: yarn workspace ${{ inputs.workspace }} npm publish
-          
-          - name: Yarn install
-            run: yarn install
 
-          - name: Build package
-            run: yarn build
+          - name: Install Yarn (v1)
+            if: ${{ !inputs.is-monorepo }}
+            run: npm install -g yarn@1.22.22
+
+          - name: Install dependencies
+            if: ${{ !inputs.is-monorepo }}
+            run: yarn install
     
           - name: Publish to GitHub Packages
             if: ${{ !inputs.is-monorepo }}
