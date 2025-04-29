@@ -52,6 +52,10 @@
           - name: Install dependencies
             if: ${{ !inputs.is-monorepo }}
             run: yarn install
+        
+          - name: Build package
+            if: ${{ !inputs.is-monorepo }}
+            run: yarn build 
     
           - name: Publish to GitHub Packages
             if: ${{ !inputs.is-monorepo }}
