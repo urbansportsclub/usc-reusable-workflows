@@ -56,6 +56,10 @@
           - name: Build package
             if: ${{ !inputs.is-monorepo }}
             run: yarn build 
+
+          - name: Debug files (optionnel pour test)
+            if: ${{ !inputs.is-monorepo }}
+            run: ls -R dist/
     
           - name: Publish to GitHub Packages
             if: ${{ !inputs.is-monorepo }}
