@@ -1,0 +1,51 @@
+---
+name: Create Tag and GitHub release for frontend projects
+on:
+  workflow_call:
+    inputs:
+      changelog: 
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  create_release:
+    runs-on: [self-hosted, dind]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+
+      - name: Check if tag already exists
+        run: |
+          if git rev-parse "v${{ steps.package-version.outputs.current-version }}" >/dev/null 2>&1; then
+            echo "::error::Tag v${{ steps.package-version.outputs.current-version }} already exists."
+            exit 1
+          else
+            echo "Tag v${{ steps.package-version.outputs.current-version }} does not exist. Proceeding."
+          fi
+
+      - name: Create Git tag
+        run: |
+          git config user.email "devops@urbansportsclub.com"
+          git config user.name "DevOpsFit"
+          git tag "v${{ steps.package-version.outputs.current-version }}"
+          git push origin "v${{ steps.package-version.outputs.current-version }}"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ steps.package-version.outputs.current-version }}"
+          name: "Release v${{ steps.package-version.outputs.current-version }}"
+          generate_release_notes: ${{ inputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
