@@ -34,19 +34,11 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - name: Setup NODE_CMD_MODE/LOCK_FILE values
-        run: |
-          if [ -f "yarn.lock" ]; then
-            echo "NODE_CMD_MODE=yarn" >> $GITHUB_ENV
-            echo "LOCK_FILE=yarn.lock" >> $GITHUB_ENV
-          elif [ -f "pnpm-lock.yaml" ]; then
-            echo "NODE_CMD_MODE=pnpm" >> $GITHUB_ENV
-            echo "LOCK_FILE=pnpm-lock.yaml" >> $GITHUB_ENV
-          else
-            echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
-            echo "LOCK_FILE=package-lock.json" >> $GITHUB_ENV
-          fi
-        working-directory: ${{ env.working-directory }}
+      - name: Detect package manager
+        id: detect_pkg_mgr
+        uses: ./.github/actions/detect-package-manager
+        with:
+          working-directory: ${{ inputs.WORKING_DIRECTORY }}
 
       # Restore NPM cache
       - name: Restore node_modules cache
