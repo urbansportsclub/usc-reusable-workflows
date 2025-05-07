@@ -1,0 +1,30 @@
+name: 'Detect JS Package Manager'
+description: 'Detects which JavaScript package manager is being used (npm, yarn, pnpm)'
+inputs:
+  working-directory:
+    description: 'Working directory to check for package manager files'
+    required: false
+    default: '.'
+outputs:
+  node_cmd_mode:
+    description: 'The command to use for the package manager (npm, yarn, pnpm)'
+    value: ${{ steps.detect.outputs.node_cmd_mode }}
+  lock_file:
+    description: 'The path to the lock file'
+    value: ${{ steps.detect.outputs.lock_file }}
+runs:
+  using: 'composite'
+  steps:
+    - id: detect
+      shell: bash
+      run: |
+        if [ -f "${{ inputs.working-directory }}/yarn.lock" ]; then
+          echo "node_cmd_mode=yarn" >> $GITHUB_OUTPUT
+          echo "lock_file=${{ inputs.working-directory }}/yarn.lock" >> $GITHUB_OUTPUT
+        elif [ -f "${{ inputs.working-directory }}/pnpm-lock.yaml" ]; then
+          echo "node_cmd_mode=pnpm" >> $GITHUB_OUTPUT
+          echo "lock_file=${{ inputs.working-directory }}/pnpm-lock.yaml" >> $GITHUB_OUTPUT
+        else
+          echo "node_cmd_mode=npm" >> $GITHUB_OUTPUT
+          echo "lock_file=${{ inputs.working-directory }}/package-lock.json" >> $GITHUB_OUTPUT
+        fi

@@ -22,15 +22,11 @@ jobs:
       - name: Checkout Repository Code
         uses: actions/checkout@v4
 
-      - name: Setup NODE_CMD_MODE values
-        run: |
-          if [ -f "${{ inputs.WORKING_DIRECTORY }}/yarn.lock" ]; then
-            echo "NODE_CMD_MODE=yarn" >> $GITHUB_ENV
-          elif [ -f "${{ inputs.WORKING_DIRECTORY }}/pnpm-lock.yaml" ]; then
-            echo "NODE_CMD_MODE=pnpm" >> $GITHUB_ENV
-          else
-            echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
-          fi
+      - name: Detect package manager
+        id: detect_pkg_mgr
+        uses: ./.github/actions/detect-package-manager
+        with:
+          working-directory: ${{ inputs.WORKING_DIRECTORY }}
 
       # Set Node version (requires .nvmrc file in the root of repository)
       - name: Setup Node Version
