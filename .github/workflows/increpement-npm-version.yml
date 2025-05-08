@@ -59,7 +59,7 @@ jobs:
       - name: Check if branch exists
         id: check_branch
         run: |
-          if git ls-remote --exit-code --heads origin env.BRANCH_EXISTS; then
+          if git ls-remote --exit-code --heads origin ${{ env.BRANCH_TO_PUSH }}; then
             echo "Branch exists"
             echo "BRANCH_EXISTS=true" >> $GITHUB_ENV
           else
