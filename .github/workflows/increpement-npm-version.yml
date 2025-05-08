@@ -37,10 +37,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
       - name: Bump version in package.json
         id: bump_version
         run: |
-          RELEASE_TYPE=${{ github.event.inputs.release_type }}
+          RELEASE_TYPE=${{ inputs.release_type }}
           echo "Bumping version with type: $RELEASE_TYPE"
           npm version $RELEASE_TYPE --no-git-tag-version
 
@@ -70,12 +71,12 @@ jobs:
           git checkout -b ${{ env.BRANCH_TO_PUSH }}
           git push origin ${{ env.BRANCH_TO_PUSH }}
 
-      # - name: Pull latest changes (only if branch existed)
-      #   if: env.BRANCH_EXISTS == 'true'
-      #   run: |
-      #     git config user.email "devops@urbansportsclub.com"
-      #     git config user.name "DevOpsFit"
-      #     git pull origin ${{ env.BRANCH_TO_PUSH }} --rebase
+      - name: Pull latest changes (only if branch existed)
+        if: env.BRANCH_EXISTS == 'true'
+        run: |
+          git config user.email "devops@urbansportsclub.com"
+          git config user.name "DevOpsFit"
+          git pull origin ${{ env.BRANCH_TO_PUSH }} --rebase
 
       - name: Bump Version of package.json to ${{ steps.package-version.outputs.current-version }}
         continue-on-error: false
