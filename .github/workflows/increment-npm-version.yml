@@ -27,6 +27,7 @@ jobs:
   create_pr:
     name: Create PR to increment package.json version
     runs-on: [self-hosted, dind]
+    needs: [check_input]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
