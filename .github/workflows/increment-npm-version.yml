@@ -97,6 +97,6 @@ jobs:
 
       - name: Create PR
         env:
-          GH_TOKEN: ${{ secrets.USG_GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr create -B main -H ${{ env.BRANCH_TO_PUSH }} --title 'Release: ${{ env.RELEASE_TAG }}' --body 'Release: ${{ env.RELEASE_TAG }}' --label 'release'
