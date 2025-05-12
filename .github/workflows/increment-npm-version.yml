@@ -6,7 +6,6 @@ on:
       release_type:
         description: 'Release type. Possible values: major, minor, patch'
         required: true
-        default: 'patch'
         type: string
 
 permissions:
