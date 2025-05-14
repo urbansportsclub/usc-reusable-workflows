@@ -12,6 +12,13 @@ jobs:
   bump_version:
     runs-on: [self-hosted, dind]
     steps:
+      - name: Check input
+        run: |
+          if [[ "${{ inputs.release_type }}" != "major" && "${{ inputs.release_type }}" != "minor" && "${{ inputs.release_type }}" != "patch" ]]; then
+            echo "::error::Invalid release type. Possible values are: major, minor, patch."
+            exit 1
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
