@@ -11,14 +11,10 @@ on:
         description: "Name of the workspace to publish"
         required: false
         type: string
-      is-monorepo:
-        description: "The repo is a monorepo with workspaces"
-        required: false
-        default: false
-        type: boolean
       working-directory:
         description: "Path to the project"
         required: false
+        default: '.'
         type: string
 
 jobs:
@@ -45,28 +41,48 @@ jobs:
           # To ensure that the token is available for npm publish
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
-      - name: Enable Corepack (for yarn monorepos only)
-        if: ${{ inputs.is-monorepo }}
+      - name: Enable Corepack
+        if: ${{ steps.detect_pkg_mgr.outputs.node_cmd_mode == 'yarn' }}
         run: |
           corepack enable
           corepack prepare yarn@4.2.2 --activate
 
-      - name: Publish to GitHub Packages for monorepo
-        if: ${{ inputs.is-monorepo }}
-        run: yarn workspace ${{ inputs.workspace }} npm publish
-
-      - name: Install Yarn (v1)
-        if: ${{ !inputs.is-monorepo }}
-        run: npm install -g yarn@1.22.22
-
       - name: Install dependencies
-        if: ${{ !inputs.is-monorepo }}
-        run: yarn install
+        run: |
+          case "${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}" in
+            yarn)
+              yarn install ${{ inputs.workspace && format(' --cwd {0}', inputs['working-directory']) }}
+              ;;
+            pnpm)
+              pnpm install ${{ inputs.workspace && format('--filter {0}', inputs.workspace) }}
+              ;;
+            npm|*)
+              npm install${{ inputs.workspace && format(' --workspace={0}', inputs.workspace) }}
+              ;;
+          esac
 
       - name: Build package
-        if: ${{ !inputs.is-monorepo }}
-        run: yarn build
+        run: |
+          CMD=${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}
+          if [ "$CMD" = "pnpm" ]; then
+            pnpm run build${{ inputs.workspace && format(' --filter {0}', inputs.workspace) }}
+          else
+            $CMD run build${{ inputs.workspace && format(' --workspace={0}', inputs.workspace) }}
+          fi
 
-      - name: Publish to GitHub Packages
-        if: ${{ !inputs.is-monorepo }}
-        run: yarn publish
+      - name: Publish package
+        run: |
+          PM=${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}
+          if [ "$PM" = "yarn" ] && [ -n "${{ inputs.workspace }}" ]; then
+            yarn workspace ${{ inputs.workspace }} npm publish
+          elif [ "$PM" = "pnpm" ] && [ -n "${{ inputs.workspace }}" ]; then
+            pnpm --filter "${{ inputs.workspace }}" publish
+          elif [ -n "${{ inputs.workspace }}" ]; then
+            npm --workspace ${{ inputs.workspace }} publish
+          else
+            case "$PM" in
+              pnpm) pnpm publish ;; 
+              yarn) yarn publish ;; 
+              npm|*) npm publish ;; 
+            esac
+          fi
