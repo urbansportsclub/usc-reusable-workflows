@@ -39,7 +39,7 @@ jobs:
       
       - name: Restore PR package.json
         run: |
-          git checkout -
+          git checkout ${{ github.head_ref }}
 
       - name: Get current PR version
         id: pr_version
