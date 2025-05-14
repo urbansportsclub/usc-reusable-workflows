@@ -1,63 +1,72 @@
 ---
-    name: Publish Package
-    
-    on:
-      workflow_call:
-        secrets:
-          NODE_AUTH_TOKEN:
-            required: true
-        inputs:
-            workspace:
-              description: "Name of the workspace to publish"
-              required: false
-              type: string
-            is-monorepo:
-              description: "The repo is a monorepo with workspaces"
-              required: false
-              default: false
-              type: boolean
-    
-    jobs:
-      build:
-        runs-on: [self-hosted, dind]
-        steps:
-          - uses: actions/checkout@v4
+name: Publish Package
 
-          - uses: actions/setup-node@v4
-            with:
-              node-version: '20.x'
-              registry-url: 'https://npm.pkg.github.com'
-              scope: '@urbansportsclub'
-              always-auth: true 
-              # Used to authenticate and publish private npm packages to our private registry in Github
-              token: ${{ secrets.NODE_AUTH_TOKEN }}
-            env:
-              # To ensure that the token is available for npm publish
-              NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+on:
+  workflow_call:
+    secrets:
+      NODE_AUTH_TOKEN:
+        required: true
+    inputs:
+      workspace:
+        description: "Name of the workspace to publish"
+        required: false
+        type: string
+      is-monorepo:
+        description: "The repo is a monorepo with workspaces"
+        required: false
+        default: false
+        type: boolean
+      working-directory:
+        description: "Path to the project"
+        required: false
+        type: string
 
-          - name: Enable Corepack (for yarn monorepos only)
-            if: ${{ inputs.is-monorepo }}
-            run: |
-              corepack enable
-              corepack prepare yarn@4.2.2 --activate
+jobs:
+  build:
+    runs-on: [self-hosted, dind]
+    steps:
+      - uses: actions/checkout@v4
 
-          - name: Publish to GitHub Packages for monorepo
-            if: ${{ inputs.is-monorepo }}
-            run: yarn workspace ${{ inputs.workspace }} npm publish
+      - name: Detect package manager
+        id: detect_pkg_mgr
+        uses: urbansportsclub/usc-reusable-workflows/.github/actions/detect-package-manager@gt_JsPackageManager
+        with:
+          working-directory: ${{ inputs.working-directory }}
 
-          - name: Install Yarn (v1)
-            if: ${{ !inputs.is-monorepo }}
-            run: npm install -g yarn@1.22.22
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@urbansportsclub"
+          always-auth: true
+          # Used to authenticate and publish private npm packages to our private registry in Github
+          token: ${{ secrets.NODE_AUTH_TOKEN }}
+        env:
+          # To ensure that the token is available for npm publish
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
-          - name: Install dependencies
-            if: ${{ !inputs.is-monorepo }}
-            run: yarn install
-        
-          - name: Build package
-            if: ${{ !inputs.is-monorepo }}
-            run: yarn build 
-    
-          - name: Publish to GitHub Packages
-            if: ${{ !inputs.is-monorepo }}
-            run: yarn publish
-              
+      - name: Enable Corepack (for yarn monorepos only)
+        if: ${{ inputs.is-monorepo }}
+        run: |
+          corepack enable
+          corepack prepare yarn@4.2.2 --activate
+
+      - name: Publish to GitHub Packages for monorepo
+        if: ${{ inputs.is-monorepo }}
+        run: yarn workspace ${{ inputs.workspace }} npm publish
+
+      - name: Install Yarn (v1)
+        if: ${{ !inputs.is-monorepo }}
+        run: npm install -g yarn@1.22.22
+
+      - name: Install dependencies
+        if: ${{ !inputs.is-monorepo }}
+        run: yarn install
+
+      - name: Build package
+        if: ${{ !inputs.is-monorepo }}
+        run: yarn build
+
+      - name: Publish to GitHub Packages
+        if: ${{ !inputs.is-monorepo }}
+        run: yarn publish
