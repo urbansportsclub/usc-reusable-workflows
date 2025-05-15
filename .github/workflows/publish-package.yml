@@ -78,8 +78,8 @@ jobs:
           PM=${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}
           if [ "$PM" = "yarn" ]; then echo "Using Yarn v2+ publish"
             yarn workspace ${{ inputs.workspace }} npm publish
-          elif [ "$PM" = "pnpm" ]; then "Using pnpm publish"
-            pnpm publish
+          elif [ "$PM" = "pnpm" ]; then echo "Using pnpm publish"
+            pnpm --filter "${{ inputs.workspace }}" publish
           elif [ -n "${{ inputs.workspace }}" ]; then echo "Using npm publish"
             npm publish
           fi
