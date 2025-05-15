@@ -79,7 +79,7 @@ jobs:
           if [ "$PM" = "yarn" ]; then echo "Using Yarn v2+ publish"
             yarn workspace ${{ inputs.workspace }} npm publish
           elif [ "$PM" = "pnpm" ]; then echo "Using pnpm publish"
-            pnpm --filter "${{ inputs.workspace }}" publish
+            pnpm --filter "${{ inputs.workspace }}" publish --no-git-checks
           elif [ -n "${{ inputs.workspace }}" ]; then echo "Using npm publish"
             npm publish
           fi
