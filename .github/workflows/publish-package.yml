@@ -42,11 +42,13 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
       - name: Enable Corepack
-        if: ${{ steps.detect_pkg_mgr.outputs.node_cmd_mode == 'yarn' && 'pnpm' }}
         run: |
           corepack enable
-          corepack prepare yarn@4.2.2 --activate
-          corepack prepare pnpm@latest --activate
+          if [ "${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}" = "yarn" ]; then
+            corepack prepare yarn@4.2.2 --activate
+          elif [ "${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}" = "pnpm" ]; then
+            corepack prepare pnpm@10.11.0 --activate
+          fi
 
       - name: Install dependencies
         run: |
