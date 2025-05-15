@@ -53,7 +53,7 @@ jobs:
       - name: Install dependencies
         run: |
           case "${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}" in
-            yarn1 && yarn2)
+            yarn1|yarn2)
               yarn install
               ;;
             pnpm)
