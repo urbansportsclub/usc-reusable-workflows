@@ -57,7 +57,7 @@ jobs:
               pnpm install ${{ inputs.workspace && format('--filter {0}', inputs.workspace) }}
               ;;
             npm|*)
-              npm install${{ inputs.workspace && format(' --workspace={0}', inputs.workspace) }}
+              npm install
               ;;
           esac
 
