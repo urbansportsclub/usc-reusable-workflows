@@ -67,7 +67,7 @@ jobs:
           if [ "$CMD" = "pnpm" ]; then
             pnpm run build${{ inputs.workspace && format(' --filter {0}', inputs.workspace) }}
           else
-            $CMD run build${{ inputs.workspace && format(' --workspace={0}', inputs.workspace) }}
+            $CMD run build
           fi
 
       - name: Publish package
