@@ -73,11 +73,11 @@ jobs:
       - name: Publish package
         run: |
           PM=${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}
-          if [ "$PM" = "yarn" ]; then
+          if [ "$PM" = "yarn" ]; then echo "Using Yarn v2+ publish"
             yarn workspace ${{ inputs.workspace }} npm publish
           elif [ "$PM" = "pnpm" ] && [ -n "${{ inputs.workspace }}" ]; then
             pnpm --filter "${{ inputs.workspace }}" publish
-          elif [ -n "${{ inputs.workspace }}" ]; then
+          elif [ -n "${{ inputs.workspace }}" ]; then echo "Using npm publish"
             npm --workspace ${{ inputs.workspace }} publish
           else
             case "$PM" in
