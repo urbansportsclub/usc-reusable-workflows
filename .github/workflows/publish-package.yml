@@ -67,11 +67,20 @@ jobs:
       - name: Build package
         run: |
           CMD=${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}
-          if [ "$CMD" = "pnpm" ]; then
-            pnpm run build
-          else
+          case "$CMD" in
+            pnpm)
+              pnpm run build
+              ;;
+            yarn1|yarn2)
+              yarn run build
+              ;;
+            npm)
+              npm run build
+              ;;
+            *)
             $CMD run build
-          fi
+            ;;
+          esac
 
       - name: Publish package
         run: |
