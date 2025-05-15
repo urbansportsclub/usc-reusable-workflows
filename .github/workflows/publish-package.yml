@@ -73,7 +73,7 @@ jobs:
       - name: Publish package
         run: |
           PM=${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}
-          if [ "$PM" = "yarn" ] && [ -n "${{ inputs.workspace }}" ]; then
+          if [ "$PM" = "yarn" ]; then
             yarn workspace ${{ inputs.workspace }} npm publish
           elif [ "$PM" = "pnpm" ] && [ -n "${{ inputs.workspace }}" ]; then
             pnpm --filter "${{ inputs.workspace }}" publish
