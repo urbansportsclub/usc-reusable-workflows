@@ -78,7 +78,7 @@ jobs:
           elif [ "$PM" = "pnpm" ] && [ -n "${{ inputs.workspace }}" ]; then
             pnpm --filter "${{ inputs.workspace }}" publish
           elif [ -n "${{ inputs.workspace }}" ]; then echo "Using npm publish"
-            npm --workspace ${{ inputs.workspace }} publish
+            npm publish
           else
             case "$PM" in
               pnpm) pnpm publish ;; 
