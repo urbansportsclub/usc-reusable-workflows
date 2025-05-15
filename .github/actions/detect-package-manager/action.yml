@@ -18,13 +18,20 @@ runs:
     - id: detect
       shell: bash
       run: |
-        if [ -f "${{ inputs.working-directory }}/yarn.lock" ]; then
-          echo "node_cmd_mode=yarn" >> $GITHUB_OUTPUT
-          echo "lock_file=${{ inputs.working-directory }}/yarn.lock" >> $GITHUB_OUTPUT
-        elif [ -f "${{ inputs.working-directory }}/pnpm-lock.yaml" ]; then
+        DIR="${{ inputs.working-directory }}"
+        if [ -f "$DIR/yarn.lock" ]; then
+          if grep -q '^__metadata:' "$DIR/yarn.lock"; then
+            echo "node_cmd_mode=yarn2" >> $GITHUB_OUTPUT
+          else
+            echo "node_cmd_mode=yarn1" >> $GITHUB_OUTPUT
+          fi
+          echo "lock_file=$DIR/yarn.lock" >> $GITHUB_OUTPUT
+
+        elif [ -f "$DIR/pnpm-lock.yaml" ]; then
           echo "node_cmd_mode=pnpm" >> $GITHUB_OUTPUT
-          echo "lock_file=${{ inputs.working-directory }}/pnpm-lock.yaml" >> $GITHUB_OUTPUT
+          echo "lock_file=$DIR/pnpm-lock.yaml" >> $GITHUB_OUTPUT
+
         else
           echo "node_cmd_mode=npm" >> $GITHUB_OUTPUT
-          echo "lock_file=${{ inputs.working-directory }}/package-lock.json" >> $GITHUB_OUTPUT
+          echo "lock_file=$DIR/package-lock.json" >> $GITHUB_OUTPUT
         fi
