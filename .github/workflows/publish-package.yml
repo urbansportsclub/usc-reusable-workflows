@@ -46,6 +46,7 @@ jobs:
         run: |
           corepack enable
           corepack prepare yarn@4.2.2 --activate
+          corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
         run: |
@@ -75,7 +76,7 @@ jobs:
           PM=${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}
           if [ "$PM" = "yarn" ]; then echo "Using Yarn v2+ publish"
             yarn workspace ${{ inputs.workspace }} npm publish
-          elif [ "$PM" = "pnpm" ] && [ -n "${{ inputs.workspace }}" ]; then
+          elif [ "$PM" = "pnpm" ] && [ -n "${{ inputs.workspace }}" ]; then "Using pnpm publish"
             pnpm --filter "${{ inputs.workspace }}" publish
           elif [ -n "${{ inputs.workspace }}" ]; then echo "Using npm publish"
             npm publish
