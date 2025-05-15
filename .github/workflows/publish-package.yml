@@ -57,7 +57,7 @@ jobs:
               yarn install
               ;;
             pnpm)
-              pnpm install ${{ inputs.workspace && format('--filter {0}', inputs.workspace) }}
+              pnpm install
               ;;
             npm|*)
               npm install
@@ -68,7 +68,7 @@ jobs:
         run: |
           CMD=${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}
           if [ "$CMD" = "pnpm" ]; then
-            pnpm run build${{ inputs.workspace && format(' --filter {0}', inputs.workspace) }}
+            pnpm run build
           else
             $CMD run build
           fi
@@ -78,14 +78,8 @@ jobs:
           PM=${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}
           if [ "$PM" = "yarn" ]; then echo "Using Yarn v2+ publish"
             yarn workspace ${{ inputs.workspace }} npm publish
-          elif [ "$PM" = "pnpm" ] && [ -n "${{ inputs.workspace }}" ]; then "Using pnpm publish"
+          elif [ "$PM" = "pnpm" ]; then "Using pnpm publish"
             pnpm --filter "${{ inputs.workspace }}" publish
           elif [ -n "${{ inputs.workspace }}" ]; then echo "Using npm publish"
             npm publish
-          else
-            case "$PM" in
-              pnpm) pnpm publish ;; 
-              yarn) yarn publish ;; 
-              npm|*) npm publish ;; 
-            esac
           fi
