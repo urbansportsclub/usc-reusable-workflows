@@ -42,7 +42,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
       - name: Enable Corepack
-        if: ${{ steps.detect_pkg_mgr.outputs.node_cmd_mode == 'yarn' }}
+        if: ${{ steps.detect_pkg_mgr.outputs.node_cmd_mode == 'yarn' && 'pnpm' }}
         run: |
           corepack enable
           corepack prepare yarn@4.2.2 --activate
