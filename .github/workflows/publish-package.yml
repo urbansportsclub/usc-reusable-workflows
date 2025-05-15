@@ -51,7 +51,7 @@ jobs:
         run: |
           case "${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}" in
             yarn)
-              yarn install --cwd "${{ inputs.working-directory }}"
+              yarn install
               ;;
             pnpm)
               pnpm install ${{ inputs.workspace && format('--filter {0}', inputs.workspace) }}
