@@ -1,5 +1,5 @@
 ---
-name: Create PR to increment package.json version
+name: Increment NPM Version
 on:
   workflow_call:
     inputs:
@@ -8,26 +8,17 @@ on:
         required: true
         type: string
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
-  check_input:
+  bump_version:
     runs-on: [self-hosted, dind]
     steps:
       - name: Check input
         run: |
-          if [[ "${{ github.event.inputs.release_type }}" != "major" && "${{ github.event.inputs.release_type }}" != "minor" && "${{ github.event.inputs.release_type }}" != "patch" ]]; then
+          if [[ "${{ inputs.release_type }}" != "major" && "${{ inputs.release_type }}" != "minor" && "${{ inputs.release_type }}" != "patch" ]]; then
             echo "::error::Invalid release type. Possible values are: major, minor, patch."
             exit 1
           fi
-          
-  create_pr:
-    name: Create PR to increment package.json version
-    runs-on: [self-hosted, dind]
-    needs: [check_input]
-    steps:
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -38,64 +29,62 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Bump version in package.json
-        id: bump_version
+      - name: Install semver
         run: |
-          RELEASE_TYPE=${{ inputs.release_type }}
-          echo "Bumping version with type: $RELEASE_TYPE"
-          npm version $RELEASE_TYPE --no-git-tag-version
+          npm install -g semver
 
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
-
-      - name: Setup env variables
+      - name: Fetch latest version main
         run: |
-          echo "BRANCH_TO_PUSH=release/${{ steps.package-version.outputs.current-version }}" >> $GITHUB_ENV
-          echo "RELEASE_TAG=${{ steps.package-version.outputs.current-version }}" >> $GITHUB_ENV
-
-      - name: Check if branch exists
-        id: check_branch
+          git fetch origin main
+      
+      - name: Get latest version from main
+        id: main_version
         run: |
-          if git ls-remote --exit-code --heads origin ${{ env.BRANCH_TO_PUSH }}; then
-            echo "Branch exists"
-            echo "BRANCH_EXISTS=true" >> $GITHUB_ENV
+          git checkout origin/main -- package.json
+          MAIN_VERSION=$(jq -r '.version' package.json)
+          echo "MAIN_VERSION=$MAIN_VERSION" >> $GITHUB_ENV
+      
+      - name: Restore PR package.json
+        run: |
+          git checkout ${{ github.head_ref }}
+
+      - name: Get current PR version
+        id: pr_version
+        run: |
+          PR_VERSION=$(jq -r '.version' package.json)
+          echo "PR_VERSION=$PR_VERSION" >> $GITHUB_ENV
+   
+      - name: Compare versions semantically
+        id: check_conflict
+        run: |
+          if semver -r "${{ env.PR_VERSION }}" -le "${{ env.MAIN_VERSION }}"; then
+            echo "VERSION_CONFLICT=true" >> $GITHUB_ENV
           else
-            echo "Branch does not exist, creating it..."
-            echo "BRANCH_EXISTS=false" >> $GITHUB_ENV
+            echo "VERSION_CONFLICT=false" >> $GITHUB_ENV
           fi
 
-      - name: Create branch if it does not exist
-        if: env.BRANCH_EXISTS == 'false'
+      - name: Overwrite PR version with main version
+        if: ${{ env.VERSION_CONFLICT }} == 'true'
         run: |
-          git checkout -b ${{ env.BRANCH_TO_PUSH }}
-          git push origin ${{ env.BRANCH_TO_PUSH }}
+          echo "Overwriting PR version with main version"
+          jq --arg new_version "$MAIN_VERSION" '.version = $new_version' package.json > tmp.json && mv tmp.json package.json
 
-      - name: Pull latest changes (only if branch existed)
-        if: env.BRANCH_EXISTS == 'true'
+      - name: Bump version in package.json
+        if: ${{ env.VERSION_CONFLICT }} == 'true'
+        run: |
+          npm version ${{ inputs.release_type }} --no-git-tag-version
+
+      - name: Commit bumped version
         run: |
           git config user.email "devops@urbansportsclub.com"
           git config user.name "DevOpsFit"
-          git pull origin ${{ env.BRANCH_TO_PUSH }} --rebase
+          git add package.json
+          git commit -m "auto-bump: resolve version conflict with new bump" || echo "No changes to commit"
 
-      - name: Bump Version of package.json to ${{ steps.package-version.outputs.current-version }}
-        continue-on-error: false
-        env:
-          PACKAGE_PATH: './package.json'
+      - name: Show final version
         run: |
-          git config user.email "devops@urbansportsclub.com"
-          git config user.name "DevOpsFit"
-          # Update the version in package.json using jq
-          jq ".version = \"${{ env.RELEASE_TAG}}\"" $PACKAGE_PATH > $PACKAGE_PATH.tmp && mv $PACKAGE_PATH.tmp $PACKAGE_PATH
-          git add $PACKAGE_PATH
-          git commit -m "bump-version: bump version to '${{ env.RELEASE_TAG }}'"
+          echo "Final version: $(jq -r '.version' package.json)"
 
       - name: Push changes
         run: |
-          git push origin ${{ env.BRANCH_TO_PUSH }}
-
-      - name: Create PR
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr create -B main -H ${{ env.BRANCH_TO_PUSH }} --title 'Release: ${{ env.RELEASE_TAG }}' --body 'Release: ${{ env.RELEASE_TAG }}' --label 'release'
+          git push origin HEAD
