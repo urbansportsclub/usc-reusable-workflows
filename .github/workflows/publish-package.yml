@@ -5,7 +5,7 @@ on:
   workflow_call:
     secrets:
       NODE_AUTH_TOKEN:
-        required: true
+        required: false
     inputs:
       workspace:
         description: "Name of the workspace to publish"
