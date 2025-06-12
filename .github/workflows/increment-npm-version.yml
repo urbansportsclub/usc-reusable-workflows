@@ -57,7 +57,7 @@ jobs:
       - name: Compare versions semantically
         id: check_conflict
         run: |
-          if semver -r "${{ env.PR_VERSION }}" -le "${{ env.MAIN_VERSION }}"; then
+          if semver -r <= "${{ env.PR_VERSION }}" "${{ env.MAIN_VERSION }}"; then
             echo "VERSION_CONFLICT=true" >> $GITHUB_ENV
           else
             echo "VERSION_CONFLICT=false" >> $GITHUB_ENV
