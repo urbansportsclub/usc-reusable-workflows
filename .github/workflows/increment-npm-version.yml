@@ -8,9 +8,9 @@ on:
         required: true
         type: string
       package_path:
-        description: 'Path to the package.json file'
+        description: 'Path to the directory where package.json file is located'
         required: false
-        default: 'package.json'
+        default: '.'
         type: string
 
 permissions:
@@ -48,7 +48,7 @@ jobs:
         run: |
           RELEASE_TYPE=${{ inputs.release_type }}
           echo "Bumping version with type: $RELEASE_TYPE"
-          npm version $RELEASE_TYPE --no-git-tag-version --prefix "$(dirname ${{ inputs.package_path }})"
+          npm version $RELEASE_TYPE --no-git-tag-version --prefix ${{ inputs.package_path }}
 
       - name: get-npm-version
         id: package-version
