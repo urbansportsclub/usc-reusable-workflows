@@ -23,6 +23,7 @@ jobs:
     steps:
       - name: Check input
         run: |
+          echo "${{ inputs.release_type }}"
           if [[ "${{ inputs.release_type }}" != "major" && "${{ inputs.release_type }}" != "minor" && "${{ inputs.release_type }}" != "patch" ]]; then
             echo "::error::Invalid release type. Possible values are: major, minor, patch."
             exit 1
