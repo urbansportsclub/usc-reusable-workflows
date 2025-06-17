@@ -7,6 +7,11 @@ on:
         description: 'Release type. Possible values: major, minor, patch'
         required: true
         type: string
+      package_path:
+        description: 'Path to the package.json file'
+        required: false
+        default: 'package.json'
+        type: string
 
 permissions:
   contents: write
@@ -43,7 +48,7 @@ jobs:
         run: |
           RELEASE_TYPE=${{ inputs.release_type }}
           echo "Bumping version with type: $RELEASE_TYPE"
-          npm version $RELEASE_TYPE --no-git-tag-version
+          npm version $RELEASE_TYPE --no-git-tag-version --prefix "$(dirname ${{ inputs.package_path }})"
 
       - name: get-npm-version
         id: package-version
