@@ -66,6 +66,7 @@ jobs:
             echo "Branch exists"
             echo "::error::Release branch already exists: ${{ env.BRANCH_TO_PUSH }}"
             exit 1
+          fi
 
       - name: Create branch
         run: |
