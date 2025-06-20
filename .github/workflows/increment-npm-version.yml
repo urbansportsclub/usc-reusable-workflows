@@ -64,7 +64,7 @@ jobs:
         run: |
           if git ls-remote --exit-code --heads origin ${{ env.BRANCH_TO_PUSH }}; then
             echo "Branch exists"
-            echo "::error::Release branch already exists: https://github.com/urbansportsclub/${{ github.repository }}/tree/${{ env.BRANCH_TO_PUSH }}."
+            echo "::error::Release branch already exists: https://github.com/urbansportsclub/${{ github.repository }}/tree/${{ env.BRANCH_TO_PUSH }}"
             exit 1
           fi
 
