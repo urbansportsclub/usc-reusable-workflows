@@ -64,24 +64,14 @@ jobs:
         run: |
           if git ls-remote --exit-code --heads origin ${{ env.BRANCH_TO_PUSH }}; then
             echo "Branch exists"
-            echo "BRANCH_EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "Branch does not exist, creating it..."
-            echo "BRANCH_EXISTS=false" >> $GITHUB_ENV
+            echo "::error::Release branch already exists: https://github.com/${{ github.repository }}/tree/${{ env.BRANCH_TO_PUSH }}"
+            exit 1
           fi
 
-      - name: Create branch if it does not exist
-        if: env.BRANCH_EXISTS == 'false'
+      - name: Create branch
         run: |
           git checkout -b ${{ env.BRANCH_TO_PUSH }}
           git push origin ${{ env.BRANCH_TO_PUSH }}
-
-      - name: Pull latest changes (only if branch existed)
-        if: env.BRANCH_EXISTS == 'true'
-        run: |
-          git config user.email "devops@urbansportsclub.com"
-          git config user.name "DevOpsFit"
-          git pull origin ${{ env.BRANCH_TO_PUSH }} --rebase
 
       - name: Bump Version of package.json to ${{ steps.package-version.outputs.current-version }}
         continue-on-error: false
