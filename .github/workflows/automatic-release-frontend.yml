@@ -4,15 +4,16 @@ on:
   workflow_call:
     inputs:
       changelog: 
+        description: 'Whether to automatically generate release notes from commits and PRs. Set to false to create release without notes.'
         required: false
         type: boolean
         default: true
       package_path:
-        description: 'Path to the directory where package.json file is located. If not provided, will auto-detect from PR changes.'
+        description: 'Path to directory containing package.json file. Examples: "." for root, "packages/components" for monorepo. If not provided, automatically detects from merged PR changes.'
         required: false
         type: string
       tag_prefix:
-        description: 'Prefix for the git tag (e.g., "components" for components/1.0.0 tags).'
+        description: 'Prefix for git tag format. Examples: "v" creates "v1.0.0" tags, "components" creates "components/1.0.0" tags for monorepos.'
         required: false
         type: string
         default: 'v'
