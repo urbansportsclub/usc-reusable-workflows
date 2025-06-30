@@ -76,7 +76,7 @@ jobs:
       - name: Bump Version of package.json to ${{ steps.package-version.outputs.current-version }}
         continue-on-error: false
         env:
-          PACKAGE_PATH: './package.json'
+          PACKAGE_PATH: '${{ inputs.package_path }}/package.json'
         run: |
           git config user.email "devops@urbansportsclub.com"
           git config user.name "DevOpsFit"
