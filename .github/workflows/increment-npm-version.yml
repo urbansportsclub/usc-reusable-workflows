@@ -53,6 +53,8 @@ jobs:
       - name: get-npm-version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
+        with:
+          path: ${{ inputs.package_path }}
 
       - name: Setup env variables
         run: |
@@ -73,16 +75,12 @@ jobs:
           git checkout -b ${{ env.BRANCH_TO_PUSH }}
           git push origin ${{ env.BRANCH_TO_PUSH }}
 
-      - name: Bump Version of package.json to ${{ steps.package-version.outputs.current-version }}
+      - name: Commit version changes
         continue-on-error: false
-        env:
-          PACKAGE_PATH: './package.json'
         run: |
           git config user.email "devops@urbansportsclub.com"
           git config user.name "DevOpsFit"
-          # Update the version in package.json using jq
-          jq ".version = \"${{ env.RELEASE_TAG}}\"" $PACKAGE_PATH > $PACKAGE_PATH.tmp && mv $PACKAGE_PATH.tmp $PACKAGE_PATH
-          git add $PACKAGE_PATH
+          git add ${{ inputs.package_path }}/package.json
           git commit -m "bump-version: bump version to '${{ env.RELEASE_TAG }}'"
 
       - name: Push changes
