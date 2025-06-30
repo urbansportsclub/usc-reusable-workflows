@@ -4,9 +4,19 @@ on:
   workflow_call:
     inputs:
       changelog: 
+        description: 'Whether to automatically generate release notes from commits and PRs. Set to false to create release without notes.'
         required: false
         type: boolean
         default: true
+      package_path:
+        description: 'Path to directory containing package.json file. Examples: "." for root, "./packages/components" for monorepo.'
+        required: false
+        type: string
+        default: "."
+      tag_prefix:
+        description: 'Tag prefix. Defaults to "v" for v1.0.0 tags. Example: "components" for components/1.0.0 tags.'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -21,32 +31,64 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Detect package path
+        id: detect-path
+        run: |
+          # Use explicit path if provided (and not default)
+          if [[ "${{ inputs.package_path }}" != "." ]]; then
+            PACKAGE_DIR="${{ inputs.package_path }}"
+            echo "Using explicit path: $PACKAGE_DIR"
+          # Auto-detect from merged PR changes
+          elif [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.pull_request.merged }}" == "true" ]]; then
+            CHANGED_PACKAGE_JSON=$(git diff --name-only HEAD~1 HEAD | grep "package\.json$" | head -1)
+            PACKAGE_DIR=$(dirname "${CHANGED_PACKAGE_JSON:-./package.json}")
+            echo "Auto-detected from PR: $PACKAGE_DIR"
+          # Use default
+          else
+            PACKAGE_DIR="${{ inputs.package_path }}"
+            echo "Using default path: $PACKAGE_DIR"
+          fi
+          echo "package-dir=$PACKAGE_DIR" >> $GITHUB_OUTPUT
+
       - name: get-npm-version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
+        with:
+          path: ${{ steps.detect-path.outputs.package-dir }}
+
+      - name: Setup tag format
+        id: tag-format
+        run: |
+          if [[ -z "${{ inputs.tag_prefix }}" ]]; then
+            TAG_NAME="v${{ steps.package-version.outputs.current-version }}"
+          else
+            TAG_NAME="${{ inputs.tag_prefix }}/${{ steps.package-version.outputs.current-version }}"
+          fi
+          echo "tag-name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "Using tag format: $TAG_NAME"
 
       - name: Check if version in package.json is bumped
         run: |
-          VERSION="v${{ steps.package-version.outputs.current-version }}"
-          if git tag --list | grep -q "$VERSION"; then
-            echo "::error::Version $VERSION already exists, version in package.json file hasn't been bumped. Exiting."
+          TAG_NAME="${{ steps.tag-format.outputs.tag-name }}"
+          if git tag --list | grep -q "^$TAG_NAME$"; then
+            echo "::error::Tag $TAG_NAME already exists, version in package.json file hasn't been bumped. Exiting."
             exit 1
           else
-            echo "Version $VERSION does not exist. Proceeding."
+            echo "Tag $TAG_NAME does not exist. Proceeding."
           fi
 
       - name: Create Git tag
         run: |
           git config user.email "devops@urbansportsclub.com"
           git config user.name "DevOpsFit"
-          git tag "v${{ steps.package-version.outputs.current-version }}"
-          git push origin "v${{ steps.package-version.outputs.current-version }}"
+          git tag "${{ steps.tag-format.outputs.tag-name }}"
+          git push origin "${{ steps.tag-format.outputs.tag-name }}"
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v${{ steps.package-version.outputs.current-version }}"
-          name: "Release v${{ steps.package-version.outputs.current-version }}"
+          tag_name: "${{ steps.tag-format.outputs.tag-name }}"
+          name: "Release ${{ steps.tag-format.outputs.tag-name }}"
           generate_release_notes: ${{ inputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
