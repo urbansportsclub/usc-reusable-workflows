@@ -59,6 +59,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ inputs.url }}
 
+      - name: .NET installation
+        if: ${{ inputs.is_dotnet_project == true && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
+        uses: ./.github/actions/setup-dotnet
+        with:
+          dotnet_version: 9.0.x
+
       - name: .NET SonarScanner
         if: ${{ inputs.is_dotnet_project == true && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
         run: dotnet tool install --global dotnet-sonarscanner
