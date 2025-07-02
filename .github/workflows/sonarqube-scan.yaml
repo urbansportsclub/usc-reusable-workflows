@@ -61,7 +61,7 @@ jobs:
 
       - name: .NET installation
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        uses: actions/setup-dotnet@v4
+        uses: ./.github/actions/setup-dotnet
         with:
           dotnet-version: 9.0.x
 
