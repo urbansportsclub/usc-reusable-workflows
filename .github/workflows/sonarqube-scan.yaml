@@ -60,36 +60,36 @@ jobs:
           SONAR_HOST_URL: ${{ inputs.url }}
 
       - name: .NET installation
-        if: ${{ inputs.is_dotnet_project == true && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
 
       - name: .NET SonarScanner
-        if: ${{ inputs.is_dotnet_project == true && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Get Sonar Project Key
         id: get_project_key
-        if: ${{ inputs.is_dotnet_project == true && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           key=$(grep "^sonar.projectKey=" sonar-project.properties | cut -d'=' -f2) && echo "projectkey=$key" >> $GITHUB_OUTPUT
 
       - name: .NET SonarScanner Begin
-        if: ${{ inputs.is_dotnet_project == true && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}"
 
       - name: .NET Build
-        if: ${{ inputs.is_dotnet_project == true && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: dotnet build
 
       - name: .NET SonarScanner End
-        if: ${{ inputs.is_dotnet_project == true && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: dotnet sonarscanner end /d:sonar.token=${{ secrets.SONAR_TOKEN }}
 
       - name: Scan
         uses: sonarsource/sonarqube-scan-action@master
-        if: ${{ inputs.is_dotnet_project != true && always() && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
+        if: ${{ always() && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) }} && inputs.is_dotnet_project != true
         with:
           args: >
             -Dsonar.projectVersion=${{ github.sha }}
