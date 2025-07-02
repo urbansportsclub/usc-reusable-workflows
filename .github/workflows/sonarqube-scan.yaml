@@ -65,6 +65,13 @@ jobs:
         with:
           dotnet_version: 9.0.x
 
+      - name: Java installation
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
       - name: .NET SonarScanner
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: dotnet tool install --global dotnet-sonarscanner
