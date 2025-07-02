@@ -68,11 +68,11 @@ jobs:
       - name: .NET SonarScanner
         if: ${{ inputs.is_dotnet_project == 'true' && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
         run: dotnet tool install --global dotnet-sonarscanner
-      
+
       - name: Get Sonar Project Key
         id: get_project_key
         if: ${{ inputs.is_dotnet_project == 'true' && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
-        run: | 
+        run: |
           key=$(grep "^sonar.projectKey=" sonar-project.properties | cut -d'=' -f2) && echo "projectkey=$key" >> $GITHUB_OUTPUT
 
       - name: .NET SonarScanner Begin
