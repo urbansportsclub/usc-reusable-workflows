@@ -68,10 +68,14 @@ jobs:
       - name: .NET SonarScanner
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Check tools installation
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        run: dotnet tool list --global
       
       - name: Add .NET tools to PATH
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: echo "${{ github.workspace }}/.dotnet/tools" >> $GITHUB_PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Get Sonar Project Key
         id: get_project_key
