@@ -61,9 +61,9 @@ jobs:
 
       - name: .NET installation
         if: ${{ inputs.is_dotnet_project == true && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
-        uses: ./.github/actions/setup-dotnet
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet_version: 9.0.x
+          dotnet-version: 9.0.x
 
       - name: .NET SonarScanner
         if: ${{ inputs.is_dotnet_project == true && github.ref == format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
