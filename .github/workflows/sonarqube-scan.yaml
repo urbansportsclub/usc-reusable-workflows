@@ -81,7 +81,7 @@ jobs:
         id: get_project_key
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
-          key=$(grep "^sonar.projectKey=" sonar-project.properties | cut -d'=' -f2) && echo "projectkey=$key" >> $GITHUB_OUTPUT
+          key=$(grep "^sonar.projectKey=" sonarproject | cut -d'=' -f2) && echo "projectkey=$key" >> $GITHUB_OUTPUT
 
       - name: .NET SonarScanner Begin
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
