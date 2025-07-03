@@ -91,7 +91,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dotnet-coverage-xml
-          path: TestResults/coverage.xml
+          path: TestResults
 
       - name: Check coverage file exists
         run: |
