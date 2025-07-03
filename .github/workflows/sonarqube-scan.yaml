@@ -92,7 +92,7 @@ jobs:
 
       - name: .NET SonarScanner Begin
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}"
+        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.token=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}"
 
       - name: Verification token
         run: |
@@ -100,7 +100,7 @@ jobs:
             echo "SONAR_TOKEN is NOT available"
             exit 1
           else
-            echo "SONAR_TOKEN is present"
+            echo "SONAR_TOKEN is present 2"
           fi
 
       - name: .NET Build
