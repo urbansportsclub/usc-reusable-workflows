@@ -95,8 +95,13 @@ jobs:
 
       - name: Check coverage file exists
         run: |
-          ls -la TestResults/
-          cat coverage.xml || echo "Coverage file missing or empty"
+          ls -lh TestResults || echo "TestResults directory does not exist!"
+          if [ -f TestResults/coverage.xml ]; then
+            cat TestResults/coverage.xml | head -n 20
+          else
+            echo "Coverage file not found!"
+            exit 1
+          fi
 
       - name: .NET SonarScanner Begin
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
