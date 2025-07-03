@@ -93,9 +93,14 @@ jobs:
           name: dotnet-coverage-xml
           path: TestResults/coverage.xml
 
+      - name: Check coverage file exists
+        run: |
+          ls -la ./TestResults/
+          cat ./TestResults/coverage.xml || echo "Coverage file missing or empty"
+
       - name: .NET SonarScanner Begin
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.cs.opencover.reportPaths="TestResults/coverage.xml"
+        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.cs.opencover.reportPaths="./TestResults/coverage.xml"
 
       - name: .NET Build
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
@@ -104,11 +109,6 @@ jobs:
       - name: .NET SonarScanner End
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
-
-      - name: Check coverage file exists
-        run: |
-          ls -la TestResults/
-          cat TestResults/coverage.xml || echo "Coverage file missing or empty"
 
       - name: Scan
         uses: sonarsource/sonarqube-scan-action@master
