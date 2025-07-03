@@ -92,7 +92,7 @@ jobs:
 
       - name: .NET SonarScanner Begin
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.token=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}"
+        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}"
 
       - name: Verification token
         run: |
@@ -109,7 +109,7 @@ jobs:
 
       - name: .NET SonarScanner End
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: dotnet sonarscanner end /d:sonar.token=${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Scan
         uses: sonarsource/sonarqube-scan-action@master
