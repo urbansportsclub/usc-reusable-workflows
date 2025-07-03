@@ -113,7 +113,7 @@ jobs:
 
       - name: Scan
         uses: sonarsource/sonarqube-scan-action@master
-        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) }} && inputs.is_dotnet_project != true
+        if: ${{ inputs.is_dotnet_project != true && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
         with:
           args: >
             -Dsonar.projectVersion=${{ github.sha }}
