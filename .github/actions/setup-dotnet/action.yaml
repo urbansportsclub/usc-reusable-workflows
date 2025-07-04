@@ -1,0 +1,17 @@
+name: Setup .NET
+description: Reusable step to install .NET with custom version
+inputs:
+  dotnet_version:
+    required: true
+    description: 'Version of .NET to install'
+
+runs:
+  using: "composite"
+  steps:
+    - name: 🧠 Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ inputs.dotnet_version }}
+      env:
+        DOTNET_INSTALL_DIR: ${{ runner.temp }}/.dotnet
+        NUGET_PACKAGES: ${{ runner.temp }}/.nuget/packages

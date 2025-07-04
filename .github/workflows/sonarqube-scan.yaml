@@ -26,6 +26,10 @@ on:
       reference_branch:
         required: false
         type: string
+      is_dotnet_project:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -55,9 +59,65 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ inputs.url }}
 
+      - name: .NET installation
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        uses: ./.github/actions/setup-dotnet
+        with:
+          dotnet_version: 9.0.x
+
+      - name: Java installation
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: .NET SonarScanner
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Add .NET tools to PATH
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Get Sonar Project Key
+        id: get_project_key
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        run: |
+          key=$(grep "^sonar.projectKey=" sonarproject | cut -d'=' -f2) && echo "projectkey=$key" >> $GITHUB_OUTPUT
+
+      - name: Download code coverage results
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        uses: actions/download-artifact@v4
+        with:
+          name: dotnet-coverage-xml
+          path: TestResults
+
+      - name: Check coverage file exists
+        run: |
+          ls -lh TestResults
+          if [ -f TestResults/coverage.opencover.xml ]; then
+            cat TestResults/coverage.opencover.xml | head -n 20
+          else
+            echo "Coverage file not found!"
+            exit 1
+          fi
+
+      - name: .NET SonarScanner Begin
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.scanner.scanAll=false /d:sonar.cs.opencover.reportPaths=TestResults/coverage.opencover.xml /d:sonar.verbose=true /d:sonar.inclusions="**/*.cs" /d:sonar.exclusions="**/*.Test.cs"
+
+      - name: .NET Build
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        run: dotnet build /p:SourceLinkCreate=true
+
+      - name: .NET SonarScanner End
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        run: dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
+
       - name: Scan
         uses: sonarsource/sonarqube-scan-action@master
-        if: ${{ always() && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
+        if: ${{ inputs.is_dotnet_project != true && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
         with:
           args: >
             -Dsonar.projectVersion=${{ github.sha }}
@@ -69,7 +129,15 @@ jobs:
       # If you wish to fail your job when the Quality Gate is red, uncomment the
       # following lines. This would typically be used to fail a deployment.
       - uses: sonarsource/sonarqube-quality-gate-action@master
-        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.enable_quality_gate == true }}
+        if: ${{ inputs.is_dotnet_project == true && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.enable_quality_gate == true }}
+        with:
+          scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - uses: sonarsource/sonarqube-quality-gate-action@master
+        if: ${{ inputs.is_dotnet_project != true && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.enable_quality_gate == true }}
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
