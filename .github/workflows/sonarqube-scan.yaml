@@ -96,8 +96,8 @@ jobs:
       - name: Check coverage file exists
         run: |
           ls -lh TestResults
-          if [ -f TestResults/coverage.xml ]; then
-            cat TestResults/coverage.xml | head -n 20
+          if [ -f TestResults/coverage.opencover.xml ]; then
+            cat TestResults/coverage.opencover.xml | head -n 20
           else
             echo "Coverage file not found!"
             exit 1
@@ -105,7 +105,7 @@ jobs:
 
       - name: .NET SonarScanner Begin
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.scanner.scanAll=false /d:sonar.cs.opencover.reportPaths=TestResults/coverage.xml /d:sonar.verbose=true
+        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.scanner.scanAll=false /d:sonar.cs.opencover.reportPaths=TestResults/coverage.opencover.xml /d:sonar.verbose=true
 
       - name: .NET Build
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
