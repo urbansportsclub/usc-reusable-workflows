@@ -132,15 +132,13 @@ jobs:
             /d:sonar.login=${{ secrets.SONAR_TOKEN }} \
             /v:"${{ github.sha }}" \
             /d:sonar.scanner.scanAll=false \
-            /d:sonar.cs.opencover.reportPaths=$(pwd)/TestResults/coverage.opencover.xml \
             /d:sonar.verbose=true \
             /d:sonar.log.level=DEBUG
 
       - name: .NET Build
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        # run: dotnet build /p:SourceLinkCreate=true
-        run: dotnet build
+        run: dotnet build /p:SourceLinkCreate=true
 
       - name: .NET SonarScanner End
         working-directory: ${{ inputs.working_directory }}
