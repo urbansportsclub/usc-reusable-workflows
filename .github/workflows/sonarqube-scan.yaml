@@ -99,14 +99,13 @@ jobs:
           
       - name: Fix coverage paths in the report
         working-directory: ${{ inputs.working_directory }}
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
-          PROJECT_ROOT=$(pwd)
-          echo "PROJECT_ROOT=$PROJECT_ROOT"
-          ls -lh ./TestResults || true
-          sed -i "s| fullPath=\"[^\"]*$PROJECT_ROOT/| fullPath=\"|g" ./TestResults/coverage.opencover.xml
+          sed -i "s| fullPath=\"| fullPath=\"${{ inputs.working_directory }}/|g" ./TestResults/coverage.opencover.xml
 
       - name: Check coverage file exists
         working-directory: ${{ inputs.working_directory }}
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           ls -lh ./TestResults
           if [ -f ./TestResults/coverage.opencover.xml ]; then
@@ -118,6 +117,7 @@ jobs:
 
       - name: Debug – List all files before begin
         working-directory: ${{ inputs.working_directory }}
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           echo "Listing files in $(pwd):"
           ls -R
@@ -130,7 +130,7 @@ jobs:
             /k:"${{ steps.get_project_key.outputs.projectkey }}" \
             /d:sonar.host.url=${{ inputs.url }} \
             /d:sonar.login=${{ secrets.SONAR_TOKEN }} \
-            /d:sonar.cs.opencover.reportPaths=$(pwd)/TestResults/coverage.opencover.xml \
+            /d:sonar.cs.opencover.reportPaths=TestResults/coverage.opencover.xml \
             /v:"${{ github.sha }}" \
             /d:sonar.scanner.scanAll=false \
             /d:sonar.verbose=true \
