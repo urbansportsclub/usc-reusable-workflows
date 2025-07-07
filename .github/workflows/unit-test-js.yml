@@ -1,0 +1,102 @@
+name: Unit Tests - Javascript
+on:
+  workflow_call:
+    inputs:
+      REPO_NAME:
+        required: true
+        type: string
+      USE_CODECOV:
+        default: false
+        required: false
+        type: boolean
+      UPLOAD_ARTIFACTS:
+        default: false
+        required: false
+        type: boolean
+      WORKING_DIRECTORY:
+        description: Working directory path.
+        default: "."
+        required: false
+        type: string
+      TEST_CMD_FLAG:
+        description: Optional flag to pass to `test` command script (e.g. :ci / :watch / :all, etc.)
+        required: false
+        type: string
+    secrets:
+      GH_PACKAGES_TOKEN:
+        required: false
+      NODE_AUTH_TOKEN:
+        required: false
+      CODECOV_TOKEN:
+        required: false
+
+jobs:
+  unit_tests:
+    name: Unit Tests (RTL/Jest)
+    defaults:
+      run:
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
+    runs-on: [self-hosted, nonroot]
+    env:
+      NODE_CMD_MODE: ""
+      LOCK_FILE: ""
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Setup NODE_CMD_MODE/LOCK_FILE values
+        run: |
+          if [ -f "${{ inputs.WORKING_DIRECTORY }}/yarn.lock" ]; then
+            echo "NODE_CMD_MODE=yarn" >> $GITHUB_ENV
+            echo "LOCK_FILE=${{ inputs.WORKING_DIRECTORY }}/yarn.lock" >> $GITHUB_ENV
+          elif [ -f "${{ inputs.WORKING_DIRECTORY }}/pnpm-lock.yaml" ]; then
+            echo "NODE_CMD_MODE=pnpm" >> $GITHUB_ENV
+            echo "LOCK_FILE=${{ inputs.WORKING_DIRECTORY }}/pnpm-lock.yaml" >> $GITHUB_ENV
+          else
+            echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
+            echo "LOCK_FILE=${{ inputs.WORKING_DIRECTORY }}/package-lock.json" >> $GITHUB_ENV
+          fi
+
+      # Restore Node cache
+      - name: Restore `node_modules` cache
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: ${{ inputs.WORKING_DIRECTORY }}/node_modules
+          key: node-cache-${{ runner.os }}-${{ hashFiles(env.LOCK_FILE) }}
+
+      # Set Node version (requires .nvmrc file in the root of repository)
+      - name: Set Node version
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ inputs.WORKING_DIRECTORY }}/.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+
+      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
+        name: Conditional Yarn install for runner if used
+        run: npm -g install yarn
+
+      - if: ${{ env.NODE_CMD_MODE == 'pnpm' }}
+        name: Conditional setup PNPM for runner
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Install Dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN  }}
+          INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || env.NODE_CMD_MODE == 'pnpm' && 'install' || 'ci' }}
+        run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
+
+      - name: Run test script command
+        env:
+          PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
+        run: ${{ format('{0} {1}{2}', env.PKG_CMD, 'test', inputs.TEST_CMD_FLAG) }}
+
+      - name: Upload coverage artifacts to `${{ inputs.WORKING_DIRECTORY }}/coverage/test-artifacts`
+        if: ${{ inputs.UPLOAD_ARTIFACTS }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: ${{ inputs.WORKING_DIRECTORY }}/coverage

@@ -1,12 +1,12 @@
 # Reusable Workflows
 
-This is our set of reusable workflows that you can use to make your life simplert when dealing with a few standard actions in our CI.
+This is our set of reusable workflows that you can use to make your life simpler when dealing with a few standard actions in our CI.
 
 ## Call Build & Push Docker Workflow
 
-If you wan to build and push images you can simply add this to your workflow
+If you want to build and push images you can simply add this to your workflow
 
-```
+```yaml
 name: Build and push docker
 
 on:
@@ -23,14 +23,23 @@ jobs:
       project_id: urbansportsclub-dev
       dockerfile_path: "Dockerfile"
 ```
+You can add an additional property ``` push: false``` if you want the workflow to build your image without pushing to the registry. This could be useful if you want to check for build errors and the default value is true (it pushes to the registry by default).
 
 We use docker/metadata to guess your image tag based on your branch, or tag. This will then be pushed to GCR and you can use that when deploying.
+
+By default, we disable the docker [build summary](https://docs.docker.com/build/ci/github-actions/build-summary/) but you can enable it from your workflow setting the enable_summary variable to true (the default is false):
+
+```yaml
+    uses: urbansportsclub/usc-reusable-workflows/.github/workflows/build-and-push-docker-image.yaml@main
+    with:
+      enable_summary: true
+```
 
 ## Call Deploy to Kubernetes Workflow ( Helm ) 
 
 Putting all together, we have the following.
 
-```
+```yaml
 name: Deploy to Kubernetes Cluster 
 
 on:
@@ -64,7 +73,7 @@ jobs:
 
 ## Rollback Workflow
 
-```
+```yaml
 name: Rollback Helm Deployment 
 
 on:
@@ -91,6 +100,20 @@ jobs:
       runner: "deploy" # Which Action Runner to use, change to "deploylive" for staging/live deployments.
 ```
 
+## Merge dependabot PRs automatically
+
+To auto-merge Dependabot PRs, add this to the end of your lint and test workflow so that the automerge only gets triggered after the tests are successful:
+If you have codeowners on your project change for automerge-dependabot-with-codeowners.yml@main
+
+```yaml
+  automerge:
+    name: Automerge Dependabot
+    needs: [lint, test, scan]
+    uses: urbansportsclub/usc-reusable-workflows/.github/workflows/automerge-dependabot.yml@main
+    secrets:
+      github-token: ${{ secrets.USG_GITHUB_TOKEN }}
+```
+
 ## SonarQube
 ### Setting Up
 
@@ -102,21 +125,11 @@ jobs:
 
 ![selecting the project](resources/readme/selecting-project.png)
 
-4. Select `GitHub Actions` to set up the repository and generate a `SONAR_TOKEN` to send data from your repository.
-
-![github actions](resources/readme/github-actions.png)
-
-5. Copy the token and go to your repository in GitHub, then set a new secret with the name `SONAR_TOKEN` and paste the token.
-
-![secrets](resources/readme/project-secrets.png)
-
-![github secrets](resources/readme/github-secrets.png)
-
-6. Return to the SonarQube page and click `Continue` to finish the tutorial.
-
-7. Retrieve the `Project key` by clicking the `Project information` link in the top right corner of the project page and copying the value.
+4. Retrieve the `Project key` by clicking the `Project information` link in the top right corner of the project page and copying the value.
 
 ![project information](resources/readme/project-information.png)
+
+> **_NOTE:_**  You don't need to generate a SONAR_TOKEN as we are using a global analysis token and it is added at the organization level.
 
 ### Properties file
 
@@ -154,7 +167,7 @@ jobs:
     name: Test
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/test-go.yaml@main
     secrets:
-      github-token: ${{ secrets.GB_TOKEN_PRIVATE }}
+      github-token: ${{ secrets.USG_GITHUB_TOKEN }}
 
   scan:
     name: Sonarqube Scan
@@ -162,8 +175,7 @@ jobs:
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/sonarqube-scan.yaml@main
     with:
       download_coverage_artifact: true
-    secrets:
-      token: ${{ secrets.SONAR_TOKEN }}
+    secrets: inherit
 ```
 
 Here is an example on how to use SonarQube for the `master|main` branch. You can notice that we are exposing two inputs for the `scan`:
@@ -184,7 +196,7 @@ jobs:
     name: Test
     uses: urbansportsclub/usc-reusable-workflows/.github/workflows/test-go.yaml@main
     secrets:
-      github-token: ${{ secrets.GB_TOKEN_PRIVATE }}
+      github-token: ${{ secrets.USG_GITHUB_TOKEN }}
   
   scan:
     name: Sonarqube Scan
@@ -193,8 +205,7 @@ jobs:
     with:
       enable_quality_gate: false
       download_coverage_artifact: true
-    secrets:
-      token: ${{ secrets.SONAR_TOKEN }}
+    secrets: inherit
 ```
 
 ### Code coverage for other languages
@@ -222,8 +233,7 @@ scan:
     enable_quality_gate: true
     download_coverage_artifact: true
     coverage_artifact_name: php-coverage-xml
-  secrets:
-    token: ${{ secrets.SONAR_TOKEN }}
+  secrets: inherit
 ```
 
 

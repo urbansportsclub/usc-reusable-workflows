@@ -1,0 +1,94 @@
+name: Linting and Formatting
+on:
+  workflow_call:
+    inputs:
+      WORKING_DIRECTORY:
+        description: Working directory path.
+        default: "."
+        required: false
+        type: string
+      LINT_CMD_FLAG:
+        description: Optional flag to pass to `lint` command script (e.g. :ci / :watch / :all, etc.)
+        required: false
+        type: string
+      FORMAT_CMD_FLAG:
+        description: Optional flag to pass to `formant` command script (e.g. :ci / :watch / :check, etc.)
+        required: false
+        type: string
+    secrets:
+      GH_PACKAGES_TOKEN:
+        required: false
+      NODE_AUTH_TOKEN:
+          required: false
+
+jobs:
+  lint-and-format:
+    name: ESLint and Prettier formatting
+    runs-on: [self-hosted, nonroot]
+    env:
+      NODE_CMD_MODE: ""
+      LOCK_FILE: ""
+      working-directory: ${{ inputs.WORKING_DIRECTORY}}/
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Setup NODE_CMD_MODE/LOCK_FILE values
+        run: |
+          if [ -f "yarn.lock" ]; then
+            echo "NODE_CMD_MODE=yarn" >> $GITHUB_ENV
+            echo "LOCK_FILE=yarn.lock" >> $GITHUB_ENV
+          elif [ -f "pnpm-lock.yaml" ]; then
+            echo "NODE_CMD_MODE=pnpm" >> $GITHUB_ENV
+            echo "LOCK_FILE=pnpm-lock.yaml" >> $GITHUB_ENV
+          else
+            echo "NODE_CMD_MODE=npm" >> $GITHUB_ENV
+            echo "LOCK_FILE=package-lock.json" >> $GITHUB_ENV
+          fi
+        working-directory: ${{ env.working-directory }}
+
+      # Restore NPM cache
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: node_modules
+          key: node-cache-${{ runner.os }}-${{ hashFiles(env.LOCK_FILE) }}
+
+      - name: Set Node version
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ env.working-directory }}.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+
+      - if: ${{ env.NODE_CMD_MODE == 'yarn' }}
+        name: Conditional Yarn install for runner if used
+        run: npm -g install yarn
+
+      - if: ${{ env.NODE_CMD_MODE == 'pnpm' }}
+        name: Conditional setup PNPM for runner
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Install Dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          INSTALL_ARGS: ${{ env.NODE_CMD_MODE == 'yarn' && '--frozen-lockfile' || env.NODE_CMD_MODE == 'pnpm' && 'install' || 'ci' }}
+        run: ${{ format('{0} {1}', env.NODE_CMD_MODE, env.INSTALL_ARGS) }}
+        working-directory: ${{ env.working-directory }}
+
+      # Run Linter
+      - name: ESLint
+        env:
+          PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
+        run: ${{ format('{0} {1}{2}', env.PKG_CMD, 'lint', inputs.LINT_CMD_FLAG) }}
+        working-directory: ${{ env.working-directory }}
+
+      # Run Formatter
+      - name: Prettier
+        env:
+          PKG_CMD: ${{ env.NODE_CMD_MODE == 'npm' && 'npm run' || env.NODE_CMD_MODE }}
+        run: ${{ format('{0} {1}{2}', env.PKG_CMD, 'format', inputs.FORMAT_CMD_FLAG) }}
+        working-directory: ${{ env.working-directory }}
