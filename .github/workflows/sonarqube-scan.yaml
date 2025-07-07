@@ -102,8 +102,10 @@ jobs:
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           PROJECT_ROOT=$(pwd)
-          sed -i "s| fullPath=\"| \"${PROJECT_ROOT}|g" ./TestResults/coverage.opencover.xml
-          cat ./TestResults/coverage.opencover.xml | grep fullPath
+          echo "PROJECT_ROOT=$PROJECT_ROOT"
+          sed -i "s| fullPath=\"[^\"]*| fullPath=\"${PROJECT_ROOT}|g" ./TestResults/coverage.opencover.xml
+          echo "--- After fix ---"
+          grep fullPath ./TestResults/coverage.opencover.xml
 
       - name: Check coverage file exists
         working-directory: ${{ inputs.working_directory }}
