@@ -118,7 +118,7 @@ jobs:
       - name: .NET Build
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         # run: dotnet build /p:SourceLinkCreate=true
-        run: dotnet build --no-restore --no-incremental --configuration Release
+        run: dotnet build
 
       - name: .NET SonarScanner End
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
