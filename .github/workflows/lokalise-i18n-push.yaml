@@ -1,11 +1,11 @@
 name: Lokalise I18N Push
-run-name: Push translations to Lokalise [${{ github.ref_name }}]
+run-name: Push translation keys up to Lokalise [${{ github.ref_name }}]
 on:
   workflow_call:
     inputs:
       I18N_DIR_PATH:
         required: true
-        description: "Path to the directory containing the i18n files, e.g., 'src/lib/i18n/'"
+        description: "Path to the directory containing the i18n files. Leave out leading and trailing slashes e.g., 'src/lib/i18n'"
         type: string
       LOKALISE_PROJECT_ID:
         required: true
