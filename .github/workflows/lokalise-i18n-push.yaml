@@ -25,11 +25,6 @@ on:
       LOKALISE_API_TOKEN:
         required: true
         description: "Lokalise API token for authentication"
-      GH_PACKAGES_TOKEN:
-        required: true
-  # push:
-  #   branches: [main, master]
-  #   paths: "src/lib/i18n/**/*.json"
 
 jobs:
   build:
