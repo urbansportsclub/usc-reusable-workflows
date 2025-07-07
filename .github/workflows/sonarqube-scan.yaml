@@ -34,6 +34,7 @@ on:
         required: false
         type: string
         default: ${{ github.workspace }}
+
 jobs:
   build:
     name: Build
@@ -47,7 +48,7 @@ jobs:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Download code coverage results
-        if: inputs.download_coverage_artifact == true
+        if: inputs.is_dotnet_project != true && inputs.download_coverage_artifact == true
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.coverage_artifact_name }}
@@ -89,7 +90,7 @@ jobs:
         run: |
           key=$(grep "^sonar.projectKey=" sonarproject | cut -d'=' -f2) && echo "projectkey=$key" >> $GITHUB_OUTPUT
 
-      - name: Download code coverage results
+      - name: Download code coverage results for .NET projects
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         uses: actions/download-artifact@v4
         with:
@@ -101,15 +102,15 @@ jobs:
         run: |
           PROJECT_ROOT=$(pwd)
           echo "PROJECT_ROOT=$PROJECT_ROOT"
-          ls -lh TestResults || true
-          sed -i "s| fullPath=\"[^\"]*$PROJECT_ROOT/| fullPath=\"|g" TestResults/coverage.opencover.xml
+          ls -lh ./TestResults || true
+          sed -i "s| fullPath=\"[^\"]*$PROJECT_ROOT/| fullPath=\"|g" ./TestResults/coverage.opencover.xml
 
       - name: Check coverage file exists
         working-directory: ${{ inputs.working_directory }}
         run: |
-          ls -lh TestResults
-          if [ -f TestResults/coverage.opencover.xml ]; then
-            cat TestResults/coverage.opencover.xml | head -n 20
+          ls -lh ./TestResults
+          if [ -f ./TestResults/coverage.opencover.xml ]; then
+            cat ./TestResults/coverage.opencover.xml | head -n 20
           else
             echo "Coverage file not found!"
             exit 1
@@ -157,3 +158,4 @@ jobs:
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          
