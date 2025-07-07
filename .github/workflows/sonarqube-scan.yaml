@@ -100,6 +100,7 @@ jobs:
         working-directory: ${{ inputs.working_directory }}
         run: |
           PROJECT_ROOT=$(pwd)
+          ls -lh TestResults
           sed -i "s| fullPath=\"[^\"]*$PROJECT_ROOT/| fullPath=\"|g" TestResults/coverage.opencover.xml
 
       - name: Check coverage file exists
@@ -115,7 +116,7 @@ jobs:
       - name: .NET SonarScanner Begin
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.scanner.scanAll=false /d:sonar.cs.opencover.reportPaths=TestResults/coverage.opencover.xml /d:sonar.verbose=true
+        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.scanner.scanAll=false /d:sonar.cs.opencover.reportPaths=$(pwd)/TestResults/coverage.opencover.xml /d:sonar.verbose=true
 
       - name: .NET Build
         working-directory: ${{ inputs.working_directory }}
