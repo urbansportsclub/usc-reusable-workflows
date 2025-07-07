@@ -132,7 +132,7 @@ jobs:
             /d:sonar.login=${{ secrets.SONAR_TOKEN }} \
             /v:"${{ github.sha }}" \
             /d:sonar.scanner.scanAll=false \
-            /d:sonar.cs.opencover.reportPaths="$(pwd)/TestResults/coverage.opencover.xml" \
+            /d:sonar.cs.opencover.reportPaths=$(pwd)/TestResults/coverage.opencover.xml \
             /d:sonar.verbose=true \
             /d:sonar.log.level=DEBUG
 
@@ -147,6 +147,14 @@ jobs:
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
+      - name: Debug Sonar End Output
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          echo "---- .sonarqube content ----"
+          ls -R .sonarqube || echo "No .sonarqube folder"
+          echo "---- Report task ----"
+          cat .sonarqube/out/.sonar/report-task.txt || echo "No report-task.txt"
+          
       - name: Scan
         uses: sonarsource/sonarqube-scan-action@master
         if: ${{ inputs.is_dotnet_project != true && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
