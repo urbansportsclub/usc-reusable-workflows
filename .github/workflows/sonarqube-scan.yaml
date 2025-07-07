@@ -94,7 +94,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dotnet-coverage-xml
-          path: TestResults
+          path: ${{ inputs.working_directory }}/TestResults
           
       - name: Fix coverage paths in the report
         working-directory: ${{ inputs.working_directory }}
