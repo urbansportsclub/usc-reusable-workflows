@@ -30,6 +30,9 @@ on:
         required: false
         type: boolean
         default: false
+      coverage_relative_path:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -110,7 +113,7 @@ jobs:
 
       - name: .NET SonarScanner Begin
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.scanner.scanAll=false /d:sonar.cs.opencover.reportPaths=TestResults/coverage.opencover.xml /d:sonar.verbose=true /d:sonar.inclusions="**/*.cs" /d:sonar.projectBaseDir=.
+        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.scanner.scanAll=false /d:sonar.cs.opencover.reportPaths=TestResults/coverage.opencover.xml /d:sonar.verbose=true /d:sonar.inclusions="**/*.cs" /d:sonar.sources=${{ inputs.coverage_relative_path }} /d:sonar.tests=${{ inputs.coverage_relative_path }}
 
       - name: .NET Build
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
