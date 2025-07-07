@@ -97,13 +97,13 @@ jobs:
           name: dotnet-coverage-xml
           path: ${{ inputs.working_directory }}/TestResults
           
-      - name: Fix coverage paths in the report
-        working-directory: ${{ inputs.working_directory }}
-        run: |
-          PROJECT_ROOT=$(pwd)
-          echo "PROJECT_ROOT=$PROJECT_ROOT"
-          ls -lh ./TestResults || true
-          sed -i "s| fullPath=\"[^\"]*$PROJECT_ROOT/| fullPath=\"|g" ./TestResults/coverage.opencover.xml
+      # - name: Fix coverage paths in the report
+      #   working-directory: ${{ inputs.working_directory }}
+      #   run: |
+      #     PROJECT_ROOT=$(pwd)
+      #     echo "PROJECT_ROOT=$PROJECT_ROOT"
+      #     ls -lh ./TestResults || true
+      #     sed -i "s| fullPath=\"[^\"]*$PROJECT_ROOT/| fullPath=\"|g" ./TestResults/coverage.opencover.xml
 
       - name: Check coverage file exists
         working-directory: ${{ inputs.working_directory }}
@@ -154,7 +154,7 @@ jobs:
           ls -R .sonarqube || echo "No .sonarqube folder"
           echo "---- Report task ----"
           cat .sonarqube/out/.sonar/report-task.txt || echo "No report-task.txt"
-          
+
       - name: Scan
         uses: sonarsource/sonarqube-scan-action@master
         if: ${{ inputs.is_dotnet_project != true && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) }}
