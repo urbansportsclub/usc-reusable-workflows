@@ -100,7 +100,8 @@ jobs:
         working-directory: ${{ inputs.working_directory }}
         run: |
           PROJECT_ROOT=$(pwd)
-          ls -lh TestResults
+          echo "PROJECT_ROOT=$PROJECT_ROOT"
+          ls -lh TestResults || true
           sed -i "s| fullPath=\"[^\"]*$PROJECT_ROOT/| fullPath=\"|g" TestResults/coverage.opencover.xml
 
       - name: Check coverage file exists
