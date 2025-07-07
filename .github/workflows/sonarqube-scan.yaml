@@ -101,7 +101,8 @@ jobs:
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
-          sed -i "s| fullPath=\"| fullPath=\"${{ inputs.working_directory }}/|g" ./TestResults/coverage.opencover.xml
+          PROJECT_ROOT=$(pwd)
+          sed -i "s| fullPath=\"[^\"]*$PROJECT_ROOT/| fullPath=\"|g" ./TestResults/coverage.opencover.xml
 
       - name: Check coverage file exists
         working-directory: ${{ inputs.working_directory }}
