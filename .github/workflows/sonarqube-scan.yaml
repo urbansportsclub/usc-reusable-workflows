@@ -148,7 +148,7 @@ jobs:
       - uses: sonarsource/sonarqube-quality-gate-action@master
         if: ${{ inputs.is_dotnet_project == true && github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.enable_quality_gate == true }}
         with:
-          scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
+          scanMetadataReportFile: ${{ inputs.working_directory }}/.sonarqube/out/.sonar/report-task.txt
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -158,4 +158,3 @@ jobs:
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          
