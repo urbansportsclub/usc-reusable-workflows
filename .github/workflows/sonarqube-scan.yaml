@@ -116,6 +116,12 @@ jobs:
             exit 1
           fi
 
+      - name: Debug – List all files before begin
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          echo "Listing files in $(pwd):"
+          ls -R
+
       - name: .NET SonarScanner Begin
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
