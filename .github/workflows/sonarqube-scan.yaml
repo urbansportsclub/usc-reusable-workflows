@@ -30,10 +30,10 @@ on:
         required: false
         type: boolean
         default: false
-      coverage_relative_path:
-        required: true
+      working_directory:
+        required: false
         type: string
-
+        default: ${{ github.workspace }}
 jobs:
   build:
     name: Build
@@ -97,7 +97,7 @@ jobs:
           path: TestResults
           
       - name: Fix coverage paths in the report
-        working-directory: ${{ github.workspace }}
+        working-directory: ${{ inputs.working_directory }}
         run: |
           PROJECT_ROOT=$(pwd)
           sed -i "s| fullPath=\"[^\"]*$PROJECT_ROOT/| fullPath=\"|g" TestResults/coverage.opencover.xml
@@ -113,18 +113,18 @@ jobs:
           fi
 
       - name: .NET SonarScanner Begin
-        working-directory: ${{ github.workspace }}
+        working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.scanner.scanAll=false /d:sonar.cs.opencover.reportPaths=TestResults/coverage.opencover.xml /d:sonar.verbose=true /d:sonar.inclusions="**/*.cs" /d:sonar.exclusions="**/*.Test.cs"
+        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.scanner.scanAll=false /d:sonar.cs.opencover.reportPaths=TestResults/coverage.opencover.xml /d:sonar.verbose=true
 
       - name: .NET Build
-        working-directory: ${{ github.workspace }}
+        working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         # run: dotnet build /p:SourceLinkCreate=true
         run: dotnet build
 
       - name: .NET SonarScanner End
-        working-directory: ${{ github.workspace }}
+        working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
