@@ -102,6 +102,10 @@ jobs:
             echo "Coverage file not found!"
             exit 1
           fi
+      - name: Fix coverage paths in the report
+        run: |
+          PROJECT_ROOT=$(pwd)
+          sed -i "s| fullPath=\"[^\"]*| fullPath=\"$PROJECT_ROOT|g" TestResults/coverage.opencover.xml
 
       - name: .NET SonarScanner Begin
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
