@@ -30,9 +30,6 @@ on:
         required: false
         type: boolean
         default: false
-      coverage_relative_path:
-        required: true
-        type: string
 
 jobs:
   build:
@@ -96,10 +93,10 @@ jobs:
           name: dotnet-coverage-xml
           path: TestResults
 
-      - name: Fix coverage paths in the report
-        run: |
-          PROJECT_ROOT=$(pwd)
-          sed -i "s| fullPath=\"[^\"]*$PROJECT_ROOT/| fullPath=\"|g" TestResults/coverage.opencover.xml
+      # - name: Fix coverage paths in the report
+      #   run: |
+      #     PROJECT_ROOT=$(pwd)
+      #     sed -i "s| fullPath=\"[^\"]*$PROJECT_ROOT/| fullPath=\"|g" TestResults/coverage.opencover.xml
 
       - name: Check coverage file exists
         run: |
@@ -113,7 +110,7 @@ jobs:
 
       - name: .NET SonarScanner Begin
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.scanner.scanAll=false /d:sonar.cs.opencover.reportPaths=TestResults/coverage.opencover.xml /d:sonar.verbose=true /d:sonar.inclusions="**/*.cs" /d:sonar.sources=${{ inputs.coverage_relative_path }} /d:sonar.tests=${{ inputs.coverage_relative_path }}
+        run: dotnet sonarscanner begin /k:"${{ steps.get_project_key.outputs.projectkey }}" /d:sonar.host.url=${{ inputs.url }} /d:sonar.login=${{ secrets.SONAR_TOKEN }} /v:"${{ github.sha }}" /d:sonar.scanner.scanAll=false /d:sonar.cs.opencover.reportPaths=TestResults/coverage.opencover.xml /d:sonar.verbose=true /d:sonar.inclusions="**/*.cs" /d:sonar.projectBaseDir=.
 
       - name: .NET Build
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
