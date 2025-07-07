@@ -1,0 +1,54 @@
+name: Lokalise I18N Push
+run-name: Push translations to Lokalise [${{ github.ref_name }}]
+on:
+  workflow_call:
+    inputs:
+      I18N_DIR_PATH:
+        required: true
+        description: "Path to the directory containing the i18n files, e.g., 'src/lib/i18n/'"
+        type: string
+      LOKALISE_PROJECT_ID:
+        required: true
+        description: "Auto-generated Lokalise Project ID"
+        type: string
+      I18N_FILE_FORMAT:
+        required: false
+        type: string
+        description: "File format for the translations, default is 'json'"
+        default: "json"
+      BASE_LANG:
+        required: false
+        type: string
+        description: "Base language for the translations, default is 'en'"
+        default: "en"
+    secrets:
+      LOKALISE_API_TOKEN:
+        required: true
+        description: "Lokalise API token for authentication"
+      GH_PACKAGES_TOKEN:
+        required: true
+  # push:
+  #   branches: [main, master]
+  #   paths: "src/lib/i18n/**/*.json"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push files up to Lokalise
+        uses: lokalise/lokalise-push-action@v3.6.0
+        with:
+          api_token: ${{ secrets.LOKALISE_API_TOKEN }}
+          project_id: ${{ inputs.LOKALISE_PROJECT_ID }}
+          file_format: ${{ inputs.I18N_FILE_FORMAT }}
+          translations_path: ${{ inputs.I18N_DIR_PATH }}
+          base_lang: ${{ inputs.BASE_LANG }}
+          flat_naming: true
+          additional_params: |
+            --cleanup-mode
+            --replace-modified
