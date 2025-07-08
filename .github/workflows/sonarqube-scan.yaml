@@ -143,7 +143,7 @@ jobs:
         working-directory: .
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
-          dotnet build \
+          dotnet build USC.BuildingBlocks.sln \
           --no-incremental \
           --configuration Release \
           /p:SourceLinkCreate=true \
