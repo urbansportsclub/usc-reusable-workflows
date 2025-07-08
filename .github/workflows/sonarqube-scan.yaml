@@ -166,6 +166,15 @@ jobs:
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
+      - name: 🔍 Check report parsing
+        working-directory: ${{ inputs.working_directory }}
+        if: ${{ inputs.is_dotnet_project == true }}
+        run: |
+          echo "--- Sonar logs: report-task.txt ---"
+          cat .sonarqube/out/.sonar/report-task.txt || echo "No report-task.txt"
+          echo "--- Sonar logs: report.log coverage lines ---"
+          find .sonarqube/out/.sonar -name "report.log" -exec grep -i coverage {} \; || echo "No matches"
+
       - name: Debug Sonar End Output
         working-directory: ${{ inputs.working_directory }}
         run: |
