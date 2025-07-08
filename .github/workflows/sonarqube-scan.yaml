@@ -126,7 +126,7 @@ jobs:
           ls -R
 
       - name: .NET SonarScanner Begin
-        working-directory: ${{ inputs.working_directory }}
+        working-directory: .
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           dotnet sonarscanner begin \
@@ -150,7 +150,7 @@ jobs:
           /p:ContinuousIntegrationBuild=true
 
       - name: .NET SonarScanner End
-        working-directory: ${{ inputs.working_directory }}
+        working-directory: .
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           set -x
