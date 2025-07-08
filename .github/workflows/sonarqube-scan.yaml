@@ -186,6 +186,11 @@ jobs:
         with:
           name: sonar-report-log
           path: ${{ inputs.working_directory }}/.sonarqube/out/.sonar/report.log
+      
+      - name: Check Background Task
+        run: |
+          URL=$(grep ceTaskUrl .sonarqube/out/.sonar/report-task.txt | cut -d'=' -f2)
+          curl -s -u "${{ secrets.SONAR_TOKEN }}:" "$URL" | jq
 
       - name: Check End result
         if: ${{ always() }}
@@ -194,11 +199,7 @@ jobs:
           echo "❌ report-task.txt is missing — something went wrong during 'end'"
           exit 1
           fi
-      - name: Check Background Task
-        run: |
-          URL=$(grep ceTaskUrl .sonarqube/out/.sonar/report-task.txt | cut -d'=' -f2)
-          curl -s -u "${{ secrets.SONAR_TOKEN }}:" "$URL" | jq
-
+          
       - name: Debug Sonar End Output
         working-directory: ${{ inputs.working_directory }}
         run: |
