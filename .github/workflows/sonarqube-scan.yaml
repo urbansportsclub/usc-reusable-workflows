@@ -143,7 +143,7 @@ jobs:
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
-          dotnet build --no-incremental --configuration Release
+          dotnet build "$csproj" --no-incremental --configuration Release
 
       - name: .NET SonarScanner End
         working-directory: ${{ inputs.working_directory }}
