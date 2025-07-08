@@ -43,7 +43,7 @@ jobs:
 
             echo "Uploading $file (lang: $LANG_ISO) with Base64 content: $BASE_64_CONTENT"
             curl -v -X POST "https://api.lokalise.com/api2/projects/$ENV_LOKALISE_PROJECT_ID/files/upload" \
-              -header "x-api-token: $ENV_LOKALISE_API_TOKEN" \
+              --header "x-api-token: $ENV_LOKALISE_API_TOKEN" \
               --header "accept: application/json" \
               --header "content-type: application/json" \
               --data '
