@@ -160,8 +160,8 @@ jobs:
         run: |
           echo "--- ModulePath in coverage.opencover.xml ---"
           grep -oP '<ModulePath>\K[^<]+' ./TestResults/coverage.opencover.xml
-          
       - name: 🔍 Check if ProjectInfo.xml was generated
+
         working-directory: ${{ inputs.working_directory }}
         run: |
           echo "--- Looking for ProjectInfo.xml ---"
@@ -172,33 +172,24 @@ jobs:
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           set -x
-          dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
+          dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.verbose=true /d:sonar.host.url=${{ inputs.url }} /d:sonar.log.level=DEBUG
 
-      - name: 🔍 Debug full report.log
+      - name: ⛏️ Check if report-task.txt exists
         working-directory: ${{ inputs.working_directory }}
         run: |
-          echo "--- FULL report.log ---"
-          cat $(find .sonarqube/out/.sonar -name "report.log") || echo "No report.log"
-          
-      - name: 🔍 Debug .sonarqube content
-        working-directory: ${{ inputs.working_directory }}
-        run: |
-          echo "Contents of .sonarqube:"
-          find .sonarqube -type f
-      
-      - name: 📦 Upload report.log as artifact
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: sonar-report-log
-          path: ${{ inputs.working_directory }}/.sonarqube/out/.sonar/report.log
-
-      - name: Check End result
-        if: ${{ always() }}
-        run: |
+          echo "--- Checking if report-task.txt was generated ---"
           if [ ! -f .sonarqube/out/.sonar/report-task.txt ]; then
           echo "❌ report-task.txt is missing — something went wrong during 'end'"
+          echo "--- Contents of .sonarqube/out ---"
+          ls -la .sonarqube/out || echo "Directory not found"
+          echo "--- Contents of .sonarqube/out/.sonar ---"
+          ls -la .sonarqube/out/.sonar || echo "No .sonar directory"
+          echo "--- Checking logs ---"
+          find .sonarqube/out/.sonar -name 'report.log' -exec cat {} \; || echo "No report.log"
           exit 1
+          else
+          echo "✅ report-task.txt found"
+          cat .sonarqube/out/.sonar/report-task.txt
           fi
 
       - name: Check Background Task
