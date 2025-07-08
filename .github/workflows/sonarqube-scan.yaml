@@ -101,22 +101,22 @@ jobs:
           name: dotnet-coverage-xml
           path: ${{ inputs.working_directory }}/TestResults
           
-      # - name: Fix coverage paths in the report
-      #   working-directory: ${{ inputs.working_directory }}
-      #   if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-      #   run: |
-      #     PROJECT_ROOT=$(pwd)
-      #     sed -i -E 's|fullPath="([^/][^"]*)"|fullPath="'"${PROJECT_ROOT}"'/\1"|g' ./TestResults/coverage.cobertura.xml
-      #     echo "--- After fix ---"
-      #     grep fullPath ./TestResults/coverage.cobertura.xml
+      - name: Fix coverage paths in the report
+        working-directory: ${{ inputs.working_directory }}
+        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+        run: |
+          PROJECT_ROOT=$(pwd)
+          sed -i -E 's|fullPath="([^/][^"]*)"|fullPath="'"${PROJECT_ROOT}"'/\1"|g' ./TestResults/coverage.opencover.xml
+          echo "--- After fix ---"
+          grep fullPath ./TestResults/coverage.opencover.xml
 
       - name: Check coverage file exists
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           ls -lh ./TestResults
-          if [ -f ./TestResults/coverage.cobertura.xml ]; then
-            cat ./TestResults/coverage.cobertura.xml | head -n 20
+          if [ -f ./TestResults/coverage.opencover.xml ]; then
+            cat ./TestResults/coverage.opencover.xml | head -n 20
           else
             echo "Coverage file not found!"
             exit 1
@@ -138,7 +138,7 @@ jobs:
             /d:sonar.host.url=${{ inputs.url }} \
             /d:sonar.login=${{ secrets.SONAR_TOKEN }} \
             /d:sonar.cs.analyzeProjects=${{ inputs.working_directory }} \
-            /d:sonar.flex.cobertura.reportPath=TestResults/coverage.cobertura.xml \
+            /d:sonar.cs.coverageReportPaths=TestResults/coverage.opencover.xml \
             /v:"${{ github.sha }}" \
             /d:sonar.scanner.scanAll=false \
             /d:sonar.verbose=true \
