@@ -5,7 +5,7 @@ on:
     inputs:
       I18N_DIR_PATH:
         required: true
-        description: "Path to the directory containing the i18n files. Leave out leading and trailing slashes e.g., 'src/lib/i18n'"
+        description: "Path to the directory containing the i18n files. Leave out leading slashes e.g., 'src/lib/i18n/'"
         type: string
       LOKALISE_PROJECT_ID:
         required: true
@@ -16,11 +16,6 @@ on:
         type: string
         description: "File format for the translations, default is 'json'"
         default: "json"
-      BASE_LANG:
-        required: false
-        type: string
-        description: "Base language for the translations, default is 'en'"
-        default: "en"
     secrets:
       LOKALISE_API_TOKEN:
         required: true
@@ -35,15 +30,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Push files up to Lokalise
-        uses: lokalise/lokalise-push-action@v3.6.0
-        with:
-          api_token: ${{ secrets.LOKALISE_API_TOKEN }}
-          project_id: ${{ inputs.LOKALISE_PROJECT_ID }}
-          file_format: ${{ inputs.I18N_FILE_FORMAT }}
-          translations_path: ${{ inputs.I18N_DIR_PATH }}
-          base_lang: ${{ inputs.BASE_LANG }}
-          flat_naming: true
-          additional_params: |
-            --cleanup-mode
-            --replace-modified
+      - name: Push dir of files up to Lokalise
+        env:
+          ENV_I18N_DIR_PATH: ${{ inputs.I18N_DIR_PATH }}
+          ENV_I18N_FILE_FORMAT: ${{ inputs.I18N_FILE_FORMAT }}
+          ENV_LOKALISE_PROJECT_ID: ${{ inputs.LOKALISE_PROJECT_ID }}
+          ENV_LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
+        run: |
+          find "$ENV_I18N_DIR_PATH" -type f -name "*.$ENV_I18N_FILE_FORMAT" | while read -r file; do
+            LANG_ISO=$(basename "$file" ".$ENV_I18N_FILE_FORMAT")
+
+            echo "Uploading $file (lang: $LANG_ISO)"
+            curl -X POST "https://api.lokalise.com/api2/projects/$ENV_LOKALISE_PROJECT_ID/files/upload" \
+              -H "x-api-token: $ENV_LOKALISE_API_TOKEN" \
+              -F "file=@$file" \
+              -F "filename=$(basename "$file")" \
+              -F "lang_iso=$LANG_ISO" \
+              -F "convert_placeholders=true" \
+              -F "cleanup_mode=true" \
+              -F "replace_modified=true"
+          done
