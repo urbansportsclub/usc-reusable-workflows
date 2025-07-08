@@ -148,13 +148,14 @@ jobs:
           echo "Found project: $csproj"
           dotnet build "$csproj" --no-incremental --configuration Release
 
-      - name: Test and collect coverage
+      - name: Run tests with code coverage
         run: |
           dotnet test \
           --no-build \
           --configuration Release \
           --collect:"XPlat Code Coverage" \
-          --results-directory ./TestResults
+          --results-directory ./TestResults \
+          $(find . -name '*.csproj' -not -path "*/obj/*" -not -name "*Tests.csproj" | head -n 1)
 
       - name: Convert coverage to OpenCover
         run: |
