@@ -106,17 +106,17 @@ jobs:
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           PROJECT_ROOT=$(pwd)
-          sed -i -E 's|fullPath="([^/][^"]*)"|fullPath="'"${PROJECT_ROOT}"'/\1"|g' ./TestResults/coverage.opencover.xml
+          sed -i -E 's|fullPath="([^/][^"]*)"|fullPath="'"${PROJECT_ROOT}"'/\1"|g' ./TestResults/coverage.cobertura.xml
           echo "--- After fix ---"
-          grep fullPath ./TestResults/coverage.opencover.xml
+          grep fullPath ./TestResults/coverage.cobertura.xml
 
       - name: Check coverage file exists
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           ls -lh ./TestResults
-          if [ -f ./TestResults/coverage.opencover.xml ]; then
-            cat ./TestResults/coverage.opencover.xml | head -n 20
+          if [ -f ./TestResults/coverage.cobertura.xml ]; then
+            cat ./TestResults/coverage.cobertura.xml | head -n 20
           else
             echo "Coverage file not found!"
             exit 1
@@ -138,7 +138,7 @@ jobs:
             /d:sonar.host.url=${{ inputs.url }} \
             /d:sonar.login=${{ secrets.SONAR_TOKEN }} \
             /d:sonar.cs.analyzeProjects=${{ inputs.working_directory }} \
-            /d:sonar.cs.opencover.reportPaths=TestResults/coverage.opencover.xml \
+            /d:sonar.flex.cobertura.reportPath=TestResults/coverage.cobertura.xml \
             /v:"${{ github.sha }}" \
             /d:sonar.scanner.scanAll=false \
             /d:sonar.verbose=true \
@@ -152,56 +152,12 @@ jobs:
           echo "Found project: $csproj"
           dotnet build "$csproj" --no-incremental --configuration Release
 
-      - name: Run tests with code coverage
-        run: |
-          dotnet test \
-          --no-build \
-          --configuration Release \
-          --collect:"XPlat Code Coverage" \
-          --results-directory ./TestResults \
-          $(find . -name '*.csproj' -not -path "*/obj/*" -not -name "*Tests.csproj" | head -n 1)
-
-      - name: Convert coverage to OpenCover
-        run: |
-          reportgenerator \
-          -reports:"TestResults/**/coverage.cobertura.xml" \
-          -targetdir:"coveragereport" \
-          -reporttypes:OpenCover \
-          -filefilters:"+*" \
-          -assemblyfilters:"+*" "-*.Tests"
-
-      - name: Debug – Sonar files to analyze
-        working-directory: ${{ inputs.working_directory }}
-        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: |
-          echo "---- FilesToAnalyze.txt ----"
-          cat .sonarqube/conf/0/FilesToAnalyze.txt || echo "Not found"
-
-      - name: 🔍 Check module path in coverage report
-        working-directory: ${{ inputs.working_directory }}
-        run: |
-          echo "--- ModulePath in coverage.opencover.xml ---"
-          grep -oP '<ModulePath>\K[^<]+' ./TestResults/coverage.opencover.xml
-      - name: 🔍 Check if ProjectInfo.xml was generated
-
-        working-directory: ${{ inputs.working_directory }}
-        run: |
-          echo "--- Looking for ProjectInfo.xml ---"
-          find . -name "ProjectInfo.xml" || echo "❌ ProjectInfo.xml not found"
-
       - name: .NET SonarScanner End
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           set -x
           dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
-
-      - name: 🕵️ Check Background Task Status
-        run: |
-          URL=$(grep ceTaskUrl .sonarqube/out/.sonar/report-task.txt | cut -d'=' -f2)
-          curl -s -u "${{ secrets.SONAR_TOKEN }}:" "$URL" | jq
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Debug Sonar End Output
         working-directory: ${{ inputs.working_directory }}
