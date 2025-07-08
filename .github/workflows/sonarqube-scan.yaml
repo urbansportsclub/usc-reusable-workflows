@@ -146,7 +146,24 @@ jobs:
         run: |
           csproj=$(find . -maxdepth 2 -name '*.csproj' | head -n 1)
           echo "Found project: $csproj"
-          dotnet build "$csproj" --no-incremental
+          dotnet build "$csproj" --no-incremental --configuration Release
+
+      - name: Test and collect coverage
+        run: |
+          dotnet test \
+          --no-build \
+          --configuration Release \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./TestResults
+
+      - name: Convert coverage to OpenCover
+        run: |
+          reportgenerator \
+          -reports:"TestResults/**/coverage.cobertura.xml" \
+          -targetdir:"coveragereport" \
+          -reporttypes:OpenCover \
+          -filefilters:"+*" \
+          -assemblyfilters:"+*" "-*.Tests"
 
       - name: Debug – Sonar files to analyze
         working-directory: ${{ inputs.working_directory }}
