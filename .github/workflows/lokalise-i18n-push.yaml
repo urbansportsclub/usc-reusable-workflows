@@ -37,9 +37,8 @@ jobs:
           ENV_LOKALISE_PROJECT_ID: ${{ inputs.LOKALISE_PROJECT_ID }}
           ENV_LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
         run: |
-          # Fail Github Action if the directory does not exist
           if [ ! -d "$ENV_I18N_DIR_PATH" ]; then
-            echo "❌ Error: Directory $ENV_I18N_DIR_PATH does not exist"
+            echo "Error ❌: Directory $ENV_I18N_DIR_PATH does not exist"
             exit 2
           fi
 
@@ -47,7 +46,8 @@ jobs:
             LANG_ISO=$(basename "$file" ".$ENV_I18N_FILE_FORMAT")
             BASE_64_CONTENT="$(base64 -w 0 "$file")"
 
-            echo "Uploading $file (lang: $LANG_ISO) with Base64 content: $BASE_64_CONTENT"
+            echo "Uploading $file (lang: $LANG_ISO) to Lokalise..."
+
             RESPONSE=$(curl -v "https://api.lokalise.com/api2/projects/$ENV_LOKALISE_PROJECT_ID/files/upload" \
               --header "x-api-token: $ENV_LOKALISE_API_TOKEN" \
               --header "accept: application/json" \
