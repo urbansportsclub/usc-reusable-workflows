@@ -126,7 +126,7 @@ jobs:
           ls -R
 
       - name: .NET SonarScanner Begin
-        working-directory: .
+        working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           dotnet sonarscanner begin \
@@ -143,11 +143,13 @@ jobs:
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
-          dotnet build \
-          --no-incremental \
-          --configuration Release \
-          /p:SourceLinkCreate=true \
-          /p:ContinuousIntegrationBuild=true
+          sln_file=$(find . -maxdepth 1 -name '*.sln' | head -n 1)
+          echo "Building solution: $sln_file"
+          dotnet build "$sln_file" \
+            --no-incremental \
+            --configuration Release \
+            /p:SourceLinkCreate=true \
+            /p:ContinuousIntegrationBuild=true
 
       - name: .NET SonarScanner End
         working-directory: ${{ inputs.working_directory }}
