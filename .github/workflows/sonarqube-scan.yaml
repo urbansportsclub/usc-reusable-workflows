@@ -155,16 +155,9 @@ jobs:
           echo "---- FilesToAnalyze.txt ----"
           cat .sonarqube/conf/0/FilesToAnalyze.txt || echo "Not found"
 
-      - name: 🔍 Compare coverage and analyzed files
-        working-directory: ${{ inputs.working_directory }}
+      - name: 🧪 Check generated DLLs
         run: |
-          echo "--- Covered files ---"
-          grep -oP 'fullPath="\K[^"]+\.cs' ./TestResults/coverage.opencover.xml | sort > covered.txt
-          cat covered.txt
-          echo "--- Analyzed files ---"
-          cat .sonarqube/conf/0/FilesToAnalyze.txt | grep '\.cs$' | sort > analyzed.txt
-          echo "--- Diff ---"
-          diff covered.txt analyzed.txt || echo "⚠️ Some files in coverage are not analyzed by SonarQube"
+          find . -type f -name '*.dll'
 
       - name: .NET SonarScanner End
         working-directory: ${{ inputs.working_directory }}
