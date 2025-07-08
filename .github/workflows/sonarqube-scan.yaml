@@ -102,8 +102,7 @@ jobs:
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           PROJECT_ROOT=$(pwd)
-          echo "PROJECT_ROOT=$PROJECT_ROOT"
-          sed -i -E "s|fullPath=\"[^\"]*/([^/\"]+\\.cs)\"|fullPath=\"${PROJECT_ROOT}/\1\"|g" ./TestResults/coverage.opencover.xml
+          sed -i -E "s|fullPath=\"([^\"]+)\"|fullPath=\"${PROJECT_ROOT}/\1\"|g" ./TestResults/coverage.opencover.xml
           echo "--- After fix ---"
           grep fullPath ./TestResults/coverage.opencover.xml
 
