@@ -133,6 +133,7 @@ jobs:
             /k:"${{ steps.get_project_key.outputs.projectkey }}" \
             /d:sonar.host.url=${{ inputs.url }} \
             /d:sonar.login=${{ secrets.SONAR_TOKEN }} \
+            /d:sonar.cs.analyzeProjects=${{ inputs.working_directory }} \
             /d:sonar.cs.coverageReportPaths=TestResults/coverage.opencover.xml \
             /v:"${{ github.sha }}" \
             /d:sonar.scanner.scanAll=false \
@@ -143,7 +144,7 @@ jobs:
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
-          dotnet build "$csproj" --no-incremental --configuration Release /p:SourceLinkCreate=true
+          dotnet build "$csproj" --no-incremental --configuration Release /p:SourceLinkCreate=true /p:ContinuousIntegrationBuild=true
 
       - name: .NET SonarScanner End
         working-directory: ${{ inputs.working_directory }}
