@@ -146,7 +146,7 @@ jobs:
         run: |
           csproj=$(find . -maxdepth 2 -name '*.csproj' | head -n 1)
           echo "Found project: $csproj"
-          dotnet build "$csproj" --no-incremental --configuration Release
+          dotnet build "$csproj" --no-incremental --configuration Release /p:SourceLinkCreate=true /p:ContinuousIntegrationBuild=true
 
       - name: .NET SonarScanner End
         working-directory: ${{ inputs.working_directory }}
