@@ -171,6 +171,13 @@ jobs:
         run: |
           echo "--- FULL report.log ---"
           cat $(find .sonarqube/out/.sonar -name "report.log") || echo "No report.log"
+      
+      - name: 📦 Upload report.log as artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonar-report-log
+          path: ${{ inputs.working_directory }}/.sonarqube/out/.sonar/report.log
 
       - name: Debug Sonar End Output
         working-directory: ${{ inputs.working_directory }}
