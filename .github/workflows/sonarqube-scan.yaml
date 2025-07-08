@@ -164,13 +164,21 @@ jobs:
       - name: .NET SonarScanner End
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
+        run: |
+          set -x
+          dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: 🔍 Debug full report.log
         working-directory: ${{ inputs.working_directory }}
         run: |
           echo "--- FULL report.log ---"
           cat $(find .sonarqube/out/.sonar -name "report.log") || echo "No report.log"
+          
+      - name: 🔍 Debug .sonarqube content
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          echo "Contents of .sonarqube:"
+          find .sonarqube -type f
       
       - name: 📦 Upload report.log as artifact
         if: ${{ always() }}
