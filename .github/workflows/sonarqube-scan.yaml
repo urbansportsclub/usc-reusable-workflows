@@ -146,7 +146,7 @@ jobs:
         run: |
           csproj=$(find . -maxdepth 2 -name '*.csproj' | head -n 1)
           echo "Found project: $csproj"
-          dotnet build "$csproj"
+          dotnet build "$csproj" --no-incremental
 
       - name: Debug – Sonar files to analyze
         working-directory: ${{ inputs.working_directory }}
@@ -186,6 +186,18 @@ jobs:
         with:
           name: sonar-report-log
           path: ${{ inputs.working_directory }}/.sonarqube/out/.sonar/report.log
+
+      - name: Check End result
+        if: ${{ always() }}
+        run: |
+          if [ ! -f .sonarqube/out/.sonar/report-task.txt ]; then
+          echo "❌ report-task.txt is missing — something went wrong during 'end'"
+          exit 1
+          fi
+      - name: Check Background Task
+        run: |
+          URL=$(grep ceTaskUrl .sonarqube/out/.sonar/report-task.txt | cut -d'=' -f2)
+          curl -s -u "${{ secrets.SONAR_TOKEN }}:" "$URL" | jq
 
       - name: Debug Sonar End Output
         working-directory: ${{ inputs.working_directory }}
