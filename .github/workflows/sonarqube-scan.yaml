@@ -134,7 +134,7 @@ jobs:
             /d:sonar.host.url=${{ inputs.url }} \
             /d:sonar.login=${{ secrets.SONAR_TOKEN }} \
             /d:sonar.cs.coverageReportPaths=TestResults/coverage.opencover.xml \
-            /d:sonar.projectBaseDir="$(pwd)" \
+            /d:sonar.projectBaseDir=$(pwd) \
             /v:"${{ github.sha }}" \
             /d:sonar.scanner.scanAll=false \
             /d:sonar.verbose=true \
