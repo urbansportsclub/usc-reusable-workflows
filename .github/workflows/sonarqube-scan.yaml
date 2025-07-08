@@ -155,9 +155,11 @@ jobs:
           echo "---- FilesToAnalyze.txt ----"
           cat .sonarqube/conf/0/FilesToAnalyze.txt || echo "Not found"
 
-      - name: 🧪 Check generated DLLs
+      - name: 🔍 Check module path in coverage report
+        working-directory: ${{ inputs.working_directory }}
         run: |
-          find . -type f -name '*.dll'
+          echo "--- ModulePath in coverage.opencover.xml ---"
+          grep -oP '<ModulePath>\K[^<]+' ./TestResults/coverage.opencover.xml
 
       - name: .NET SonarScanner End
         working-directory: ${{ inputs.working_directory }}
