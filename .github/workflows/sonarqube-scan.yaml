@@ -79,10 +79,6 @@ jobs:
       - name: .NET SonarScanner
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: dotnet tool install --global dotnet-sonarscanner
-      
-      - name: Install ReportGenerator
-        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
       - name: Add .NET tools to PATH
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
