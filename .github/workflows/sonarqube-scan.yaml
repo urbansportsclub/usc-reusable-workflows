@@ -150,7 +150,7 @@ jobs:
           /p:ContinuousIntegrationBuild=true
 
       - name: .NET SonarScanner End
-        working-directory: .
+        working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           set -x
