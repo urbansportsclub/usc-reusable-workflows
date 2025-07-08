@@ -65,7 +65,7 @@ jobs:
             RESP_MSG=$(echo "$RESPONSE" | jq -r '.error.message')
 
             if [ "$RESP_STATUS" -ne 200 ]; then
-              echo "Request failed with status: $RESP_STATUS
+              echo "Request failed with status: $RESP_STATUS"
               echo "Error Message:"
               echo "$RESP_MSG"
               exit 1
