@@ -125,6 +125,17 @@ jobs:
           echo "Listing files in $(pwd):"
           ls -R
 
+      - name: 🔍 Compare coverage and analyzed files
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          echo "--- Covered files ---"
+          grep -oP 'fullPath="\K[^"]+\.cs' ./TestResults/coverage.opencover.xml | sort > covered.txt
+          cat covered.txt
+          echo "--- Analyzed files ---"
+          cat .sonarqube/conf/0/FilesToAnalyze.txt | grep '\.cs$' | sort > analyzed.txt
+          echo "--- Diff ---"
+          diff covered.txt analyzed.txt || echo "⚠️ Some files in coverage are not analyzed by SonarQube"
+
       - name: .NET SonarScanner Begin
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
