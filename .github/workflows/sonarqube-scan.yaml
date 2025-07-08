@@ -172,7 +172,7 @@ jobs:
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
           set -x
-          dotnet sonarscanner end
+          dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: ⛏️ Check if report-task.txt exists
         working-directory: ${{ inputs.working_directory }}
