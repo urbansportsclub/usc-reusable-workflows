@@ -39,14 +39,29 @@ jobs:
         run: |
           find "$ENV_I18N_DIR_PATH" -type f -name "*.$ENV_I18N_FILE_FORMAT" | while read -r file; do
             LANG_ISO=$(basename "$file" ".$ENV_I18N_FILE_FORMAT")
+            BASE_64_CONTENT="$(base64 -w 0 "$file")"
 
-            echo "Uploading $file (lang: $LANG_ISO)"
-            curl -X POST "https://api.lokalise.com/api2/projects/$ENV_LOKALISE_PROJECT_ID/files/upload" \
-              -H "x-api-token: $ENV_LOKALISE_API_TOKEN" \
-              -F "file=@$file" \
-              -F "filename=$(basename "$file")" \
-              -F "lang_iso=$LANG_ISO" \
-              -F "convert_placeholders=true" \
-              -F "cleanup_mode=true" \
-              -F "replace_modified=true"
+            echo "Uploading $file (lang: $LANG_ISO) with Base64 content: $BASE_64_CONTENT"
+            curl -v -X POST "https://api.lokalise.com/api2/projects/$ENV_LOKALISE_PROJECT_ID/files/upload" \
+              -header "x-api-token: $ENV_LOKALISE_API_TOKEN" \
+              --header "accept: application/json" \
+              --header "content-type: application/json" \
+              --data '
+                {
+                  "format": "json",
+                  "replace_modified": true,
+                  "tag_inserted_keys": true,
+                  "tag_updated_keys": true,
+                  "tags": [
+                    "cli-upload"
+                  ],
+                  "detect_icu_plurals": false,
+                  "convert_placeholders": true,
+                  "cleanup_mode": true,
+                  "slashn_to_linebreak": true,
+                  "lang_iso": $LANG_ISO,
+                  "filename": $file,
+                  "data": $BASE_64_CONTENT
+                }
+              '
           done
