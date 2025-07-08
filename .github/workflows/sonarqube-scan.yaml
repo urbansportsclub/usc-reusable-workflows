@@ -97,14 +97,14 @@ jobs:
           name: dotnet-coverage-xml
           path: ${{ inputs.working_directory }}/TestResults
           
-      - name: Fix coverage paths in the report
-        working-directory: ${{ inputs.working_directory }}
-        if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
-        run: |
-          PROJECT_ROOT=$(pwd)
-          sed -i -E 's|fullPath="([^/][^"]*)"|fullPath="'"${PROJECT_ROOT}"'/\1"|g' ./TestResults/coverage.opencover.xml
-          echo "--- After fix ---"
-          grep fullPath ./TestResults/coverage.opencover.xml
+      # - name: Fix coverage paths in the report
+      #   working-directory: ${{ inputs.working_directory }}
+      #   if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
+      #   run: |
+      #     PROJECT_ROOT=$(pwd)
+      #     sed -i -E 's|fullPath="([^/][^"]*)"|fullPath="'"${PROJECT_ROOT}"'/\1"|g' ./TestResults/coverage.opencover.xml
+      #     echo "--- After fix ---"
+      #     grep fullPath ./TestResults/coverage.opencover.xml
 
       - name: Check coverage file exists
         working-directory: ${{ inputs.working_directory }}
@@ -143,9 +143,7 @@ jobs:
         working-directory: ${{ inputs.working_directory }}
         if: ${{ github.ref != format('refs/heads/{0}', env.REFERENCE_BRANCH) && inputs.is_dotnet_project == true }}
         run: |
-          csproj=$(find . -maxdepth 2 -name '*.csproj' | head -n 1)
-          echo "Found project: $csproj"
-          dotnet build "$csproj" --no-incremental --configuration Release /p:SourceLinkCreate=true /p:ContinuousIntegrationBuild=true
+          dotnet build --no-incremental --configuration Release
 
       - name: .NET SonarScanner End
         working-directory: ${{ inputs.working_directory }}
