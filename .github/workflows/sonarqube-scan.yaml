@@ -174,28 +174,12 @@ jobs:
           set -x
           dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
-      - name: ⛏️ Check if report-task.txt exists
-        working-directory: ${{ inputs.working_directory }}
-        run: |
-          echo "--- Checking if report-task.txt was generated ---"
-          if [ ! -f .sonarqube/out/.sonar/report-task.txt ]; then
-          echo "❌ report-task.txt is missing — something went wrong during 'end'"
-          echo "--- Contents of .sonarqube/out ---"
-          ls -la .sonarqube/out || echo "Directory not found"
-          echo "--- Contents of .sonarqube/out/.sonar ---"
-          ls -la .sonarqube/out/.sonar || echo "No .sonar directory"
-          echo "--- Checking logs ---"
-          find .sonarqube/out/.sonar -name 'report.log' -exec cat {} \; || echo "No report.log"
-          exit 1
-          else
-          echo "✅ report-task.txt found"
-          cat .sonarqube/out/.sonar/report-task.txt
-          fi
-
-      - name: Check Background Task
+      - name: 🕵️ Check Background Task Status
         run: |
           URL=$(grep ceTaskUrl .sonarqube/out/.sonar/report-task.txt | cut -d'=' -f2)
           curl -s -u "${{ secrets.SONAR_TOKEN }}:" "$URL" | jq
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Debug Sonar End Output
         working-directory: ${{ inputs.working_directory }}
