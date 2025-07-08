@@ -37,6 +37,12 @@ jobs:
           ENV_LOKALISE_PROJECT_ID: ${{ inputs.LOKALISE_PROJECT_ID }}
           ENV_LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
         run: |
+          # Fail Github Action if the directory does not exist
+          if [ ! -d "$ENV_I18N_DIR_PATH" ]; then
+            echo "❌ Error: Directory $ENV_I18N_DIR_PATH does not exist"
+            exit 1
+          fi
+
           find "$ENV_I18N_DIR_PATH" -type f -name "*.$ENV_I18N_FILE_FORMAT" | while read -r file; do
             LANG_ISO=$(basename "$file" ".$ENV_I18N_FILE_FORMAT")
             BASE_64_CONTENT="$(base64 -w 0 "$file")"
