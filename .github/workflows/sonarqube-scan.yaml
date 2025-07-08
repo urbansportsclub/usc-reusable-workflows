@@ -160,6 +160,12 @@ jobs:
         run: |
           echo "--- ModulePath in coverage.opencover.xml ---"
           grep -oP '<ModulePath>\K[^<]+' ./TestResults/coverage.opencover.xml
+          
+      - name: 🔍 Check if ProjectInfo.xml was generated
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          echo "--- Looking for ProjectInfo.xml ---"
+          find . -name "ProjectInfo.xml" || echo "❌ ProjectInfo.xml not found"
 
       - name: .NET SonarScanner End
         working-directory: ${{ inputs.working_directory }}
@@ -186,11 +192,6 @@ jobs:
         with:
           name: sonar-report-log
           path: ${{ inputs.working_directory }}/.sonarqube/out/.sonar/report.log
-      
-      - name: Check Background Task
-        run: |
-          URL=$(grep ceTaskUrl .sonarqube/out/.sonar/report-task.txt | cut -d'=' -f2)
-          curl -s -u "${{ secrets.SONAR_TOKEN }}:" "$URL" | jq
 
       - name: Check End result
         if: ${{ always() }}
@@ -199,7 +200,12 @@ jobs:
           echo "❌ report-task.txt is missing — something went wrong during 'end'"
           exit 1
           fi
-          
+
+      - name: Check Background Task
+        run: |
+          URL=$(grep ceTaskUrl .sonarqube/out/.sonar/report-task.txt | cut -d'=' -f2)
+          curl -s -u "${{ secrets.SONAR_TOKEN }}:" "$URL" | jq
+
       - name: Debug Sonar End Output
         working-directory: ${{ inputs.working_directory }}
         run: |
