@@ -46,22 +46,18 @@ jobs:
               --header "x-api-token: $ENV_LOKALISE_API_TOKEN" \
               --header "accept: application/json" \
               --header "content-type: application/json" \
-              --data '
-                {
-                  "format": "json",
-                  "replace_modified": true,
-                  "tag_inserted_keys": true,
-                  "tag_updated_keys": true,
-                  "tags": [
-                    "cli-upload"
-                  ],
-                  "detect_icu_plurals": false,
-                  "convert_placeholders": true,
-                  "cleanup_mode": true,
-                  "slashn_to_linebreak": true,
-                  "lang_iso": "$LANG_ISO",
-                  "filename": "$file",
-                  "data": $BASE_64_CONTENT
-                }
-              '
+              --data "{
+                \"format\": \"json\",
+                \"replace_modified\": true,
+                \"tag_inserted_keys\": true,
+                \"tag_updated_keys\": true,
+                \"tags\": [\"cli-upload\"],
+                \"detect_icu_plurals\": false,
+                \"convert_placeholders\": true,
+                \"cleanup_mode\": true,
+                \"slashn_to_linebreak\": true,
+                \"lang_iso\": \"$LANG_ISO\",
+                \"filename\": \"$file\",
+                \"data\": \"$BASE_64_CONTENT\"
+              }"
           done
