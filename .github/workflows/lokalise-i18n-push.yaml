@@ -40,7 +40,7 @@ jobs:
           # Fail Github Action if the directory does not exist
           if [ ! -d "$ENV_I18N_DIR_PATH" ]; then
             echo "❌ Error: Directory $ENV_I18N_DIR_PATH does not exist"
-            exit 1
+            exit 2
           fi
 
           find "$ENV_I18N_DIR_PATH" -type f -name "*.$ENV_I18N_FILE_FORMAT" | while read -r file; do
@@ -72,8 +72,7 @@ jobs:
 
             if [ "$RESP_STATUS" -ne 200 ]; then
               echo "Request failed with status: $RESP_STATUS"
-              echo "Error Message:"
-              echo "$RESP_MSG"
-              exit 1
+              echo "Error Message: $RESP_MSG"
+              exit 2
             fi
           done
