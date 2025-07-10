@@ -1,0 +1,73 @@
+name: SonarQube Analysis
+description: Runs SonarQube analysis with injected build/test steps
+
+inputs:
+  project_key:
+    description: "SonarQube project key"
+    required: true
+  sonar_token:
+    description: "SonarQube authentication token"
+    required: true
+  sonar_host_url:
+    description: "SonarQube server URL"
+    default: 'https://sonarqube.svc.urbansportsclub.tech'
+    required: false
+  build_command:
+    required: true
+    description: "The dotnet build command to run after `begin`"
+  test_command:
+    required: true
+    description: "The dotnet test command (e.g. for coverage)"
+
+runs:
+  using: "composite"
+  steps:
+    - name: ☕ Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: 🛠️ Install Tools
+      shell: bash
+      run: |
+        dotnet tool install --global dotnet-sonarscanner
+        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+    - name: 🚀 Begin SonarQube Analysis
+      shell: bash
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+           SONAR_PR_KEY="${{ github.event.pull_request.number }}"
+           SONAR_PR_BRANCH="${{ github.head_ref }}"
+           SONAR_PR_BASE="${{ github.base_ref }}"
+           ARGS="/d:sonar.pullrequest.key=${SONAR_PR_KEY} \
+                 /d:sonar.pullrequest.branch=${SONAR_PR_BRANCH} \
+                 /d:sonar.pullrequest.base=${SONAR_PR_BASE}"
+         else
+           ARGS="/d:sonar.branch.name=${GITHUB_REF##*/}"
+         fi
+
+        dotnet sonarscanner begin \
+          /k:"${{ inputs.project_key }}" \
+          /d:sonar.login="${{ inputs.sonar_token }}" \
+          /d:sonar.host.url="${{ inputs.sonar_host_url }}" \
+          /d:sonar.cs.opencover.reportsPaths="./**/coverage.opencover.xml" \
+          /d:sonar.exclusions="Source/Migrations/*" \
+          /d:sonar.coverage.exclusions="**Tests*.cs" \
+          /d:sonar.issuesReport.console.enable=true \
+          $ARGS
+
+    - name: 🛠️ Build Project
+      shell: bash
+      run: ${{ inputs.build_command }}
+
+    - name: 🧪 Test Step
+      if: ${{ inputs.test_command != '' }}
+      shell: bash
+      run: ${{ inputs.test_command }}
+
+    - name: 🧼 End SonarQube Analysis
+      shell: bash
+      run: |
+        dotnet sonarscanner end /d:sonar.login="${{ inputs.sonar_token }}"
