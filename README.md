@@ -208,7 +208,7 @@ jobs:
     secrets: inherit
 ```
 
-### Code coverage for other languages
+### Code coverage for other languages (Except .Net)
 
 Your test step should output a coverage file for use with other languages, which should then be uploaded to GitHub artifacts. Since the upload and download of the file occur at different times, you need to specify the name of the artifact to be downloaded.
 
@@ -253,4 +253,63 @@ You just need to add the input `external_container_dependencies` with your desir
         sudo apt-get -y install poppler-utils wv unrtf tidy
         go get github.com/JalfResi/justext
         go install code.sajari.com/docconv/docd@latest
+```
+
+### SonarQube for .Net projects
+
+Since `sonarsource/sonarqube-scan-action` is not supporting .Net, you have to use `urbansportsclub/usc-reusable-workflows/.github/actions/sonarqube-analysis@main` composite action for using SonarQube scan on your projetc. Before using this action, ensure you have installed `coverlet.msbuild` in your test projects if you want code coverage to be collected and submitted to SonarQube:
+
+```bash
+dotnet add path/to/YourProject.Tests.csproj package coverlet.msbuild
+```
+
+This is critical because the composite action expects OpenCover-formatted results in:
+
+`./**/coverage.opencover.xml`
+
+##### 📥 Inputs
+|Input	| Required | Description |
+|---|---|---|
+|project_key | ✅ Yes| The SonarQube project key |
+|sonar_token | ✅ Yes | Authentication token from SonarQube |
+|sonar_host_url | ❌ No | SonarQube server URL. Defaults to https://sonarqube.svc.urbansportsclub.tech |
+|build_command | ✅ Yes | Shell command to build the project after scanner begins |
+|test_command | ✅ Yes | Shell command to test the project and collect coverage |
+
+
+#### 🚀 Example Workflow Usage
+Here’s how to use this action in a GitHub Actions workflow:
+```yaml
+name: CI
+
+on:
+push:
+branches: [ main ]
+pull_request:
+
+jobs:
+analyze:
+runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🧠 Setup .NET
+        uses: urbansportsclub/usc-reusable-workflows/.github/actions/setup-dotnet@main
+        with:
+          dotnet_version: 9.0.x
+
+      - name: 📦 Restore packages
+        run: dotnet restore
+
+      - name: 🚨 Run SonarQube Analysis
+        uses: urbansportsclub/usc-reusable-workflows/.github/actions/sonarqube-analysis@main
+        with:
+          project_key: urbansportsclub_MyProject
+          sonar_token: ${{ secrets.SONAR_TOKEN }}
+          build_command: |
+            dotnet build --configuration Release --no-restore --no-incremental
+          test_command: |
+            dotnet test --no-build --no-restore --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 ```
