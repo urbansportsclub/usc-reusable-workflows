@@ -101,5 +101,5 @@ jobs:
           else
            git commit -m 'Latest translation values downloaded from Lokalise'
            git push --set-upstream origin ${{ env.GITHUB_NEW_BRANCH_NAME }}
-           gh pr create --base ${{ env.BASE_REF_NAME }} --head ${{ inputs.GITHUB_PR_BRANCH_NAME }} --title "Lokalise translation updates" --body "Test PR Body @martin.foakes"
+           gh pr create --base ${{ env.BASE_REF_NAME }} --head ${{ env.GITHUB_NEW_BRANCH_NAME }} --title "Lokalise translation updates" --body "Test PR Body @martin.foakes"
           fi
