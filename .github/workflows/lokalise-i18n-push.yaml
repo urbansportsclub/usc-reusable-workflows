@@ -72,8 +72,8 @@ jobs:
                 \"slashn_to_linebreak\": true,
                 \"lang_iso\": \"$LANG_ISO\",
                 \"filename\": \"$file\",
-                \"data\": \"$BASE_64_CONTENT\"
-                \"apply_tm\": \"$ENV_RUN_AUTOMATIONS\"
+                \"data\": \"$BASE_64_CONTENT\",
+                \"apply_tm\": \"$ENV_RUN_AUTOMATIONS\",
                 \"use_automations\": \"$ENV_RUN_AUTOMATIONS\"
               }")
 
