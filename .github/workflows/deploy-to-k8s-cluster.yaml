@@ -120,6 +120,18 @@ jobs:
             helm repo add ${ARGS[@]}
           done
 
+      # Extract project name and team from catalog-info.yaml
+      - name: Extract project info from catalog
+        id: catalog-info
+        run: |-
+          # Extract the first Component's metadata.name and spec.owner from catalog-info.yaml
+          PROJECT_NAME=$(yq eval 'select(.kind == "Component") | .metadata.name' catalog-info.yaml | head -1)
+          TEAM_OWNER=$(yq eval 'select(.kind == "Component") | .spec.owner' catalog-info.yaml | head -1)
+          echo "project-name=$PROJECT_NAME" >> $GITHUB_OUTPUT
+          echo "team-owner=$TEAM_OWNER" >> $GITHUB_OUTPUT
+          echo "Extracted project name: $PROJECT_NAME"
+          echo "Extracted team owner: $TEAM_OWNER"
+
       # Build dependency for helm-library
       - name: Helm dependency build
         run: |-
@@ -131,10 +143,10 @@ jobs:
       - name: Deploy
         if: inputs.sops == true
         run: |-
-          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }} ${{ inputs.helm_args }}
+          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }} --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} ${{ inputs.helm_args }}
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
         if: inputs.sops == false
         run: |-
-          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }} ${{ inputs.helm_args }}
+          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }} --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} ${{ inputs.helm_args }}
