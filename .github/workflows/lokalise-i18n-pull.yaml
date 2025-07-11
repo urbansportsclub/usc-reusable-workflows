@@ -34,7 +34,7 @@ jobs:
         run: |
           echo "Downloading Zip of i18n keys from Lokalise..."
 
-          RESPONSE=$(curl -v --request POST --url "https://api.lokalise.com/api2/projects/$ENV_LOKALISE_PROJECT_ID/files/download" \
+          RESPONSE=$(curl -v "https://api.lokalise.com/api2/projects/$ENV_LOKALISE_PROJECT_ID/files/download" \
             --header "x-api-token: $ENV_LOKALISE_API_TOKEN" \
             --header "accept: application/json" \
             --header "content-type: application/json" \
@@ -59,17 +59,20 @@ jobs:
               exit 2
             fi
 
-            RESP_SUCCESS_URL=$(echo "$RESPONSE" | jq -r '.bundle_url')
-            if [[ -n $RESP_SUCCESS_URL ]]; then
-              echo "Download URL: $RESP_SUCCESS_URL"
+            echo "Request successful, processing response..."
+            echo "Response: $RESPONSE"
 
-              ZIP_FILE_NAME="lokalise_i18n_keys_${{ github.run_id }}.zip"
-              echo "Downloading Zip file to $ZIP_FILE_NAME..."
-              curl -L -o "$ZIP_FILE_NAME" "$RESP_SUCCESS_URL"
+            # RESP_SUCCESS_URL=$(echo "$RESPONSE" | jq -r '.bundle_url')
+            # if [[ -n $RESP_SUCCESS_URL ]]; then
+            #   echo "Download URL: $RESP_SUCCESS_URL"
+
+            #   ZIP_FILE_NAME="lokalise_i18n_keys_${{ github.run_id }}.zip"
+            #   echo "Downloading Zip file to $ZIP_FILE_NAME..."
+            #   curl -L -o "$ZIP_FILE_NAME" "$RESP_SUCCESS_URL"
               
-              echo "Unzipping $ZIP_FILE_NAME..."
-              unzip -o "$ZIP_FILE_NAME" -d "$ENV_DESTINATION_DIR"
+            #   echo "Unzipping $ZIP_FILE_NAME..."
+            #   unzip -o "$ZIP_FILE_NAME" -d "$ENV_DESTINATION_DIR"
               
-              echo "Unzipped files to $ENV_DESTINATION_DIR"
-              rm "$ZIP_FILE_NAME"
-            fi
+            #   echo "Unzipped files to $ENV_DESTINATION_DIR"
+            #   rm "$ZIP_FILE_NAME"
+            # fi
