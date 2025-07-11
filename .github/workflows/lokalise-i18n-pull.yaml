@@ -81,6 +81,11 @@ jobs:
               rm "$ZIP_FILE_NAME"
             fi
 
+      - name: Set up Git Bot User
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Create Pull Request for i18n key changes
         env:
           ENV_DESTINATION_DIR: ${{ inputs.DESTINATION_DIR }}
@@ -88,8 +93,6 @@ jobs:
           GITHUB_NEW_BRANCH_NAME: ${{ inputs.GITHUB_PR_BRANCH_NAME }}-Lokalise-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           git checkout -b ${{ env.GITHUB_NEW_BRANCH_NAME }}
-          # git config --global user.name "${GITHUB_ACTOR}"
-          # git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git add "$ENV_DESTINATION_DIR"/*.json
 
           if [[ -z $(git status --untracked-files=no --porcelain) ]]; then
