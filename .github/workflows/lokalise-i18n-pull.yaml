@@ -72,7 +72,7 @@ jobs:
               curl -L -o "$ZIP_FILE_NAME" "$RESP_SUCCESS_URL"
               
               echo "Unzipping $ZIP_FILE_NAME..."
-              unzip -o -j "$ZIP_FILE_NAME" 'locales/*.json' -d "$ENV_DESTINATION_DIR"
+              unzip -o -j "$ZIP_FILE_NAME" 'locale/*.json' -d "$ENV_DESTINATION_DIR"
               
               echo "Unzipped files to $ENV_DESTINATION_DIR"
               rm "$ZIP_FILE_NAME"
