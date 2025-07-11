@@ -18,7 +18,7 @@ on:
       GH_TEAM_NAME:
         required: false
         default: ""
-        description: "GitHub team to tag in the pull request to, e.g. urbansportsclub/member-acquisition-team"
+        description: "GitHub team to tag in the pull request, syntax of: urbansportsclub/team-name"
         type: string
     secrets:
       LOKALISE_API_TOKEN:
