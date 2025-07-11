@@ -45,22 +45,22 @@ jobs:
                 \"translated\"
               ],
               \"add_newline_eof\": false,
-              \"export_sort\": \"a-z\",
+              \"export_sort\": \"a_z\",
               \"export_empty_as\": \"empty\",
               \"replace_breaks\": true
             }")
 
+            echo "Processing request response..."
+            echo "Response: $RESPONSE"
+
             RESP_ERR_STATUS=$(echo "$RESPONSE" | jq -r '.error.code')
             RESP_ERR_MSG=$(echo "$RESPONSE" | jq -r '.error.message')
 
-            if [ "$RESP_STATUS" -ne 200 ]; then
-              echo "Request failed with status: $RESP_STATUS"
-              echo "Error Message: $RESP_MSG"
+            if [ "$RESP_ERR_STATUS" -ne 200 ]; then
+              echo "Request failed with status: $RESP_ERR_STATUS"
+              echo "Error Message: $RESP_ERR_MSG"
               exit 2
-            fi
-
-            echo "Request successful, processing response..."
-            echo "Response: $RESPONSE"
+            fi            
 
             # RESP_SUCCESS_URL=$(echo "$RESPONSE" | jq -r '.bundle_url')
             # if [[ -n $RESP_SUCCESS_URL ]]; then
