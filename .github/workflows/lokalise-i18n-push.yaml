@@ -20,8 +20,8 @@ on:
         required: false
         type: boolean
         description: |
-          "Run automation jobs after the upload, default is false"
-          "Automation jobs must be set up first in Lokalise dashboard"
+          Run automation jobs after the upload, default is false
+          Automation jobs must be set up first in Lokalise dashboard
         default: false
     secrets:
       LOKALISE_API_TOKEN:
