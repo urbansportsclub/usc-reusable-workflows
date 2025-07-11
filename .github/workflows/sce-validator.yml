@@ -1,0 +1,15 @@
+---
+name: SCE validator
+on:
+ workflow_call:
+
+jobs:
+  sce_validator:
+    runs-on: [self-hosted, dind]
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: SCE validator
+        uses: urbansportsclub/usc-github-actions/SCE-validator@main
+            

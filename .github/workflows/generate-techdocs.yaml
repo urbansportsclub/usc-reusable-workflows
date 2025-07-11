@@ -1,0 +1,85 @@
+name: Publish TechDocs Site
+
+on:
+  workflow_call:
+    inputs:
+      BACKSTAGE_ENTITY_NAMESPACE:
+        required: false
+        type: string
+        description: "Backstage Entity Namespace"
+        default: 'default'
+      BACKSTAGE_ENTITY_KIND:
+        required: false
+        type: string
+        description: "Backstage Entity Kind"
+        default: 'Component'
+      BACKSTAGE_ENTITY_NAME:
+        required: true
+        type: string
+        description: "Backstage Entity Name"
+      ADD_README:
+        required: false
+        type: boolean
+        default: false
+        description: "Extra file to be added to the docs site as index.md"
+      TECHDOCS_DIR:
+        required: false
+        type: string
+        default: 'docs'
+        description: "Directory containing documentation files"
+
+env:
+  KROKI_SERVER_URL: https://kroki.svc.urbansportsclub.tech
+
+jobs:
+  publish-techdocs-site:
+    runs-on: [self-hosted, nonroot]
+
+    env:
+      GCS_BUCKET_NAME: usg-svc-backstage-techdocs # or urbansportsclub-dev-backstage-techdocs for dev environment
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check if docs directory exists
+        run: |
+          if [ ! -d "${{ inputs.TECHDOCS_DIR }}" ]; then
+            echo "::error::The techdocs directory '${{ inputs.TECHDOCS_DIR }}' does not exist. Please create this directory or specify a different one using TECHDOCS_DIR parameter."
+            exit 1
+          fi
+
+      - name: Check for index.md conflict and copy README if needed
+        if: ${{ inputs.ADD_README }}
+        run: |
+          if [ -f "${{ inputs.TECHDOCS_DIR }}/index.md" ]; then
+            echo "::error::Cannot add README.md as homepage because ${{ inputs.TECHDOCS_DIR }}/index.md already exists. Please either remove the existing index.md file or set ADD_README to false."
+            exit 1
+          fi
+          cp README.md ${{ inputs.TECHDOCS_DIR }}/index.md
+
+      - name: Install techdocs-cli
+        run: npm install -g @techdocs/cli
+
+      - name: Install mkdocs and mkdocs plugins
+        run: python -m pip install mkdocs-techdocs-core==1.*
+
+      - name: Install mkdocs kroki
+        run: pip install mkdocs-kroki-plugin
+
+      - name: Generate docs site
+        run: techdocs-cli generate --no-docker --verbose
+
+      - name: Publish docs site
+        run: |
+          techdocs-cli publish --publisher-type googleGcs \
+          --storage-name ${{ env.GCS_BUCKET_NAME }} \
+          --entity ${{ inputs.BACKSTAGE_ENTITY_NAMESPACE }}/${{ inputs.BACKSTAGE_ENTITY_KIND }}/${{ inputs.BACKSTAGE_ENTITY_NAME }}

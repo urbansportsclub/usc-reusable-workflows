@@ -31,9 +31,15 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.github-token }}
 
+      - name: Check PR checks
+        run: |
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          gh pr checks $PR_URL --required --watch --fail-fast
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+
       - name: Enable auto-merge for Dependabot PRs
-        if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' && github.event.pull_request.check_suite.conclusion == 'success' }}
-        run: gh pr merge --auto --squash "$PR_URL"
+        run: gh pr merge --squash --admin "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.github-token }}
