@@ -83,10 +83,10 @@ jobs:
 
       - name: Create Pull Request for i18n key changes
         env:
-          BASE_REF_NAME: ${{ github.ref_name }}
+          BASE_REF_NAME: ${{ github.event.repository.default_branch }}
           GITHUB_NEW_BRANCH_NAME: ${{ inputs.GITHUB_PR_BRANCH_NAME }}-Lokalise-${{ github.run_id }}${{ github.run_attempt }}
         run: |
-          echo "Creating Pull Request for i18n key changes on new branch ${{ env.GITHUB_NEW_BRANCH_NAME }}, against base branch ${{ env.BASE_REF_NAME }}"
+          echo "Creating Pull Request for i18n key changes on new branch: ${{ env.GITHUB_NEW_BRANCH_NAME }}, against base branch ${{ env.BASE_REF_NAME }}"
 
           # git checkout -b ${{ inputs.GITHUB_PR_BRANCH_NAME }}
           # # git config --global user.name "${GITHUB_ACTOR}"
