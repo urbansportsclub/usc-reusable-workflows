@@ -11,13 +11,18 @@ on:
         required: true
         description: "Directory to save the downloaded i18n keys. eg. ./src/lib/i18n/"
         type: string
+      GITHUB_PR_BRANCH_NAME:
+        required: true
+        description: "Name of the branch to create for the pull request to main"
+        type: string
     secrets:
       LOKALISE_API_TOKEN:
         required: true
         description: "Lokalise API token for authentication"
 
 jobs:
-  build:
+  download-i18n-files:
+    name: Unzip i18n directory from Lokalise and open PR
     runs-on: ubuntu-latest
 
     steps:
@@ -27,6 +32,7 @@ jobs:
           fetch-depth: 0
 
       - name: Pull Zip of i18n keys down from Lokalise
+        id: download-lokalise-i18n
         env:
           ENV_LOKALISE_PROJECT_ID: ${{ inputs.LOKALISE_PROJECT_ID }}
           ENV_LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
@@ -50,9 +56,6 @@ jobs:
               \"replace_breaks\": true
             }")
 
-            echo "Processing request response..."
-            echo "Response: $RESPONSE"
-
             RESP_ERR_STATUS=$(echo "$RESPONSE" | jq -r '.error.code')
             RESP_ERR_MSG=$(echo "$RESPONSE" | jq -r '.error.message')
 
@@ -62,14 +65,14 @@ jobs:
               exit 2
             fi            
 
-            RESP_SUCCESS_URL=$(echo "$RESPONSE" | jq -r '.bundle_url')
+            RESP_SUCCES_BUNDLE_URL=$(echo "$RESPONSE" | jq -r '.bundle_url')
 
-            if [[ -n $RESP_SUCCESS_URL ]]; then
-              echo "Download URL: $RESP_SUCCESS_URL"
+            if [[ -n $RESP_SUCCES_BUNDLE_URL ]]; then
+              echo "Download URL: $RESP_SUCCES_BUNDLE_URL"
 
               ZIP_FILE_NAME="lokalise_i18n_keys_${{ github.run_id }}.zip"
               echo "Downloading Zip file to $ZIP_FILE_NAME..."
-              curl -L -o "$ZIP_FILE_NAME" "$RESP_SUCCESS_URL"
+              curl -L -o "$ZIP_FILE_NAME" "$RESP_SUCCES_BUNDLE_URL"
               
               echo "Unzipping $ZIP_FILE_NAME..."
               unzip -o -j "$ZIP_FILE_NAME" 'locale/*.json' -d "$ENV_DESTINATION_DIR"
@@ -78,7 +81,23 @@ jobs:
               rm "$ZIP_FILE_NAME"
             fi
 
-            echo "Listing files in the working directory:"
-            cd "$ENV_DESTINATION_DIR" || exit 1
-            echo "Current directory: $(pwd)"
-            ls -alh
+      - name: Create Pull Request for i18n key changes
+        env:
+          BASE_REF_NAME: ${{ github.ref_name }}
+          GITHUB_NEW_BRANCH_NAME: ${{ inputs.GITHUB_PR_BRANCH_NAME }}-Lokalise-${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          echo "Creating Pull Request for i18n key changes... against base branch ${{ env.BASE_REF_NAME }}"
+
+          # git checkout -b ${{ inputs.GITHUB_PR_BRANCH_NAME }}
+          # # git config --global user.name "${GITHUB_ACTOR}"
+          # # git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          # git add "$ENV_DESTINATION_DIR/*.json"
+
+          # if [[ -z $(git status --untracked-files=no --porcelain) ]]
+          # then
+          #  echo "No changes"
+          # else
+          #  git commit -m 'New translation values downloaded from Lokalise'
+          #  git push --set-upstream origin ${{ inputs.GITHUB_PR_BRANCH_NAME }}
+          #  gh pr create --base ${{ env.BASE_REF_NAME }} --head ${{ inputs.GITHUB_PR_BRANCH_NAME }} --title "Lokalise translations update" --body ""
+          # fi
