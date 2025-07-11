@@ -9,7 +9,7 @@ on:
         type: string
       DESTINATION_DIR:
         required: true
-        description: "Directory to save the downloaded i18n keys. eg. ./src/lib/i18n/"
+        description: "Directory to save the downloaded i18n keys. !No trailing slash! eg. ./src/lib/i18n"
         type: string
       GITHUB_PR_BRANCH_NAME:
         required: true
@@ -89,7 +89,7 @@ jobs:
           git checkout -b ${{ env.GITHUB_NEW_BRANCH_NAME }}
           # git config --global user.name "${GITHUB_ACTOR}"
           # git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git add "$ENV_DESTINATION_DIR/*.json"
+          git add "$ENV_DESTINATION_DIR"/*.json
 
           if [[ -z $(git status --untracked-files=no --porcelain) ]]; then
            echo "No changes"
