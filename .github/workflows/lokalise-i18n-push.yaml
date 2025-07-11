@@ -74,7 +74,7 @@ jobs:
                 \"filename\": \"$file\",
                 \"data\": \"$BASE_64_CONTENT\",
                 \"apply_tm\": \"$ENV_RUN_AUTOMATIONS\",
-                \"use_automations\": \"$ENV_RUN_AUTOMATIONS\"
+                \"use_automations\": $ENV_RUN_AUTOMATIONS
               }")
 
             RESP_STATUS=$(echo "$RESPONSE" | jq -r '.error.code')
