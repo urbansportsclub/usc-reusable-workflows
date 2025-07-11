@@ -9,7 +9,7 @@ on:
         type: string
       DESTINATION_DIR:
         required: true
-        description: "Directory to save the downloaded i18n keys. eg. './src/lib/i18n/'"
+        description: "Directory to save the downloaded i18n keys. eg. ./src/lib/i18n/"
         type: string
     secrets:
       LOKALISE_API_TOKEN:
@@ -77,3 +77,8 @@ jobs:
               echo "Unzipped files to $ENV_DESTINATION_DIR"
               rm "$ZIP_FILE_NAME"
             fi
+
+            echo "Listing files in the working directory:"
+            cd "$ENV_DESTINATION_DIR" || exit 1
+            echo "Current directory: $(pwd)"
+            ls -alh
