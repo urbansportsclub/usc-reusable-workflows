@@ -104,12 +104,11 @@ jobs:
           git add "$ENV_DESTINATION_DIR"/*.json
 
           if [[ -z $(git status --untracked-files=no --porcelain) ]]; then
-           echo "No changes to commit"
+            echo "No changes to commit"
           else
-           git commit -m "Latest translation values downloaded from Lokalise - $NOW"
-           git push --set-upstream origin ${{ env.GITHUB_NEW_BRANCH_NAME }}
-           gh pr create -B ${{ env.BASE_REF_NAME }} -H ${{ env.GITHUB_NEW_BRANCH_NAME }} \
-           -t "Lokalise translation updates - $NOW" \
-           -b "Translation updates from Lokalise, please review and merge ASAP @${{ inputs.GH_TEAM_NAME }}" \
-           --reviewer ${{ inputs.GH_TEAM_NAME }}
+            git commit -m "Latest translation values downloaded from Lokalise - $NOW"
+            git push --set-upstream origin ${{ env.GITHUB_NEW_BRANCH_NAME }}
+            gh pr create -B ${{ env.BASE_REF_NAME }} -H ${{ env.GITHUB_NEW_BRANCH_NAME }} \
+            -t "Lokalise translation updates - $NOW" \
+            -b "Translation updates from Lokalise, please review and merge ASAP @${{ inputs.GH_TEAM_NAME }}"
           fi
