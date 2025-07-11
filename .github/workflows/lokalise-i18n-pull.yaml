@@ -16,8 +16,9 @@ on:
         description: "Name of the branch to create for the pull request to main"
         type: string
       GH_TEAM_NAME:
-        required: true
-        description: "GitHub team to assign the pull request to, e.g. urbansportsclub/member-acquisition-team"
+        required: false
+        default: ""
+        description: "GitHub team to tag in the pull request to, e.g. urbansportsclub/member-acquisition-team"
         type: string
     secrets:
       LOKALISE_API_TOKEN:
