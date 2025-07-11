@@ -39,6 +39,7 @@ jobs:
 
       - name: Push dir of files up to Lokalise
         env:
+          ENV_GITHUB_CURRENT_COMMIT: ${{ github.event.before }}
           ENV_I18N_DIR_PATH: ${{ inputs.I18N_DIR_PATH }}
           ENV_I18N_FILE_FORMAT: ${{ inputs.I18N_FILE_FORMAT }}
           ENV_LOKALISE_PROJECT_ID: ${{ inputs.LOKALISE_PROJECT_ID }}
@@ -65,7 +66,7 @@ jobs:
                 \"replace_modified\": true,
                 \"tag_inserted_keys\": true,
                 \"tag_updated_keys\": true,
-                \"tags\": [\"cli-upload\"],
+                \"tags\": [\"cli-upload: ${{env.ENV_GITHUB_CURRENT_COMMIT}}\"],
                 \"detect_icu_plurals\": false,
                 \"convert_placeholders\": true,
                 \"cleanup_mode\": true,
