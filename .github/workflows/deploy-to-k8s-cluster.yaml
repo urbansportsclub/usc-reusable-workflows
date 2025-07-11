@@ -153,9 +153,31 @@ jobs:
               "https://backstage.svc.urbansportsclub.tech/api/catalog/entities/by-name/group/default/$TEAM_OWNER" || echo "")
             
             if [ -n "$API_RESPONSE" ]; then
-              # Extract the hive value from the API response using grep and sed
-              HIVE_VALUE=$(echo "$API_RESPONSE" | grep -o '"urbansportsclub/hive"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"urbansportsclub\/hive"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' || echo "unknown")
+              # Debug: Show a portion of the API response to understand the structure
               echo "API Response received for team $TEAM_OWNER"
+              echo "Sample of API response: $(echo "$API_RESPONSE" | head -c 200)..."
+              
+              # Extract the hive value from the API response using multiple approaches
+              # Try approach 1: Look for the exact pattern
+              HIVE_VALUE=$(echo "$API_RESPONSE" | grep -o '"urbansportsclub/hive"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"urbansportsclub\/hive"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' || echo "")
+              
+              # Try approach 2: More flexible pattern if first approach fails
+              if [ -z "$HIVE_VALUE" ]; then
+                HIVE_VALUE=$(echo "$API_RESPONSE" | grep -o 'urbansportsclub/hive[^:]*:[^"]*"[^"]*"' | sed 's/.*"\([^"]*\)".*/\1/' || echo "")
+              fi
+              
+              # Try approach 3: Even simpler pattern
+              if [ -z "$HIVE_VALUE" ]; then
+                HIVE_VALUE=$(echo "$API_RESPONSE" | grep 'urbansportsclub/hive' | sed 's/.*"urbansportsclub\/hive"[^"]*"\([^"]*\)".*/\1/' || echo "")
+              fi
+              
+              # Fallback to unknown if still empty
+              if [ -z "$HIVE_VALUE" ]; then
+                HIVE_VALUE="unknown"
+                echo "Warning: Could not extract hive value from API response"
+              fi
+              
+              echo "Extracted hive value: '$HIVE_VALUE'"
             else
               echo "Warning: Failed to fetch team information from Backstage API for team: $TEAM_OWNER"
             fi
