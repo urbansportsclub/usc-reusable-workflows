@@ -1,0 +1,85 @@
+name: Lokalise I18N Push
+run-name: Push translation keys up to Lokalise [${{ github.ref_name }}]
+on:
+  workflow_call:
+    inputs:
+      I18N_DIR_PATH:
+        required: true
+        description: "Path to the directory containing the i18n files. Leave out leading slashes e.g., 'src/lib/i18n/'"
+        type: string
+      LOKALISE_PROJECT_ID:
+        required: true
+        description: "Auto-generated Lokalise Project ID"
+        type: string
+      I18N_FILE_FORMAT:
+        required: false
+        type: string
+        description: "File format for the translations, default is 'json'"
+        default: "json"
+      RUN_AUTOMATIONS:
+        required: false
+        type: boolean
+        description: |
+          "Run automation jobs after the upload, default is false"
+          "Automation jobs must be set up first in Lokalise dashboard"
+        default: false
+    secrets:
+      LOKALISE_API_TOKEN:
+        required: true
+        description: "Lokalise API token for authentication"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push dir of files up to Lokalise
+        env:
+          ENV_I18N_DIR_PATH: ${{ inputs.I18N_DIR_PATH }}
+          ENV_I18N_FILE_FORMAT: ${{ inputs.I18N_FILE_FORMAT }}
+          ENV_LOKALISE_PROJECT_ID: ${{ inputs.LOKALISE_PROJECT_ID }}
+          ENV_LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
+        run: |
+          if [ ! -d "$ENV_I18N_DIR_PATH" ]; then
+            echo "Error ❌: Directory $ENV_I18N_DIR_PATH does not exist"
+            exit 2
+          fi
+
+          find "$ENV_I18N_DIR_PATH" -type f -name "*.$ENV_I18N_FILE_FORMAT" | while read -r file; do
+            LANG_ISO=$(basename "$file" ".$ENV_I18N_FILE_FORMAT")
+            BASE_64_CONTENT="$(base64 -w 0 "$file")"
+
+            echo "Uploading $file (lang: $LANG_ISO) to Lokalise..."
+
+            RESPONSE=$(curl -v "https://api.lokalise.com/api2/projects/$ENV_LOKALISE_PROJECT_ID/files/upload" \
+              --header "x-api-token: $ENV_LOKALISE_API_TOKEN" \
+              --header "accept: application/json" \
+              --header "content-type: application/json" \
+              --data "{
+                \"format\": \"json\",
+                \"replace_modified\": true,
+                \"tag_inserted_keys\": true,
+                \"tag_updated_keys\": true,
+                \"tags\": [\"cli-upload\"],
+                \"detect_icu_plurals\": false,
+                \"convert_placeholders\": true,
+                \"cleanup_mode\": true,
+                \"slashn_to_linebreak\": true,
+                \"lang_iso\": \"$LANG_ISO\",
+                \"filename\": \"$file\",
+                \"data\": \"$BASE_64_CONTENT\"
+              }")
+
+            RESP_STATUS=$(echo "$RESPONSE" | jq -r '.error.code')
+            RESP_MSG=$(echo "$RESPONSE" | jq -r '.error.message')
+
+            if [ "$RESP_STATUS" -ne 200 ]; then
+              echo "Request failed with status: $RESP_STATUS"
+              echo "Error Message: $RESP_MSG"
+              exit 2
+            fi
+          done
