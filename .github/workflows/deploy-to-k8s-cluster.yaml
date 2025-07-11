@@ -127,10 +127,46 @@ jobs:
           # Extract the first Component's metadata.name and spec.owner from catalog-info.yaml
           PROJECT_NAME=$(yq eval 'select(.kind == "Component") | .metadata.name' catalog-info.yaml | head -1)
           TEAM_OWNER=$(yq eval 'select(.kind == "Component") | .spec.owner' catalog-info.yaml | head -1)
+          
+          # Debug: Show what we extracted
+          echo "Raw PROJECT_NAME: '$PROJECT_NAME'"
+          echo "Raw TEAM_OWNER: '$TEAM_OWNER'"
+          
+          # Check if values are empty and provide defaults
+          if [ -z "$PROJECT_NAME" ] || [ "$PROJECT_NAME" = "null" ]; then
+            echo "Warning: PROJECT_NAME is empty or null"
+            PROJECT_NAME="unknown"
+          fi
+          
+          if [ -z "$TEAM_OWNER" ] || [ "$TEAM_OWNER" = "null" ]; then
+            echo "Warning: TEAM_OWNER is empty or null"
+            TEAM_OWNER="unknown"
+          fi
+          
+          # Fetch hive information from Backstage API
+          echo "Fetching hive information for team: $TEAM_OWNER"
+          HIVE_VALUE="unknown"  # Default value
+          
+          if [ "$TEAM_OWNER" != "unknown" ]; then
+            # Make API call to Backstage to get the team's hive
+            API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.BACKSTAGE_CATALOG_KEY }}" \
+              "https://backstage.svc.urbansportsclub.tech/api/catalog/entities/by-name/group/default/$TEAM_OWNER" || echo "")
+            
+            if [ -n "$API_RESPONSE" ]; then
+              # Extract the hive value from the API response using grep and sed
+              HIVE_VALUE=$(echo "$API_RESPONSE" | grep -o '"urbansportsclub/hive"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"urbansportsclub\/hive"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' || echo "unknown")
+              echo "API Response received for team $TEAM_OWNER"
+            else
+              echo "Warning: Failed to fetch team information from Backstage API for team: $TEAM_OWNER"
+            fi
+          fi
+          
           echo "project-name=$PROJECT_NAME" >> $GITHUB_OUTPUT
           echo "team-owner=$TEAM_OWNER" >> $GITHUB_OUTPUT
-          echo "Extracted project name: $PROJECT_NAME"
-          echo "Extracted team owner: $TEAM_OWNER"
+          echo "hive-value=$HIVE_VALUE" >> $GITHUB_OUTPUT
+          echo "Final extracted project name: $PROJECT_NAME"
+          echo "Final extracted team owner: $TEAM_OWNER"
+          echo "Final extracted hive value: $HIVE_VALUE"
 
       # Build dependency for helm-library
       - name: Helm dependency build
@@ -143,10 +179,20 @@ jobs:
       - name: Deploy
         if: inputs.sops == true
         run: |-
-          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }} --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} ${{ inputs.helm_args }}
+          # Debug: Show the values being passed to Helm
+          echo "Deploying with owner.project=${{ steps.catalog-info.outputs.project-name }}"
+          echo "Deploying with owner.team=${{ steps.catalog-info.outputs.team-owner }}"
+          echo "Deploying with owner.hive=${{ steps.catalog-info.outputs.hive-value }}"
+          
+          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }} --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} --set owner.hive=${{ steps.catalog-info.outputs.hive-value }} ${{ inputs.helm_args }}
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
         if: inputs.sops == false
         run: |-
-          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }} --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} ${{ inputs.helm_args }}
+          # Debug: Show the values being passed to Helm
+          echo "Deploying with owner.project=${{ steps.catalog-info.outputs.project-name }}"
+          echo "Deploying with owner.team=${{ steps.catalog-info.outputs.team-owner }}"
+          echo "Deploying with owner.hive=${{ steps.catalog-info.outputs.hive-value }}"
+          
+          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }} --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} --set owner.hive=${{ steps.catalog-info.outputs.hive-value }} ${{ inputs.helm_args }}
