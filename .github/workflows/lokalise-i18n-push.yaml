@@ -20,8 +20,8 @@ on:
         required: false
         type: boolean
         description: |
-          Run automation jobs after the upload, default is false
-          Automation jobs must be set up first in Lokalise dashboard
+          Run automation jobs after the upload - default is false
+          Automation jobs must first be set up in Lokalise dashboard
         default: false
     secrets:
       LOKALISE_API_TOKEN:
@@ -43,6 +43,7 @@ jobs:
           ENV_I18N_FILE_FORMAT: ${{ inputs.I18N_FILE_FORMAT }}
           ENV_LOKALISE_PROJECT_ID: ${{ inputs.LOKALISE_PROJECT_ID }}
           ENV_LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
+          ENV_RUN_AUTOMATIONS: ${{ inputs.RUN_AUTOMATIONS }}
         run: |
           if [ ! -d "$ENV_I18N_DIR_PATH" ]; then
             echo "Error ❌: Directory $ENV_I18N_DIR_PATH does not exist"
@@ -72,6 +73,7 @@ jobs:
                 \"lang_iso\": \"$LANG_ISO\",
                 \"filename\": \"$file\",
                 \"data\": \"$BASE_64_CONTENT\"
+                \"use_automations\": \"$ENV_RUN_AUTOMATIONS\"
               }")
 
             RESP_STATUS=$(echo "$RESPONSE" | jq -r '.error.code')
