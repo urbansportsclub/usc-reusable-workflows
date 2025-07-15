@@ -39,6 +39,11 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Download code coverage results
         if: inputs.download_coverage_artifact == true
         uses: actions/download-artifact@v4
