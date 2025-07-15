@@ -39,10 +39,11 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
-      # - name: Set up Node.js
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: '20'
+      - name: Set up Node.js
+        if hashFiles('.nvmrc') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
 
       - name: Download code coverage results
         if: inputs.download_coverage_artifact == true
