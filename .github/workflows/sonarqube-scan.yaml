@@ -39,6 +39,13 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
+      # Set up Node.js to ensure SonarQube can properly analyze JavaScript/TypeScript projects
+      - name: Set up Node.js
+        if: ${{ hashFiles('package.json') != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Download code coverage results
         if: inputs.download_coverage_artifact == true
         uses: actions/download-artifact@v4
