@@ -126,13 +126,7 @@ jobs:
         uses: urbansportsclub/backstage-catalog-action@main
         with:
           backstage-token: ${{ secrets.BACKSTAGE_CATALOG_KEY }}
-        # continue-on-error: true
-
-      - name: Test print outputs
-        run: |
-          echo "Project Name: ${{ steps.catalog-info.outputs.project-name }}"
-          echo "Team Owner: ${{ steps.catalog-info.outputs.team-owner }}"
-          echo "Hive Value: ${{ steps.catalog-info.outputs.hive-value }}"
+        continue-on-error: true
 
       # Build dependency for helm-library
       - name: Helm dependency build
