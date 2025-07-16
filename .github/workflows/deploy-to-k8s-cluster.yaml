@@ -139,20 +139,10 @@ jobs:
       - name: Deploy
         if: inputs.sops == true
         run: |-
-          # Debug: Show the values being passed to Helm
-          echo "Deploying with owner.project=${{ steps.catalog-info.outputs.project-name }}"
-          echo "Deploying with owner.team=${{ steps.catalog-info.outputs.team-owner }}"
-          echo "Deploying with owner.hive=${{ steps.catalog-info.outputs.hive-value }}"
-          
           helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }} --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} --set owner.hive=${{ steps.catalog-info.outputs.hive-value }} ${{ inputs.helm_args }}
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
         if: inputs.sops == false
-        run: |-
-          # Debug: Show the values being passed to Helm
-          echo "Deploying with owner.project=${{ steps.catalog-info.outputs.project-name }}"
-          echo "Deploying with owner.team=${{ steps.catalog-info.outputs.team-owner }}"
-          echo "Deploying with owner.hive=${{ steps.catalog-info.outputs.hive-value }}"
-          
+        run: |-         
           helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }} --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} --set owner.hive=${{ steps.catalog-info.outputs.hive-value }} ${{ inputs.helm_args }}
