@@ -1,0 +1,96 @@
+---
+name: Publish Package
+
+on:
+  workflow_call:
+    secrets:
+      NODE_AUTH_TOKEN:
+        required: false
+    inputs:
+      workspace:
+        description: "Name of the workspace to publish"
+        required: false
+        type: string
+      working-directory:
+        description: "Path to the project"
+        required: false
+        default: '.'
+        type: string
+
+jobs:
+  build:
+    runs-on: [self-hosted, dind]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect package manager
+        id: detect_pkg_mgr
+        uses: urbansportsclub/usc-reusable-workflows/.github/actions/detect-package-manager@gt_JsPackageManager
+        with:
+          working-directory: ${{ inputs.working-directory }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@urbansportsclub"
+          always-auth: true
+          # Used to authenticate and publish private npm packages to our private registry in Github
+          token: ${{ secrets.NODE_AUTH_TOKEN }}
+        env:
+          # To ensure that the token is available for npm publish
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          if [ "${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}" = "yarn2" ]; then
+            corepack prepare yarn@4.2.2 --activate
+          elif [ "${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}" = "pnpm" ]; then
+            corepack prepare pnpm@10.11.0 --activate
+          fi
+
+      - name: Install dependencies
+        run: |
+          case "${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}" in
+            yarn1|yarn2)
+              yarn install
+              ;;
+            pnpm)
+              pnpm install
+              ;;
+            npm|*)
+              npm install
+              ;;
+          esac
+
+      - name: Build package
+        run: |
+          CMD=${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}
+          case "$CMD" in
+            pnpm)
+              pnpm run build
+              ;;
+            yarn1|yarn2)
+              yarn run build
+              ;;
+            npm)
+              npm run build
+              ;;
+            *)
+            $CMD run build
+            ;;
+          esac
+
+      - name: Publish package
+        run: |
+          PM=${{ steps.detect_pkg_mgr.outputs.node_cmd_mode }}
+          if [ "$PM" = "yarn1" ]; then echo "Using Yarn v1 publish"
+            yarn publish
+          elif [ "$PM" = "yarn2" ]; then echo "Using Yarn v2+ publish"
+            yarn workspace ${{ inputs.workspace }} npm publish
+          elif [ "$PM" = "pnpm" ]; then echo "Using pnpm publish"
+            pnpm --filter "${{ inputs.workspace }}" publish --no-git-checks
+          elif [ -n "${{ inputs.workspace }}" ]; then echo "Using npm publish"
+            npm publish
+          fi
