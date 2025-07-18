@@ -120,13 +120,13 @@ jobs:
             helm repo add ${ARGS[@]}
           done
 
-      # Extract project name and team from catalog-info.yaml
-      - name: Extract project info from catalog
-        id: catalog-info
-        uses: urbansportsclub/backstage-catalog-action@main
-        with:
-          backstage-token: ${{ secrets.BACKSTAGE_CATALOG_KEY }}
-        continue-on-error: true
+      # Extract project name and team from catalog-info.yaml TODO enable again when we validate the owner fields
+#      - name: Extract project info from catalog
+#        id: catalog-info
+#        uses: urbansportsclub/backstage-catalog-action@main
+#        with:
+#          backstage-token: ${{ secrets.BACKSTAGE_CATALOG_KEY }}
+#        continue-on-error: true
 
       # Build dependency for helm-library
       - name: Helm dependency build
@@ -139,10 +139,12 @@ jobs:
       - name: Deploy
         if: inputs.sops == true
         run: |-
-          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }} --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} --set owner.hive=${{ steps.catalog-info.outputs.hive-value }} ${{ inputs.helm_args }}
+          helm secrets upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml -f ${{ inputs.chart_path }}/secrets.${{ inputs.stage }}.yaml --set image.tag=${{ inputs.image_version }}
+#         TODO enable again when we validate the owner fields --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} --set owner.hive=${{ steps.catalog-info.outputs.hive-value }} ${{ inputs.helm_args }}
 
       # Deploy to the GKE cluster - without sops
       - name: Deploy
         if: inputs.sops == false
         run: |-         
-          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }} --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} --set owner.hive=${{ steps.catalog-info.outputs.hive-value }} ${{ inputs.helm_args }}
+          helm upgrade --install ${{ inputs.chart_name }} ${{ inputs.chart_path }} -n ${{ inputs.namespace }} --create-namespace -f ${{ inputs.chart_path }}/values.yaml -f ${{ inputs.chart_path }}/values.${{ env.VALUES_STAGE }}.yaml --set image.tag=${{ inputs.image_version }}
+#         TODO enable again when we validate the owner fields --set owner.project=${{ steps.catalog-info.outputs.project-name }} --set owner.team=${{ steps.catalog-info.outputs.team-owner }} --set owner.hive=${{ steps.catalog-info.outputs.hive-value }} ${{ inputs.helm_args }}
