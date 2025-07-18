@@ -120,7 +120,7 @@ jobs:
             helm repo add ${ARGS[@]}
           done
 
-      # Extract project name and team from catalog-info.yaml TODO enable again when we validate the owner fields
+      # Extract project name and team from catalog-info.yaml: TODO enable again when we validate the owner fields
 #      - name: Extract project info from catalog
 #        id: catalog-info
 #        uses: urbansportsclub/backstage-catalog-action@main
