@@ -123,7 +123,7 @@ jobs:
       # Extract project name and team from catalog-info.yaml
       - name: Extract project info from catalog
         id: catalog-info
-        uses: urbansportsclub/backstage-catalog-action@main
+        uses: urbansportsclub/backstage-catalog-action@jz_improveTeamExtraction
         with:
           backstage-token: ${{ secrets.BACKSTAGE_CATALOG_KEY }}
         continue-on-error: true
