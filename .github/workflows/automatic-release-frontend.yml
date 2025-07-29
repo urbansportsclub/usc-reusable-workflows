@@ -3,8 +3,8 @@ name: Create Tag and GitHub release for frontend projects
 on:
   workflow_call:
     inputs:
-      changelog: 
-        description: 'Whether to automatically generate release notes from commits and PRs. Set to false to create release without notes.'
+      changelog:
+        description: "Whether to automatically generate release notes from commits and PRs. Set to false to create release without notes."
         required: false
         type: boolean
         default: true
@@ -17,6 +17,11 @@ on:
         description: 'Tag prefix. Defaults to "v" for v1.0.0 tags. Example: "components" for components/1.0.0 tags.'
         required: false
         type: string
+      tag_suffix:
+        description: 'Tag suffix. Defaults to empty. Example: "beta" for v1.0.0-beta tags.'
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -63,6 +68,8 @@ jobs:
             TAG_NAME="v${{ steps.package-version.outputs.current-version }}"
           else
             TAG_NAME="${{ inputs.tag_prefix }}/${{ steps.package-version.outputs.current-version }}"
+          if [[ -n "${{ inputs.tag_suffix }}" ]]; then
+            TAG_NAME="$TAG_NAME-${{ inputs.tag_suffix }}"
           fi
           echo "tag-name=$TAG_NAME" >> $GITHUB_OUTPUT
           echo "Using tag format: $TAG_NAME"
