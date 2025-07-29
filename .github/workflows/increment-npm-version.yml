@@ -12,8 +12,8 @@ on:
         required: false
         default: "."
         type: string
-      label:
-        description: "Additional label to add to the PR"
+      labels:
+        description: "Additional labels to add to the PR"
         required: false
         type: string
 
