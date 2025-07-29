@@ -99,4 +99,4 @@ jobs:
           if [ -n "${{ inputs.label }}" ]; then
             LABELS="$LABELS,${{ inputs.label }}"
           fi
-          gh pr create -B main -H ${{ env.BRANCH_TO_PUSH }} --title 'Release: ${{ env.RELEASE_TAG }}' --body 'Release: ${{ env.RELEASE_TAG }}'"
+          gh pr create -B main -H ${{ env.BRANCH_TO_PUSH }} --title 'Release: ${{ env.RELEASE_TAG }}' --body 'Release: ${{ env.RELEASE_TAG }}'
