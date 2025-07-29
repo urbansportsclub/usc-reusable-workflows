@@ -4,17 +4,13 @@ on:
   workflow_call:
     inputs:
       release_type:
-        description: "Release type. Possible values: major, minor, patch"
+        description: "Release type. Possible values: major, minor, patch, prerelease"
         required: true
         type: string
       package_path:
         description: "Path to the directory where package.json file is located"
         required: false
         default: "."
-        type: string
-      labels:
-        description: "Additional labels to add to the PR"
-        required: false
         type: string
 
 permissions:
@@ -27,8 +23,8 @@ jobs:
     steps:
       - name: Check input
         run: |
-          if [[ "${{ inputs.release_type }}" != "major" && "${{ inputs.release_type }}" != "minor" && "${{ inputs.release_type }}" != "patch" ]]; then
-            echo "::error::Invalid release type. Possible values are: major, minor, patch."
+          if [[ "${{ inputs.release_type }}" != "major" && "${{ inputs.release_type }}" != "minor" && "${{ inputs.release_type }}" != "patch" && "${{ inputs.release_type }}" != "prerelease" ]]; then
+            echo "::error::Invalid release type. Possible values are: major, minor, patch, prerelease."
             exit 1
           fi
 
@@ -52,7 +48,10 @@ jobs:
         run: |
           RELEASE_TYPE=${{ inputs.release_type }}
           echo "Bumping version with type: $RELEASE_TYPE"
-          npm version $RELEASE_TYPE --no-git-tag-version --prefix ${{ inputs.package_path }}
+          if [[ "$RELEASE_TYPE" == "prerelease" ]]; then
+            npm version prerelease --preid=alpha --no-git-tag-version --prefix ${{ inputs.package_path }}
+          else
+            npm version $RELEASE_TYPE --no-git-tag-version --prefix ${{ inputs.package_path }}
 
       - name: get-npm-version
         id: package-version
@@ -99,4 +98,4 @@ jobs:
           if [ -n "${{ inputs.label }}" ]; then
             LABELS="$LABELS,${{ inputs.label }}"
           fi
-          gh pr create -B main -H ${{ env.BRANCH_TO_PUSH }} --title 'Release: ${{ env.RELEASE_TAG }}' --body 'Release: ${{ env.RELEASE_TAG }}' --label "$LABELS"
+          gh pr create -B main -H ${{ env.BRANCH_TO_PUSH }} --title 'Release: ${{ env.RELEASE_TAG }}' --body 'Release: ${{ env.RELEASE_TAG }}'"
