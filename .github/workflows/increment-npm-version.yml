@@ -52,6 +52,7 @@ jobs:
             npm version prerelease --preid=alpha --no-git-tag-version --prefix ${{ inputs.package_path }}
           else
             npm version $RELEASE_TYPE --no-git-tag-version --prefix ${{ inputs.package_path }}
+          fi
 
       - name: get-npm-version
         id: package-version
